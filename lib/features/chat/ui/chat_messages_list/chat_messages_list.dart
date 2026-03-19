@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/features/chat/chat_messages_list_controller.dart';
-import 'package:lingu/features/chat/message/message.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
+import 'package:lingu/features/chat/logic/message/message.dart';
 import 'package:lingu/features/chat/ui/message_bubble.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -17,7 +17,7 @@ class ChatMessagesList extends StatelessWidget {
 
         Widget content = switch (message) {
           TextMessage textMessage => Text(textMessage.text),
-          AudioMessage audioMessage => Icon(Icons.audiotrack), // Placeholder for audio content
+          AudioMessage audioMessage => Icon(Icons.audiotrack), 
         };
 
         return Align(

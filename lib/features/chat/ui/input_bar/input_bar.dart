@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/features/chat/input_bar/input_bar_controller.dart';
+import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
 import 'package:signals/signals_flutter.dart' show FlutterReadonlySignalUtils;
 
 class InputBar extends StatefulWidget {
@@ -12,6 +12,23 @@ class InputBar extends StatefulWidget {
 
 class _InputBarState extends State<InputBar> {
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      widget.controller.setFocused(_focusNode.hasFocus);
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -19,6 +36,7 @@ class _InputBarState extends State<InputBar> {
         Expanded(
           child: TextField(
             controller: _textController,
+            focusNode: _focusNode,
             decoration: const InputDecoration(
               hintText: 'Type a message',
             ),

@@ -1,0 +1,3 @@
+class BottomPanelController {
+  Function()? onClose;
+}

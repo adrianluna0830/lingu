@@ -2,32 +2,21 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/di/injection.dart';
-import 'package:lingu/features/chat/chat_messages_list.dart/chat_messages_list.dart';
-import 'package:lingu/features/chat/chat_messages_list_controller.dart';
-import 'package:lingu/features/chat/input_bar/input_bar.dart';
-import 'package:lingu/features/chat/input_bar/input_bar_controller.dart';
-import 'package:lingu/features/chat/message/message.dart';
-import 'package:signals/signals.dart';
+import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list.dart';
+import 'package:lingu/features/chat/logic/message/audio_message_input.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
+import 'package:lingu/features/chat/ui/input_bar/input_bar.dart';
+import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
+import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart';
+import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
+import 'package:lingu/features/chat/logic/panel/panel_type.dart';
+import 'package:lingu/features/chat/ui/record/record_controller.dart';
+import 'package:lingu/features/chat/ui/record/record_display.dart';
+import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
+import 'package:lingu/features/text_message_input.dart';
+import 'package:signals/signals_flutter.dart';
 
-@singleton
-class ChatMessagesManager
-{
-  final _messages = listSignal<Message>([]);
-  ReadonlySignal<List<Message>> get messages => _messages;
-  
-
-  int _messageIdCounter = 0;
-
-  void addTextMessage({required String text, required bool isUser})
-  {
-    _messages.add(TextMessage(text: text, isUser: isUser, id: _messageIdCounter++));
-  }
-
-  void addAudioMessage({required String audioUrl, required bool isUser})
-  {
-    _messages.add(AudioMessage(audioUrl: audioUrl, isUser: isUser, id: _messageIdCounter++));
-  }
-}
 @RoutePage()
 class ChatView extends StatefulWidget {
   const ChatView({super.key});
@@ -38,8 +27,14 @@ class ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<ChatView> {
   final InputBarController _inputBarController = InputBarController();
-  final ChatMessagesListController controller = ChatMessagesListController();
+  final ChatMessagesListController _controller = ChatMessagesListController();
+  final RecordController _recordController = RecordController();
   final ChatMessagesManager _messagesManager = di<ChatMessagesManager>();
+  final PanelManager _panelManager = di<PanelManager>();
+  final AudioMessageInput _audioMessageInput = di<AudioMessageInput>();
+  final TextMessageInput _textMessageInput = di<TextMessageInput>();
+  
+  final BottomPanelController _bottomPanelController = BottomPanelController();
   @override
   void initState() {
     super.initState();
@@ -47,10 +42,53 @@ class _ChatViewState extends State<ChatView> {
       _messagesManager.addTextMessage(text: text, isUser: true);
     };
 
+    _inputBarController.onStartRecording = () {
+      _panelManager.openMicPanel();
+    };
+
+    _inputBarController.onChat = () {
+      _panelManager.openChatPanel();
+    };
+
     effect(() {
-      controller.setMessages(_messagesManager.messages.value.toList());
+      _inputBarController.isFocused;
+      if (_inputBarController.isFocused.value) {
+        _textMessageInput.gainFocus();
+      }
     });
 
+    effect(() {
+      _controller.setMessages(_messagesManager.messages.value.toList());
+    });
+
+    _audioMessageInput.amplitudeStream.listen((amplitude) {
+      _recordController.updateAmplitude(amplitude);
+    });
+
+    _recordController.onStart = () {
+      _audioMessageInput.startRecording();
+    };
+
+    _recordController.onStop = () {
+      _audioMessageInput.stopRecording();
+    };
+    
+
+    _recordController.onCancel = () {
+      _audioMessageInput.cancelRecording();
+    };
+
+    _bottomPanelController.onClose = () {
+      _panelManager.closePanel();
+    };
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _recordController.dispose();
+    _audioMessageInput.dispose();
   }
 
   @override
@@ -61,8 +99,15 @@ class _ChatViewState extends State<ChatView> {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(child: ChatMessagesList(controller: controller)),
-          InputBar(_inputBarController),
+          Expanded(child: ChatMessagesList(controller: _controller)),
+          if (_panelManager.currentPanel.watch(context) == PanelType.mic)
+            Expanded(child: RecordDisplay(controller: _recordController)),
+          if (_panelManager.currentPanel.watch(context) == PanelType.messageDetails)
+            BottomPanel(controller: _bottomPanelController),
+          if (_panelManager.currentPanel.watch(context) == PanelType.chat)
+            BottomPanel(controller: _bottomPanelController),
+          if (_panelManager.currentPanel.watch(context) != PanelType.mic)
+            InputBar(_inputBarController),
         ],
       ),
     );

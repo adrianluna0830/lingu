@@ -5,11 +5,17 @@ class InputBarController
   Function(String)? onTextSubmit;
   Function()? onStartRecording;
   Function()? onChat;
+  
+  final _isFocusedSignal = signal(false);
+  ReadonlySignal get isFocused => _isFocusedSignal;
+
 
   final _textSignal = signal("");
   String get text => _textSignal.value;
 
   late final showTextIcon = computed(() => text.isNotEmpty);
+
+  void setFocused(bool focused) => _isFocusedSignal.value = focused;
 
   void updateText(String newText) => _textSignal.value = newText;
   

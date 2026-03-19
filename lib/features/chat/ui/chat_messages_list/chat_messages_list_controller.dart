@@ -1,4 +1,4 @@
-import 'package:lingu/features/chat/message/message.dart';
+import 'package:lingu/features/chat/logic/message/message.dart';
 import 'package:signals/signals.dart';
 
 class ChatMessagesListController
