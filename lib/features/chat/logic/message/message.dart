@@ -15,5 +15,8 @@ class TextMessage extends Message
 class AudioMessage extends Message
 {
   final String audioUrl;
-  AudioMessage({required this.audioUrl, required super.isUser, required super.id});
+  final Duration duration;
+
+  AudioMessage({required super.isUser, required super.id, required this.audioUrl, required this.duration});
+
 }

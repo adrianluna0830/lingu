@@ -16,8 +16,8 @@ class ChatMessagesManager
     _messages.add(TextMessage(text: text, isUser: isUser, id: _messageIdCounter++));
   }
 
-  void addAudioMessage({required String audioUrl, required bool isUser})
+  void addAudioMessage({required String audioUrl, required bool isUser, required Duration duration})
   {
-    _messages.add(AudioMessage(audioUrl: audioUrl, isUser: isUser, id: _messageIdCounter++));
+    _messages.add(AudioMessage(audioUrl: audioUrl, isUser: isUser, id: _messageIdCounter++, duration: duration));
   }
 }

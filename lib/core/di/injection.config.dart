@@ -39,11 +39,15 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i65.IAudioPlayerManager>(
       () => _i198.JustAudioPlayerManager(),
     );
-    gh.singleton<_i344.AudioMessageInput>(
-      () => _i344.AudioMessageInput(gh<_i149.ChatMessagesManager>()),
-    );
     gh.singleton<_i239.TextMessageInput>(
       () => _i239.TextMessageInput(gh<_i149.ChatMessagesManager>()),
+    );
+    gh.singleton<_i344.AudioMessageInput>(
+      () => _i344.AudioMessageInput(
+        gh<_i149.ChatMessagesManager>(),
+        gh<_i709.IAudioRecorder>(),
+        gh<_i65.IAudioPlayerManager>(),
+      ),
     );
     gh.singleton<_i15.PanelHandler>(
       () => _i15.PanelHandler(

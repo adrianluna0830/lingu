@@ -3,76 +3,69 @@ import 'package:injectable/injectable.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:signals/signals.dart';
+
 @Singleton(as: IAudioPlayerManager)
 class JustAudioPlayerManager extends IAudioPlayerManager {
   final ja.AudioPlayer _player = ja.AudioPlayer();
 
   final Signal<String?> _currentSource = signal(null);
   final Signal<AudioPlaybackState> _playbackState = signal(AudioPlaybackState.stopped);
-  final Signal<Duration> _position = signal(Duration.zero);
   final Signal<Duration> _duration = signal(Duration.zero);
 
-  final StreamController<void> _onCompletionController =
-      StreamController<void>.broadcast();
+  bool _completed = false;
+
+  final StreamController<Duration> _positionController =
+      StreamController<Duration>.broadcast();
+
+  final StreamController<String> _onCompletionController =
+      StreamController<String>.broadcast();
 
   late final StreamSubscription _playerStateSubscription;
   late final StreamSubscription _positionSubscription;
   late final StreamSubscription _durationSubscription;
 
+  late final _playbackStateContainer =
+      readonlySignalContainer<AudioPlaybackState, String>(
+    (source) => computed(() => _currentSource.value == source
+        ? _playbackState.value
+        : AudioPlaybackState.stopped),
+    cache: true,
+  );
+
   JustAudioPlayerManager() {
-    _playerStateSubscription = _player.playerStateStream.listen((state) {
-      if (state.processingState == ja.ProcessingState.completed) {
-        _playbackState.value = AudioPlaybackState.stopped;
-        _currentSource.value = null;
-        _position.value = Duration.zero;
-        _onCompletionController.add(null);
-        return;
-      }
-      if (state.playing) {
-        _playbackState.value = AudioPlaybackState.playing;
-      } else {
-        _playbackState.value =
-            state.processingState == ja.ProcessingState.idle
-                ? AudioPlaybackState.stopped
-                : AudioPlaybackState.paused;
-      }
-    });
-
+    _playerStateSubscription = _player.playerStateStream.listen(_onPlayerState);
     _positionSubscription = _player.positionStream.listen((pos) {
-      _position.value = pos;
+      _positionController.add(pos);
     });
-
-    _durationSubscription = _player.durationStream.listen((dur) {
-      _duration.value = dur ?? Duration.zero;
-    });
+    _durationSubscription = _player.durationStream.listen(
+      (dur) => _duration.value = dur ?? Duration.zero,
+    );
   }
 
-  @override
-  ReadonlySignal<String?> get currentSource => _currentSource;
-
-  @override
-  ReadonlySignal<AudioPlaybackState> get playbackState => _playbackState;
-
-  @override
-  ReadonlySignal<Duration> get position => _position;
-
-  @override
-  ReadonlySignal<Duration> get duration => _duration;
-
-  @override
-  Stream<void> get onCompletion => _onCompletionController.stream;
-
-  @override
-  Future<void> playOrResume(String source) async {
-    if (_currentSource.value == source &&
-        _playbackState.value == AudioPlaybackState.paused) {
-      await _player.play();
+  void _onPlayerState(ja.PlayerState state) {
+    if (state.processingState == ja.ProcessingState.completed) {
+      if (_completed) {
+        return;
+      }
+      _completed = true;
+      _playbackState.value = AudioPlaybackState.stopped;
+      _positionController.add(Duration.zero);
+      final source = _currentSource.value;
+      if (source != null) _onCompletionController.add(source);
       return;
     }
 
-    _currentSource.value = source;
-    await _player.setUrl(source);
-    await _player.play();
+    if (_completed) {
+      return;
+    }
+
+    final newState = state.playing
+        ? AudioPlaybackState.playing
+        : state.processingState == ja.ProcessingState.idle
+            ? AudioPlaybackState.stopped
+            : AudioPlaybackState.paused;
+
+    _playbackState.value = newState;
   }
 
   @override
@@ -84,31 +77,36 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
     if (_currentSource.value != source) {
       _currentSource.value = source;
       await _player.setUrl(source);
+    } else if (_completed) {
+      await _player.pause();
+      await _player.setUrl(source);
     }
 
+    _completed = false;
     await _player.seek(start);
 
     if (autoPlay) {
+      _playbackState.value = AudioPlaybackState.playing;
       await _player.play();
     }
   }
 
   @override
-  Future<void> pause() async {
-    await _player.pause();
+  Future<void> pause(String source) async {
+    if (_currentSource.value == source) {
+      await _player.pause();
+    }
   }
 
   @override
-  Future<void> stop() async {
+  Future<void> stop(String source) async {
+    if (_currentSource.value != source) {
+      return;
+    }
     await _player.stop();
     _currentSource.value = null;
-    _position.value = Duration.zero;
+    _positionController.add(Duration.zero);
     _playbackState.value = AudioPlaybackState.stopped;
-  }
-
-  @override
-  Future<void> seek(Duration position) async {
-    await _player.seek(position);
   }
 
   @override
@@ -116,14 +114,39 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
     if (_currentSource.value == source && _duration.value != Duration.zero) {
       return _duration.value;
     }
+    return _fetchDuration(source);
+  }
 
+  Future<Duration> _fetchDuration(String source) async {
     final tempPlayer = ja.AudioPlayer();
     try {
-      final duration = await tempPlayer.setUrl(source);
-      return duration ?? Duration.zero;
+      return await tempPlayer.setUrl(source) ?? Duration.zero;
     } finally {
       await tempPlayer.dispose();
     }
+  }
+
+  @override
+  ReadonlySignal<bool> getIsActiveSignal(String source) {
+    return computed(() => getPlaybackStateSignal(source).value != AudioPlaybackState.stopped);
+  }
+
+  @override
+  ReadonlySignal<AudioPlaybackState> getPlaybackStateSignal(String source) {
+    return _playbackStateContainer(source);
+  }
+
+  @override
+  Stream<String> getOnCompletion(String source) {
+    return _onCompletionController.stream.where((s) => s == source);
+  }
+
+  @override
+  Stream<Duration> getPositionStream(String source) {
+    return _positionController.stream.where((pos) {
+      return _currentSource.value == source &&
+          _playbackState.value == AudioPlaybackState.playing;
+    });
   }
 
   @override
@@ -131,7 +154,9 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
     await _playerStateSubscription.cancel();
     await _positionSubscription.cancel();
     await _durationSubscription.cancel();
+    await _positionController.close();
     await _onCompletionController.close();
+    _playbackStateContainer.dispose();
     await _player.dispose();
   }
 }
