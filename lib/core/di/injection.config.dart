@@ -17,6 +17,7 @@ import 'package:lingu/core/audio/playback/just_audio_player_manager.dart'
 import 'package:lingu/core/audio/record/audio_recorder.dart' as _i109;
 import 'package:lingu/core/audio/record/i_audio_recorder.dart' as _i709;
 import 'package:lingu/core/router/app_router.dart' as _i1036;
+import 'package:lingu/features/chat/chat_view.dart' as _i761;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -26,6 +27,7 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.singleton<_i1036.AppRouter>(() => _i1036.AppRouter());
+    gh.singleton<_i761.ChatMessagesManager>(() => _i761.ChatMessagesManager());
     gh.singleton<_i709.IAudioRecorder>(() => _i109.AudioRecorder());
     gh.singleton<_i65.IAudioPlayerManager>(
       () => _i198.JustAudioPlayerManager(),
