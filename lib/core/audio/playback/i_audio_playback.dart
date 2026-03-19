@@ -8,6 +8,7 @@ enum AudioPlaybackState {
   stopped,
 }
 
+
 abstract class IAudioPlayerManager {
   ReadonlySignal<String?> get currentSource;
   ReadonlySignal<AudioPlaybackState> get playbackState;

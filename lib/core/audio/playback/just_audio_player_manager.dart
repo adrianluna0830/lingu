@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'package:injectable/injectable.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:signals/signals.dart';
-
+@Singleton(as: IAudioPlayerManager)
 class JustAudioPlayerManager extends IAudioPlayerManager {
   final ja.AudioPlayer _player = ja.AudioPlayer();
 

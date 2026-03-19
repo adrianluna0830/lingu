@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:injectable/injectable.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart' as rec;
 import 'package:signals/signals.dart';
-
+@Singleton(as: IAudioRecorder)
 class AudioRecorder extends IAudioRecorder {
   final rec.AudioRecorder _recorder = rec.AudioRecorder();
   final StreamController<Amplitude> _amplitudeController =
