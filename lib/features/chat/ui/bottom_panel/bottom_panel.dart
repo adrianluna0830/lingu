@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
-import 'package:lingu/features/chat/chat_view.dart';
 
 class BottomPanel extends StatelessWidget {
   final BottomPanelController controller;

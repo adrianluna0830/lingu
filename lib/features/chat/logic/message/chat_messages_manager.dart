@@ -1,23 +1,36 @@
 import 'package:injectable/injectable.dart';
-import 'package:lingu/features/chat/logic/message/message.dart';
-import 'package:signals/signals.dart';
+import 'package:lingu/features/chat/logic/message/chat_message.dart';
+import 'package:signals/signals_flutter.dart';
 
 @singleton
 class ChatMessagesManager
 {
-  final _messages = listSignal<Message>([]);
-  ReadonlySignal<List<Message>> get messages => _messages;
-  
 
-  int _messageIdCounter = 0;
+  final _messages = listSignal<ChatMessage>([]);
+  ReadonlySignal<List<ChatMessage>> get messages => _messages;
 
-  void addTextMessage({required String text, required bool isUser})
+  Future<void> addTextMessage({required String text, required bool isUser}) async
   {
-    _messages.add(TextMessage(text: text, isUser: isUser, id: _messageIdCounter++));
+    if(isUser)
+    {
+      _messages.add(UserTextMessage(text: text));
+      
+    }
+    else
+    {
+      _messages.add(AITextMessage(text: text));
+    }
   }
 
-  void addAudioMessage({required String audioUrl, required bool isUser, required Duration duration})
+  Future<void> addAudioMessage({required String audioUrl, required bool isUser, required Duration duration}) async
   {
-    _messages.add(AudioMessage(audioUrl: audioUrl, isUser: isUser, id: _messageIdCounter++, duration: duration));
+    if(isUser)
+    {
+      _messages.add(UserAudioMessage(audioUrl: audioUrl, duration: duration));
+    }
+    else
+    {
+      _messages.add(AIAudioMessage(audioUrl: audioUrl, duration: duration));
+    }
   }
 }

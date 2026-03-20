@@ -21,9 +21,7 @@ import 'package:lingu/features/chat/logic/message/audio_message_input.dart'
     as _i344;
 import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart'
     as _i149;
-import 'package:lingu/features/chat/logic/panel/panel_handler.dart' as _i15;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
-import 'package:lingu/features/text_message_input.dart' as _i239;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -39,21 +37,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i65.IAudioPlayerManager>(
       () => _i198.JustAudioPlayerManager(),
     );
-    gh.singleton<_i239.TextMessageInput>(
-      () => _i239.TextMessageInput(gh<_i149.ChatMessagesManager>()),
-    );
     gh.singleton<_i344.AudioMessageInput>(
       () => _i344.AudioMessageInput(
         gh<_i149.ChatMessagesManager>(),
         gh<_i709.IAudioRecorder>(),
         gh<_i65.IAudioPlayerManager>(),
-      ),
-    );
-    gh.singleton<_i15.PanelHandler>(
-      () => _i15.PanelHandler(
-        gh<_i420.PanelManager>(),
-        gh<_i344.AudioMessageInput>(),
-        gh<_i239.TextMessageInput>(),
       ),
     );
     return this;

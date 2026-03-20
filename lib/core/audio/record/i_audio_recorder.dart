@@ -19,6 +19,7 @@ abstract class IAudioRecorder {
   Stream<Amplitude> get onAmplitudeChanged;
   Future<void> start();
   Future<Uint8List> stop();
+  Future<String> stopAndGetFilePath({String? directory, String? fileName});
   Future<void> pause();
   Future<void> resume();
   Future<void> dispose();

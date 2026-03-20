@@ -23,15 +23,12 @@ class AudioMessageInput {
   Future<void> stopRecording() async {
     notifyStopRecording?.call();
 
-    Uint8List audioData = await _audioRecorder.stop(); 
+    final filepath  = await _audioRecorder.stopAndGetFilePath(); 
 
-    final tempDir = await getTemporaryDirectory();
-    final filePath = '${tempDir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
-    final file = File(filePath);
-    await file.writeAsBytes(audioData);
-    Duration duration = await _audioPlayerManager.getDuration(filePath);
 
-    _messagesManager.addAudioMessage(audioUrl: filePath, isUser: true, duration: duration);
+    Duration duration = await _audioPlayerManager.getDuration(filepath);
+
+    _messagesManager.addAudioMessage(audioUrl: filepath, isUser: true, duration: duration);
 
   }
 

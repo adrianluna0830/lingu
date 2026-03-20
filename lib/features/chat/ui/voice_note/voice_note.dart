@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/features/chat/logic/message/message.dart';
 import 'package:lingu/features/chat/ui/voice_note/voice_note_controller.dart';
 import 'package:signals/signals_flutter.dart';
 
 class VoiceNote extends StatefulWidget {
-  final AudioMessage audioMessage;
-  const VoiceNote({super.key, required this.audioMessage});
+  final String audioUrl;
+  final Duration duration;
+  const VoiceNote({super.key, required this.audioUrl, required this.duration});
 
   @override
   State<VoiceNote> createState() => _VoiceNoteState();
@@ -18,8 +18,8 @@ class _VoiceNoteState extends State<VoiceNote> {
   void initState() {
     super.initState();
     controller.init(
-      widget.audioMessage.audioUrl,
-      widget.audioMessage.duration,
+      widget.audioUrl,
+      widget.duration,
     );
   }
 
@@ -31,7 +31,7 @@ class _VoiceNoteState extends State<VoiceNote> {
 
   @override
   Widget build(BuildContext context) {
-    final maxMs = widget.audioMessage.duration.inMilliseconds.toDouble();
+    final maxMs = widget.duration.inMilliseconds.toDouble();
     final currentMs = controller.currentPosition
         .watch(context)
         .inMilliseconds.clamp(0, maxMs).toDouble();

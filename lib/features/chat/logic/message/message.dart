@@ -1,22 +1,22 @@
-sealed class Message
+sealed class RawMessage
 {
   final bool isUser;
   final int id;
-  Message({required this.isUser, required this.id});
+  RawMessage({required this.isUser, required this.id});
 
 }
 
-class TextMessage extends Message
+class RawTextMessage extends RawMessage
 {
   final String text;
-  TextMessage({required this.text, required super.isUser, required super.id});
+  RawTextMessage({required this.text, required super.isUser, required super.id});
 }
 
-class AudioMessage extends Message
+class RawAudioMessage extends RawMessage
 {
   final String audioUrl;
   final Duration duration;
 
-  AudioMessage({required super.isUser, required super.id, required this.audioUrl, required this.duration});
+  RawAudioMessage({required super.isUser, required super.id, required this.audioUrl, required this.duration});
 
 }
