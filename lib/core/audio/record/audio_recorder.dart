@@ -102,26 +102,5 @@ class AudioRecorder extends IAudioRecorder {
     _isRecording.value = false;
     _recorder.dispose();
   }
-  
-  @override
-  Future<String> stopAndGetFilePath({String? directory, String? fileName}) async {
-    _amplitudeTimer?.cancel();
-    _amplitudeTimer = null;
-    final path = await _recorder.stop();
-    _isRecording.value = false;
-    if (path == null) {
-      throw Exception('Recording stopped but no file was produced');
-    }
-    final targetDir = directory != null
-        ? Directory(directory)
-        : await getTemporaryDirectory();
-    if (!await targetDir.exists()) {
-      await targetDir.create(recursive: true);
-    }
-    final name =
-        fileName ?? 'recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
-    final targetPath = '${targetDir.path}/$name';
-    await File(path).rename(targetPath);
-    return targetPath;
-  }
+
 }
