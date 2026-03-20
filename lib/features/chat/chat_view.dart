@@ -37,7 +37,7 @@ class _ChatViewState extends State<ChatView> {
   void initState() {
     super.initState();
     _inputBarController.onTextSubmit = (text) {
-      _messagesProxy.addTextMessage(text: text, isUser: true);
+      _messagesProxy.addTextMessage(text: text);
     };
 
     _inputBarController.onStartRecording = () {
