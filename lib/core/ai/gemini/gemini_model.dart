@@ -2,6 +2,7 @@ import 'package:googleai_dart/googleai_dart.dart';
 import 'package:lingu/core/ai/core/ai_chat_history.dart';
 import 'package:lingu/core/ai/core/ai_chat_message.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/ai/gemini/gemini_exception_mapper.dart';
 
 enum GeminiModelType {
   gemini25FlashLite('gemini-2.5-flash-lite'),
@@ -20,12 +21,13 @@ class GeminiModel extends IAIModel {
 
   GeminiModel({required GoogleAIClient client, required this.modelType}) : _client = client;
 
-  @override
-  Future<String> generateContent({
-    required String prompt,
-    String? systemInstructions,
-    Map<String, dynamic>? responseSchema,
-  }) async {
+@override
+Future<String> generateContent({
+  required String prompt,
+  String? systemInstructions,
+  Map<String, dynamic>? responseSchema,
+}) async {
+  try {
     final response = await _client.models.generateContent(
       model: modelType.value,
       request: GenerateContentRequest(
@@ -37,15 +39,19 @@ class GeminiModel extends IAIModel {
       ),
     );
     return response.text ?? '';
+  } catch (e) {
+    throw GeminiExceptionMapper.map(e);
   }
+}
 
-  @override
-  Future<AIChatHistory> generateChatContent({
-    required String prompt,
-    AIChatHistory chatHistory = const AIChatHistory(),
-    String? systemInstructions,
-    Map<String, dynamic>? responseSchema,
-  }) async {
+@override
+Future<AIChatHistory> generateChatContent({
+  required String prompt,
+  AIChatHistory chatHistory = const AIChatHistory(),
+  String? systemInstructions,
+  Map<String, dynamic>? responseSchema,
+}) async {
+  try {
     final historyWithUser = chatHistory.addUser(prompt);
     final response = await _client.models.generateContent(
       model: modelType.value,
@@ -57,9 +63,11 @@ class GeminiModel extends IAIModel {
         generationConfig: _buildGenerationConfig(responseSchema),
       ),
     );
-    final text = response.text ?? '';
-    return historyWithUser.addModel(text);
+    return historyWithUser.addModel(response.text ?? '');
+  } catch (e) {
+    throw GeminiExceptionMapper.map(e);
   }
+}
 
   void dispose() => _client.close();
 
