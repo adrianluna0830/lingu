@@ -14,11 +14,12 @@ part of 'app_router.dart';
 /// [AICredentialsView]
 class AICredentialsRoute extends PageRouteInfo<AICredentialsRouteArgs> {
   AICredentialsRoute({
+    Key? key,
     required VoidCallback onComplete,
     List<PageRouteInfo>? children,
   }) : super(
          AICredentialsRoute.name,
-         args: AICredentialsRouteArgs(onComplete: onComplete),
+         args: AICredentialsRouteArgs(key: key, onComplete: onComplete),
          initialChildren: children,
        );
 
@@ -28,30 +29,32 @@ class AICredentialsRoute extends PageRouteInfo<AICredentialsRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<AICredentialsRouteArgs>();
-      return AICredentialsView(onComplete: args.onComplete);
+      return AICredentialsView(key: args.key, onComplete: args.onComplete);
     },
   );
 }
 
 class AICredentialsRouteArgs {
-  const AICredentialsRouteArgs({required this.onComplete});
+  const AICredentialsRouteArgs({this.key, required this.onComplete});
+
+  final Key? key;
 
   final VoidCallback onComplete;
 
   @override
   String toString() {
-    return 'AICredentialsRouteArgs{onComplete: $onComplete}';
+    return 'AICredentialsRouteArgs{key: $key, onComplete: $onComplete}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! AICredentialsRouteArgs) return false;
-    return onComplete == other.onComplete;
+    return key == other.key && onComplete == other.onComplete;
   }
 
   @override
-  int get hashCode => onComplete.hashCode;
+  int get hashCode => key.hashCode ^ onComplete.hashCode;
 }
 
 /// generated route for
@@ -90,11 +93,12 @@ class HomeRoute extends PageRouteInfo<void> {
 /// [LearningLocaleView]
 class LearningLocaleRoute extends PageRouteInfo<LearningLocaleRouteArgs> {
   LearningLocaleRoute({
+    Key? key,
     required VoidCallback onComplete,
     List<PageRouteInfo>? children,
   }) : super(
          LearningLocaleRoute.name,
-         args: LearningLocaleRouteArgs(onComplete: onComplete),
+         args: LearningLocaleRouteArgs(key: key, onComplete: onComplete),
          initialChildren: children,
        );
 
@@ -104,41 +108,60 @@ class LearningLocaleRoute extends PageRouteInfo<LearningLocaleRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<LearningLocaleRouteArgs>();
-      return LearningLocaleView(onComplete: args.onComplete);
+      return LearningLocaleView(key: args.key, onComplete: args.onComplete);
     },
   );
 }
 
 class LearningLocaleRouteArgs {
-  const LearningLocaleRouteArgs({required this.onComplete});
+  const LearningLocaleRouteArgs({this.key, required this.onComplete});
+
+  final Key? key;
 
   final VoidCallback onComplete;
 
   @override
   String toString() {
-    return 'LearningLocaleRouteArgs{onComplete: $onComplete}';
+    return 'LearningLocaleRouteArgs{key: $key, onComplete: $onComplete}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! LearningLocaleRouteArgs) return false;
-    return onComplete == other.onComplete;
+    return key == other.key && onComplete == other.onComplete;
   }
 
   @override
-  int get hashCode => onComplete.hashCode;
+  int get hashCode => key.hashCode ^ onComplete.hashCode;
+}
+
+/// generated route for
+/// [MainView]
+class MainRoute extends PageRouteInfo<void> {
+  const MainRoute({List<PageRouteInfo>? children})
+    : super(MainRoute.name, initialChildren: children);
+
+  static const String name = 'MainRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MainView();
+    },
+  );
 }
 
 /// generated route for
 /// [NativeLocaleView]
 class NativeLocaleRoute extends PageRouteInfo<NativeLocaleRouteArgs> {
   NativeLocaleRoute({
+    Key? key,
     required VoidCallback onComplete,
     List<PageRouteInfo>? children,
   }) : super(
          NativeLocaleRoute.name,
-         args: NativeLocaleRouteArgs(onComplete: onComplete),
+         args: NativeLocaleRouteArgs(key: key, onComplete: onComplete),
          initialChildren: children,
        );
 
@@ -148,30 +171,32 @@ class NativeLocaleRoute extends PageRouteInfo<NativeLocaleRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<NativeLocaleRouteArgs>();
-      return NativeLocaleView(onComplete: args.onComplete);
+      return NativeLocaleView(key: args.key, onComplete: args.onComplete);
     },
   );
 }
 
 class NativeLocaleRouteArgs {
-  const NativeLocaleRouteArgs({required this.onComplete});
+  const NativeLocaleRouteArgs({this.key, required this.onComplete});
+
+  final Key? key;
 
   final VoidCallback onComplete;
 
   @override
   String toString() {
-    return 'NativeLocaleRouteArgs{onComplete: $onComplete}';
+    return 'NativeLocaleRouteArgs{key: $key, onComplete: $onComplete}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! NativeLocaleRouteArgs) return false;
-    return onComplete == other.onComplete;
+    return key == other.key && onComplete == other.onComplete;
   }
 
   @override
-  int get hashCode => onComplete.hashCode;
+  int get hashCode => key.hashCode ^ onComplete.hashCode;
 }
 
 /// generated route for
@@ -179,11 +204,13 @@ class NativeLocaleRouteArgs {
 class PronunciationAssessmentCredentialsRoute
     extends PageRouteInfo<PronunciationAssessmentCredentialsRouteArgs> {
   PronunciationAssessmentCredentialsRoute({
+    Key? key,
     required VoidCallback onComplete,
     List<PageRouteInfo>? children,
   }) : super(
          PronunciationAssessmentCredentialsRoute.name,
          args: PronunciationAssessmentCredentialsRouteArgs(
+           key: key,
            onComplete: onComplete,
          ),
          initialChildren: children,
@@ -196,6 +223,7 @@ class PronunciationAssessmentCredentialsRoute
     builder: (data) {
       final args = data.argsAs<PronunciationAssessmentCredentialsRouteArgs>();
       return PronunciationAssessmentCredentialsView(
+        key: args.key,
         onComplete: args.onComplete,
       );
     },
@@ -203,35 +231,57 @@ class PronunciationAssessmentCredentialsRoute
 }
 
 class PronunciationAssessmentCredentialsRouteArgs {
-  const PronunciationAssessmentCredentialsRouteArgs({required this.onComplete});
+  const PronunciationAssessmentCredentialsRouteArgs({
+    this.key,
+    required this.onComplete,
+  });
+
+  final Key? key;
 
   final VoidCallback onComplete;
 
   @override
   String toString() {
-    return 'PronunciationAssessmentCredentialsRouteArgs{onComplete: $onComplete}';
+    return 'PronunciationAssessmentCredentialsRouteArgs{key: $key, onComplete: $onComplete}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! PronunciationAssessmentCredentialsRouteArgs) return false;
-    return onComplete == other.onComplete;
+    return key == other.key && onComplete == other.onComplete;
   }
 
   @override
-  int get hashCode => onComplete.hashCode;
+  int get hashCode => key.hashCode ^ onComplete.hashCode;
+}
+
+/// generated route for
+/// [SettingsView]
+class SettingsRoute extends PageRouteInfo<void> {
+  const SettingsRoute({List<PageRouteInfo>? children})
+    : super(SettingsRoute.name, initialChildren: children);
+
+  static const String name = 'SettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SettingsView();
+    },
+  );
 }
 
 /// generated route for
 /// [TTSCredentialsView]
 class TTSCredentialsRoute extends PageRouteInfo<TTSCredentialsRouteArgs> {
   TTSCredentialsRoute({
+    Key? key,
     required VoidCallback onComplete,
     List<PageRouteInfo>? children,
   }) : super(
          TTSCredentialsRoute.name,
-         args: TTSCredentialsRouteArgs(onComplete: onComplete),
+         args: TTSCredentialsRouteArgs(key: key, onComplete: onComplete),
          initialChildren: children,
        );
 
@@ -241,28 +291,30 @@ class TTSCredentialsRoute extends PageRouteInfo<TTSCredentialsRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<TTSCredentialsRouteArgs>();
-      return TTSCredentialsView(onComplete: args.onComplete);
+      return TTSCredentialsView(key: args.key, onComplete: args.onComplete);
     },
   );
 }
 
 class TTSCredentialsRouteArgs {
-  const TTSCredentialsRouteArgs({required this.onComplete});
+  const TTSCredentialsRouteArgs({this.key, required this.onComplete});
+
+  final Key? key;
 
   final VoidCallback onComplete;
 
   @override
   String toString() {
-    return 'TTSCredentialsRouteArgs{onComplete: $onComplete}';
+    return 'TTSCredentialsRouteArgs{key: $key, onComplete: $onComplete}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! TTSCredentialsRouteArgs) return false;
-    return onComplete == other.onComplete;
+    return key == other.key && onComplete == other.onComplete;
   }
 
   @override
-  int get hashCode => onComplete.hashCode;
+  int get hashCode => key.hashCode ^ onComplete.hashCode;
 }

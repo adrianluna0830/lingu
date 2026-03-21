@@ -1,13 +1,13 @@
-import 'dart:ui';
-
 import 'package:auto_route/auto_route.dart';
-import 'package:googleapis/spanner/v1.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/router/guards/chat_guard.dart';
 import 'package:lingu/core/router/guards/home_guard.dart';
 import 'package:lingu/core/router/guards/login_guards.dart';
 import 'package:lingu/features/chat/chat_view.dart';
-import 'package:lingu/features/home/home_view.dart';
+import 'package:lingu/features/home/ui/home_view.dart';
+import 'package:lingu/features/home/ui/main_view.dart';
+import 'package:lingu/features/settings/ui/settings_view.dart';
 import 'package:lingu/features/login/ui/ai_credentials_view.dart';
 import 'package:lingu/features/login/ui/learning_locale_view.dart';
 import 'package:lingu/features/login/ui/native_locale_view.dart';
@@ -47,14 +47,20 @@ class AppRouter extends RootStackRouter {
   ];
   @override
   List<AutoRoute> get routes => [
-        AutoRoute(page: NativeLocaleRoute.page),
+    AutoRoute(page: NativeLocaleRoute.page),
     AutoRoute(page: LearningLocaleRoute.page),
     AutoRoute(page: AICredentialsRoute.page),
     AutoRoute(page: PronunciationAssessmentCredentialsRoute.page),
     AutoRoute(page: TTSCredentialsRoute.page),
-    AutoRoute(page: HomeRoute.page, initial: true,guards: [_homeGuard]),
-    AutoRoute(page: ChatRoute.page,guards: [_chatGuard]),
-
+    AutoRoute(
+      page: HomeRoute.page,
+      initial: true,
+      guards: [_homeGuard],
+      children: [
+        AutoRoute(page: MainRoute.page, initial: true),
+        AutoRoute(page: SettingsRoute.page),
+      ],
+    ),
+    AutoRoute(page: ChatRoute.page, guards: [_chatGuard]),
   ];
 }
-

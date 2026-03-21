@@ -7,5 +7,5 @@ final di = GetIt.instance;
 
 @InjectableInit()
 Future<void> configureDependencies() async {
-  di.init(environment: Environment.prod);
+  await di.init(environment: Environment.prod);
 }

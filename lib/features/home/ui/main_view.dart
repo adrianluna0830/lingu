@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:lingu/core/router/app_router.dart';
 
 @RoutePage()
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class MainView extends StatelessWidget {
+  const MainView({super.key});
 
   @override
   Widget build(BuildContext context) {
