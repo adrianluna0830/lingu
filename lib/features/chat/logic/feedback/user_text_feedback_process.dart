@@ -6,11 +6,7 @@ sealed class UserTextFeedbackProgress {
 class AnalyzingText extends UserTextFeedbackProgress{
   const AnalyzingText();
 }
-class FluencyIssues
-{
-  final FeedbackCorrectionLevel level;
-  FluencyIssues({required this.level});
-}
+
 class TextFeedbackResult extends UserTextFeedbackProgress
 {
   final UserFeedback? feedback;

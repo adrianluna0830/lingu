@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:lingu/core/ai/core/i_ai_model_fabric.dart' as _i691;
+import 'package:lingu/core/ai/gemini/gemini_fabric.dart' as _i915;
 import 'package:lingu/core/audio/playback/i_audio_playback.dart' as _i65;
 import 'package:lingu/core/audio/playback/just_audio_player_manager.dart'
     as _i198;
@@ -27,6 +29,8 @@ import 'package:lingu/core/settings/pronunciation_assessment_credentials_service
 import 'package:lingu/core/settings/stores.dart' as _i140;
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart'
     as _i711;
+import 'package:lingu/core/tts/core/i_tts_fabric.dart' as _i42;
+import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
 import 'package:lingu/features/chat/logic/message/audio_message_input.dart'
     as _i344;
 import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart'
@@ -40,7 +44,6 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    gh.factory<_i503.ChatGuard>(() => _i503.ChatGuard());
     gh.factory<_i597.HomeGuard>(() => _i597.HomeGuard());
     gh.singleton<_i140.SecureStore>(() => _i140.SecureStore());
     gh.singleton<_i140.SharedPreferencesStore>(
@@ -92,11 +95,26 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i65.IAudioPlayerManager>(),
       ),
     );
+    gh.singleton<_i691.IAIModelFabric>(
+      () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
+    );
+    gh.factory<_i42.ITTSFabric>(
+      () => _i573.GoogleTTSFabric(gh<_i711.TextToSpeechSettingsService>()),
+    );
     gh.factory<_i1033.TTSCredentialsGuard>(
       () => _i1033.TTSCredentialsGuard(gh<_i711.TextToSpeechSettingsService>()),
     );
     gh.factory<_i1033.AICredentialsGuard>(
       () => _i1033.AICredentialsGuard(gh<_i85.AICredentialsService>()),
+    );
+    gh.factory<_i503.ChatGuard>(
+      () => _i503.ChatGuard(
+        gh<_i85.AICredentialsService>(),
+        gh<_i711.TextToSpeechSettingsService>(),
+        gh<_i56.LocaleSettingsService>(),
+        gh<_i691.IAIModelFabric>(),
+        gh<_i42.ITTSFabric>(),
+      ),
     );
     gh.singleton<_i1036.AppRouter>(
       () => _i1036.AppRouter(
