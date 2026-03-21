@@ -1,4 +1,4 @@
-import 'package:lingu/features/chat/logic/message/feedback_correction_level.dart';
+import 'package:lingu/features/chat/logic/feedback/feedback_correction_level.dart';
 
 sealed class UserAudioFeedbackProgress {
   const UserAudioFeedbackProgress();

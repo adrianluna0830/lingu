@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/features/chat/logic/message/feedback_correction_level.dart';
+import 'package:lingu/features/chat/logic/feedback/feedback_correction_level.dart';
 import 'package:lingu/features/chat/logic/message/chat_message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
 import 'package:lingu/features/chat/ui/message_bubble.dart';
 import 'package:lingu/features/chat/ui/voice_note/voice_note.dart';
-import 'package:lingu/features/chat/logic/message/user_audio_feedback_process.dart';
-import 'package:lingu/features/chat/logic/message/user_text_feedback_process.dart';
+import 'package:lingu/features/chat/logic/feedback/user_audio_feedback_process.dart';
+import 'package:lingu/features/chat/logic/feedback/user_text_feedback_process.dart';
 import 'package:signals/signals_flutter.dart';
 
 Color _colorForLevel(FeedbackCorrectionLevel level) {

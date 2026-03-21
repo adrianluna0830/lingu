@@ -1,5 +1,5 @@
-import 'package:lingu/features/chat/logic/message/user_audio_feedback_process.dart';
-import 'package:lingu/features/chat/logic/message/user_text_feedback_process.dart';
+import 'package:lingu/features/chat/logic/feedback/user_audio_feedback_process.dart';
+import 'package:lingu/features/chat/logic/feedback/user_text_feedback_process.dart';
 
 sealed class ChatMessage {}
 
