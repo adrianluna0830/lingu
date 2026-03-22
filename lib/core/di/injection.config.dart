@@ -31,10 +31,6 @@ import 'package:lingu/core/settings/text_to_speech_settings_service.dart'
     as _i711;
 import 'package:lingu/core/tts/core/i_tts_fabric.dart' as _i42;
 import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
-import 'package:lingu/features/chat/logic/message/audio_message_input.dart'
-    as _i344;
-import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart'
-    as _i149;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -49,7 +45,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i140.SharedPreferencesStore>(
       () => _i140.SharedPreferencesStore(),
     );
-    gh.singleton<_i149.ChatMessagesManager>(() => _i149.ChatMessagesManager());
     gh.singleton<_i420.PanelManager>(() => _i420.PanelManager());
     gh.singleton<_i709.IAudioRecorder>(() => _i109.AudioRecorder());
     gh.singleton<_i65.IAudioPlayerManager>(
@@ -87,13 +82,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i1033.LearningLocaleGuard>(
       () => _i1033.LearningLocaleGuard(gh<_i56.LocaleSettingsService>()),
-    );
-    gh.singleton<_i344.AudioMessageInput>(
-      () => _i344.AudioMessageInput(
-        gh<_i149.ChatMessagesManager>(),
-        gh<_i709.IAudioRecorder>(),
-        gh<_i65.IAudioPlayerManager>(),
-      ),
     );
     gh.singleton<_i691.IAIModelFabric>(
       () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),

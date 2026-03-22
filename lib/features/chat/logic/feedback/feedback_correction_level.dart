@@ -4,7 +4,7 @@ enum FeedbackCorrectionLevel
   neutral
 }
 
-sealed class UserFeedback {
+class UserFeedback {
   final FeedbackCorrectionLevel level;
   final String correction;
   final String explanation;
@@ -14,9 +14,14 @@ sealed class UserFeedback {
     required this.correction,
     required this.explanation,
   });
+
+  @override
+  String toString() {
+    return 'UserFeedback(level: $level, correction: $correction, explanation: $explanation)';
+  }
 }
 
-sealed class PronunciationFeedback {
+class PronunciationFeedback {
   final FeedbackCorrectionLevel level;
 
   PronunciationFeedback({required this.level});

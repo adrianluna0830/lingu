@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/ai/core/i_ai_model_fabric.dart';
+import 'package:lingu/core/audio/playback/i_audio_playback.dart';
+import 'package:lingu/core/audio/record/i_audio_recorder.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/language_locale.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
@@ -14,6 +16,7 @@ import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/core/i_tts_fabric.dart';
 
 import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart';
+import 'package:lingu/features/chat/logic/message/audio_message_input.dart';
 import 'package:lingu/features/chat/logic/feedback/user_feedback_analyzer.dart';
 
 @injectable
@@ -63,7 +66,19 @@ class ChatGuard extends AutoRouteGuard {
               () => TargetLocale(_localeSettings.learningLocale.value!),
             );
             gh.factory<UserFeedbackAnalyzer>(
-              () => UserFeedbackAnalyzer(di<IAIModel>()),
+              () => UserFeedbackAnalyzer(di<IAIModel>(), _localeSettings.nativeLocale.value!, _localeSettings.learningLocale.value!),
+            );
+
+            gh.singleton<ChatMessagesManager>(
+              () => ChatMessagesManager(gh<UserFeedbackAnalyzer>()),
+            );
+
+            gh.singleton<AudioMessageInput>(
+              () => AudioMessageInput(
+                gh<ChatMessagesManager>(),
+                di<IAudioRecorder>(),
+                di<IAudioPlayerManager>(),
+              ),
             );
           },
         );

@@ -1,15 +1,15 @@
 import 'package:lingu/features/chat/logic/feedback/feedback_correction_level.dart';
 
-sealed class UserAudioFeedbackProgress {
-  const UserAudioFeedbackProgress();
+sealed class AudioFeedbackState {
+  const AudioFeedbackState();
 }
-class AnalyzingAudio extends UserAudioFeedbackProgress {
+class AnalyzingAudio extends AudioFeedbackState {
   const AnalyzingAudio();
 }
-class GeneratingFeedback extends UserAudioFeedbackProgress {
+class GeneratingFeedback extends AudioFeedbackState {
   const GeneratingFeedback();
 }
-class AudioFeedbackResult extends UserAudioFeedbackProgress
+class AudioFeedbackResult extends AudioFeedbackState
 {
   final String transcription;
   final UserFeedback? feedback;

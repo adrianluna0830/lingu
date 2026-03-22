@@ -1,18 +1,19 @@
 import 'package:lingu/features/chat/logic/feedback/feedback_correction_level.dart';
 
-sealed class UserTextFeedbackProgress {
-  const UserTextFeedbackProgress();
+sealed class TextFeedbackState {
+  const TextFeedbackState();
 }
-class AnalyzingText extends UserTextFeedbackProgress{
+class AnalyzingText extends TextFeedbackState{
   const AnalyzingText();
 }
 
-class TextFeedbackResult extends UserTextFeedbackProgress
+class TextFeedbackResult extends TextFeedbackState
 {
   final UserFeedback? feedback;
   final UserFeedback? grammar;
 
-  TextFeedbackResult({this.feedback, this.grammar});
+  TextFeedbackResult({required this.feedback, required this.grammar});
+
 
   
 }

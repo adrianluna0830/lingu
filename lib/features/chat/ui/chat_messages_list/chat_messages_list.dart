@@ -21,30 +21,21 @@ class TextFeedbackIcons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icons = <Widget>[];
-
-    if (result.feedback != null) {
-      icons.add(Icon(
-        Icons.record_voice_over,
-        color: _colorForLevel(result.feedback!.level),
-        size: 18,
-      ));
-    }
-
-    if (result.grammar != null) {
-      icons.add(Icon(
-        Icons.spellcheck,
-        color: _colorForLevel(result.grammar!.level),
-        size: 18,
-      ));
-    }
-
-    if (icons.isEmpty) return const SizedBox.shrink();
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 4,
-      children: icons,
+      children: [
+        Icon(
+          Icons.record_voice_over,
+          color: result.feedback == null ? Colors.green : _colorForLevel(result.feedback!.level),
+          size: 18,
+        ),
+        Icon(
+          Icons.spellcheck,
+          color: result.grammar == null ? Colors.green : _colorForLevel(result.grammar!.level),
+          size: 18,
+        ),
+      ],
     );
   }
 }
@@ -55,38 +46,26 @@ class AudioFeedbackIcons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icons = <Widget>[];
-
-    if (result.feedback != null) {
-      icons.add(Icon(
-        Icons.record_voice_over,
-        color: _colorForLevel(result.feedback!.level),
-        size: 18,
-      ));
-    }
-
-    if (result.grammar != null) {
-      icons.add(Icon(
-        Icons.spellcheck,
-        color: _colorForLevel(result.grammar!.level),
-        size: 18,
-      ));
-    }
-
-    if (result.pronunciation != null) {
-      icons.add(Icon(
-        Icons.mic,
-        color: _colorForLevel(result.pronunciation!.level),
-        size: 18,
-      ));
-    }
-
-    if (icons.isEmpty) return const SizedBox.shrink();
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 4,
-      children: icons,
+      children: [
+        Icon(
+          Icons.record_voice_over,
+          color: result.feedback == null ? Colors.green : _colorForLevel(result.feedback!.level),
+          size: 18,
+        ),
+        Icon(
+          Icons.spellcheck,
+          color: result.grammar == null ? Colors.green : _colorForLevel(result.grammar!.level),
+          size: 18,
+        ),
+        Icon(
+          Icons.mic,
+          color: result.pronunciation == null ? Colors.green : _colorForLevel(result.pronunciation!.level),
+          size: 18,
+        ),
+      ],
     );
   }
 }
@@ -120,7 +99,10 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
           UserTextMessage m => Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                bubble,
+                AbsorbPointer(
+                  absorbing: m.feedbackProcess is! TextFeedbackResult,
+                  child: bubble,
+                ),
                 switch (m.feedbackProcess) {
                   AnalyzingText() => const Text("Analyzing text..."),
                   TextFeedbackResult r => TextFeedbackIcons(result: r),
@@ -130,7 +112,10 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
           UserAudioMessage m => Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                bubble,
+                AbsorbPointer(
+                  absorbing: m.feedbackProcess is! AudioFeedbackResult,
+                  child: bubble,
+                ),
                 switch (m.feedbackProcess) {
                   AnalyzingAudio() => const Text("Analyzing audio..."),
                   GeneratingFeedback() => const Text("Generating feedback..."),
