@@ -1,16 +1,18 @@
 import 'dart:convert';
 
 import 'package:googleai_dart/googleai_dart.dart';
+import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/language_locale.dart';
+import 'package:lingu/features/chat/logic/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/feedback_correction_level.dart';
 
+@Injectable(scope: 'chat')
 class UserFeedbackAnalyzer {
   final IAIModel _aiModel;
-  final LanguageLocale _nativeLocale;
-  final LanguageLocale _targetLocale;
+  final ChatLanguages _languages;
 
-  UserFeedbackAnalyzer(this._aiModel, this._nativeLocale, this._targetLocale);
+  UserFeedbackAnalyzer(this._aiModel, this._languages);
 
   Future<(UserFeedback? fluency, UserFeedback? grammar)> analyze(
       String statement) async {
@@ -45,7 +47,7 @@ class UserFeedbackAnalyzer {
     );
 
     final prompt =
-        "Analyze the following text in ${_getLanguageName(_targetLocale)} and provide feedback in ${_getLanguageName(_nativeLocale)}. "
+        "Analyze the following text in ${_getLanguageName(_languages.target)} and provide feedback in ${_getLanguageName(_languages.native)}. "
         "If there are issues with fluency or grammar, provide a correction and explanation. "
         "If the text is perfect or no feedback is needed for a category, return null for that category. "
         "Text: \"$statement\"";

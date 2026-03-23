@@ -3,36 +3,22 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
-import 'package:lingu/core/ai/core/i_ai_model.dart';
-import 'package:lingu/core/ai/core/i_ai_model_fabric.dart';
-import 'package:lingu/core/audio/playback/i_audio_playback.dart';
-import 'package:lingu/core/audio/record/i_audio_recorder.dart';
 import 'package:lingu/core/di/injection.dart';
-import 'package:lingu/core/language_locale.dart';
+import 'package:lingu/core/di/injection.config.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
-import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
-import 'package:lingu/core/tts/core/i_tts_fabric.dart';
-
-import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart';
-import 'package:lingu/features/chat/logic/message/audio_message_input.dart';
-import 'package:lingu/features/chat/logic/feedback/user_feedback_analyzer.dart';
 
 @injectable
 class ChatGuard extends AutoRouteGuard {
   final AICredentialsService _aiCredentials;
   final TextToSpeechSettingsService _ttsSettings;
   final LocaleSettingsService _localeSettings;
-  final IAIModelFabric _aiFabric;
-  final ITTSFabric _ttsFabric;
 
   ChatGuard(
     this._aiCredentials,
     this._ttsSettings,
     this._localeSettings,
-    this._aiFabric,
-    this._ttsFabric,
   );
 
   @override
@@ -54,37 +40,22 @@ class ChatGuard extends AutoRouteGuard {
           await di.popScopesTill('chat', inclusive: true);
         } catch (_) {}
 
-        GetItHelper(di).initScope(
-          'chat',
-          init: (gh) {
-            gh.factory<IAIModel>(() => _aiFabric.create());
-            gh.factory<ITextToSpeechService>(() => _ttsFabric.create());
-            gh.factory<NativeLocale>(
-              () => NativeLocale(_localeSettings.nativeLocale.value!),
-            );
-            gh.factory<TargetLocale>(
-              () => TargetLocale(_localeSettings.learningLocale.value!),
-            );
-            gh.factory<UserFeedbackAnalyzer>(
-              () => UserFeedbackAnalyzer(di<IAIModel>(), _localeSettings.nativeLocale.value!, _localeSettings.learningLocale.value!),
-            );
-
-            gh.singleton<ChatMessagesManager>(
-              () => ChatMessagesManager(gh<UserFeedbackAnalyzer>()),
-            );
-
-            gh.singleton<AudioMessageInput>(
-              () => AudioMessageInput(
-                gh<ChatMessagesManager>(),
-                di<IAudioRecorder>(),
-                di<IAudioPlayerManager>(),
-              ),
-            );
-          },
-        );
+        di.initChatScope();
 
         resolver.next(true);
       } catch (e) {
+        // Drop scope on error if it was partially initialized or if initChatScope threw
+        try {
+          // We can't easily check if scope is active, but popping it is safe?
+          // Actually, if initChatScope fails, it might not have pushed the scope or might have left it half-baked.
+          // initChatScope usually pushes the scope.
+          // But GetIt scopes are a stack.
+          // If initChatScope throws, we should try to cleanup.
+          // Since we don't know the state, we can try to drop scope if we are in it?
+          // But 'dropScope' is not a standard GetIt method, popScopesTill is.
+           await di.popScopesTill('chat', inclusive: true);
+        } catch (_) {}
+        
         _showError(router, 'Error initializing chat: $e');
         resolver.next(false);
       }

@@ -1,8 +1,10 @@
+import 'package:injectable/injectable.dart';
 import 'package:lingu/features/chat/logic/feedback/user_feedback_analyzer.dart';
 import 'package:lingu/features/chat/logic/feedback/user_text_feedback_process.dart';
 import 'package:lingu/features/chat/logic/message/chat_message.dart';
 import 'package:signals/signals.dart';
 
+@Singleton(scope: 'chat')
 class ChatMessagesManager {
   final UserFeedbackAnalyzer _feedbackAnalyzer;
 

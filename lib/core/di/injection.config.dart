@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:lingu/core/ai/core/i_ai_model.dart' as _i250;
 import 'package:lingu/core/ai/core/i_ai_model_fabric.dart' as _i691;
 import 'package:lingu/core/ai/gemini/gemini_fabric.dart' as _i915;
 import 'package:lingu/core/audio/playback/i_audio_playback.dart' as _i65;
@@ -29,8 +30,17 @@ import 'package:lingu/core/settings/pronunciation_assessment_credentials_service
 import 'package:lingu/core/settings/stores.dart' as _i140;
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart'
     as _i711;
+import 'package:lingu/core/tts/core/i_text_to_speech_service.dart' as _i648;
 import 'package:lingu/core/tts/core/i_tts_fabric.dart' as _i42;
 import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
+import 'package:lingu/features/chat/di/chat_module.dart' as _i437;
+import 'package:lingu/features/chat/logic/chat_languages.dart' as _i820;
+import 'package:lingu/features/chat/logic/feedback/user_feedback_analyzer.dart'
+    as _i155;
+import 'package:lingu/features/chat/logic/message/audio_message_input.dart'
+    as _i344;
+import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart'
+    as _i149;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -100,8 +110,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i85.AICredentialsService>(),
         gh<_i711.TextToSpeechSettingsService>(),
         gh<_i56.LocaleSettingsService>(),
-        gh<_i691.IAIModelFabric>(),
-        gh<_i42.ITTSFabric>(),
       ),
     );
     gh.singleton<_i1036.AppRouter>(
@@ -117,4 +125,42 @@ extension GetItInjectableX on _i174.GetIt {
     );
     return this;
   }
+
+  // initializes the registration of chat-scope dependencies inside of GetIt
+  _i174.GetIt initChatScope({_i174.ScopeDisposeFunc? dispose}) {
+    return _i526.GetItHelper(this).initScope(
+      'chat',
+      dispose: dispose,
+      init: (_i526.GetItHelper gh) {
+        final chatModule = _$ChatModule();
+        gh.factory<_i648.ITextToSpeechService>(
+          () => chatModule.getTTS(gh<_i42.ITTSFabric>()),
+        );
+        gh.factory<_i820.ChatLanguages>(
+          () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
+        );
+        gh.factory<_i250.IAIModel>(
+          () => chatModule.getAIModel(gh<_i691.IAIModelFabric>()),
+        );
+        gh.factory<_i155.UserFeedbackAnalyzer>(
+          () => _i155.UserFeedbackAnalyzer(
+            gh<_i250.IAIModel>(),
+            gh<_i820.ChatLanguages>(),
+          ),
+        );
+        gh.singleton<_i149.ChatMessagesManager>(
+          () => _i149.ChatMessagesManager(gh<_i155.UserFeedbackAnalyzer>()),
+        );
+        gh.singleton<_i344.AudioMessageInput>(
+          () => _i344.AudioMessageInput(
+            gh<_i149.ChatMessagesManager>(),
+            gh<_i709.IAudioRecorder>(),
+            gh<_i65.IAudioPlayerManager>(),
+          ),
+        );
+      },
+    );
+  }
 }
+
+class _$ChatModule extends _i437.ChatModule {}

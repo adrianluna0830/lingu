@@ -53,6 +53,7 @@ dependencies:
   media_kit_libs_linux: ^1.2.1
   waveform_flutter: ^1.2.0
   command_it: ^9.5.1
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
