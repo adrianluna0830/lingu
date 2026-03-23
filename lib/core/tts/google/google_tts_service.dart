@@ -23,7 +23,7 @@ class GoogleTTSService implements ITextToSpeechService {
   @override
   Future<Uint8List> synthesizeSpeechText(
     String text,
-    String voiceName,
+    String? voiceName,
     String speechBcp47, {
     double speakingRate = 1.0,
   }) async {
@@ -56,7 +56,7 @@ class GoogleTTSService implements ITextToSpeechService {
   @override
   Future<Uint8List> synthesizeSpeechSSML(
     String ssml,
-    String voiceName,
+    String? voiceName,
     String speechBcp47, {
     double speakingRate = 1.0,
   }) async {
@@ -104,7 +104,7 @@ class GoogleTTSService implements ITextToSpeechService {
   @override
   Future<SynthesisWithTimepointsResponse> synthesizeSpeechWithTimepoints(
     String text,
-    String voiceName,
+    String? voiceName,
     String speechBcp47, {
     double speakingRate = 1.0,
   }) async {

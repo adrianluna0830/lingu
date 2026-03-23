@@ -37,8 +37,6 @@ import 'package:lingu/features/chat/di/chat_module.dart' as _i437;
 import 'package:lingu/features/chat/logic/chat_languages.dart' as _i820;
 import 'package:lingu/features/chat/logic/feedback/user_feedback_analyzer.dart'
     as _i155;
-import 'package:lingu/features/chat/logic/message/audio_message_input.dart'
-    as _i344;
 import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart'
     as _i149;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
@@ -57,6 +55,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i420.PanelManager>(() => _i420.PanelManager());
     gh.singleton<_i709.IAudioRecorder>(() => _i109.AudioRecorder());
+    gh.factory<_i155.UserFeedbackAnalyzer>(
+      () => _i155.UserFeedbackAnalyzer(
+        gh<_i250.IAIModel>(),
+        gh<_i820.ChatLanguages>(),
+      ),
+    );
     gh.singleton<_i65.IAudioPlayerManager>(
       () => _i198.JustAudioPlayerManager(),
     );
@@ -86,6 +90,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i140.SharedPreferencesStore>(),
       ),
       preResolve: true,
+    );
+    gh.factory<_i149.UserMessagesHandler>(
+      () => _i149.UserMessagesHandler(
+        gh<_i709.IAudioRecorder>(),
+        gh<_i65.IAudioPlayerManager>(),
+        gh<_i149.ChatMessagesManager>(),
+        gh<_i155.UserFeedbackAnalyzer>(),
+      ),
     );
     gh.factory<_i1033.NativeLocaleGuard>(
       () => _i1033.NativeLocaleGuard(gh<_i56.LocaleSettingsService>()),
@@ -136,26 +148,22 @@ extension GetItInjectableX on _i174.GetIt {
         gh.factory<_i648.ITextToSpeechService>(
           () => chatModule.getTTS(gh<_i42.ITTSFabric>()),
         );
+        gh.singleton<_i149.ChatMessagesManager>(
+          () => _i149.ChatMessagesManager(),
+        );
         gh.factory<_i820.ChatLanguages>(
           () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
         );
         gh.factory<_i250.IAIModel>(
           () => chatModule.getAIModel(gh<_i691.IAIModelFabric>()),
         );
-        gh.factory<_i155.UserFeedbackAnalyzer>(
-          () => _i155.UserFeedbackAnalyzer(
-            gh<_i250.IAIModel>(),
-            gh<_i820.ChatLanguages>(),
-          ),
-        );
-        gh.singleton<_i149.ChatMessagesManager>(
-          () => _i149.ChatMessagesManager(gh<_i155.UserFeedbackAnalyzer>()),
-        );
-        gh.singleton<_i344.AudioMessageInput>(
-          () => _i344.AudioMessageInput(
+        gh.singleton<_i149.AIMessagesManager>(
+          () => _i149.AIMessagesManager(
             gh<_i149.ChatMessagesManager>(),
-            gh<_i709.IAudioRecorder>(),
+            gh<_i149.UserMessagesHandler>(),
+            gh<_i648.ITextToSpeechService>(),
             gh<_i65.IAudioPlayerManager>(),
+            gh<_i250.IAIModel>(),
           ),
         );
       },

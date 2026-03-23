@@ -7,7 +7,7 @@ import 'package:lingu/core/language_locale.dart';
 import 'package:lingu/features/chat/logic/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/feedback_correction_level.dart';
 
-@Injectable(scope: 'chat')
+@injectable
 class UserFeedbackAnalyzer {
   final IAIModel _aiModel;
   final ChatLanguages _languages;

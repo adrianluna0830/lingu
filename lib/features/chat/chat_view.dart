@@ -4,7 +4,6 @@ import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list.dart';
-import 'package:lingu/features/chat/logic/message/audio_message_input.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
@@ -30,14 +29,13 @@ class _ChatViewState extends State<ChatView> {
   final BottomPanelController _bottomPanelController = BottomPanelController();
 
   final PanelManager _panelManager = di<PanelManager>();
-  final AudioMessageInput _audioMessageInput = di<AudioMessageInput>();
-  final ChatMessagesManager _messagesProxy = di<ChatMessagesManager>();
+  final UserMessagesHandler _userMessagesInputHandler = di<UserMessagesHandler>();
 
   @override
   void initState() {
     super.initState();
     _inputBarController.onTextSubmit = (text) {
-      _messagesProxy.addTextMessage(text: text);
+      _userMessagesInputHandler.sendTextMessage(text: text);
     };
 
     _inputBarController.onStartRecording = () {
@@ -56,28 +54,28 @@ class _ChatViewState extends State<ChatView> {
     });
 
     effect(() {
-      final chatMessages = _messagesProxy.messages.value.toList();
+      final chatMessages = _userMessagesInputHandler.messages.value.toList();
       _controller.setMessages(chatMessages);
     });
 
-    _audioMessageInput.amplitudeStream.listen((amplitude) {
+    _userMessagesInputHandler.amplitudeStream.listen((amplitude) {
       _recordController.updateAmplitude(amplitude);
     });
 
     _recordController.onStart = () {
       _panelManager.openMicPanel();
-      _audioMessageInput.startRecording();
+      _userMessagesInputHandler.startRecording();
     };
 
     _recordController.onStop = () {
       _panelManager.closePanel();
-      _audioMessageInput.stopRecording();
+      _userMessagesInputHandler.sendRecording();
     };
     
 
     _recordController.onCancel = () {
       _panelManager.closePanel();
-      _audioMessageInput.cancelRecording();
+      _userMessagesInputHandler.cancelRecording();
     };
 
     _bottomPanelController.onClose = () {
@@ -90,7 +88,7 @@ class _ChatViewState extends State<ChatView> {
     super.dispose();
 
     _recordController.dispose();
-    _audioMessageInput.dispose();
+    _userMessagesInputHandler.dispose();
   }
 
   @override
