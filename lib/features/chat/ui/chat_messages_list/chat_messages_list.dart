@@ -99,10 +99,7 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
           UserTextMessage m => Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                AbsorbPointer(
-                  absorbing: m.feedbackProcess is! TextFeedbackResult,
-                  child: bubble,
-                ),
+                bubble,
                 switch (m.feedbackProcess) {
                   AnalyzingText() => const Text("Analyzing text..."),
                   TextFeedbackResult r => TextFeedbackIcons(result: r),
@@ -112,10 +109,7 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
           UserAudioMessage m => Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                AbsorbPointer(
-                  absorbing: m.feedbackProcess is! AudioFeedbackResult,
-                  child: bubble,
-                ),
+                bubble,
                 switch (m.feedbackProcess) {
                   AnalyzingAudio() => const Text("Analyzing audio..."),
                   GeneratingFeedback() => const Text("Generating feedback..."),

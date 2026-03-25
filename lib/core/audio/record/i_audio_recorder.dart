@@ -12,7 +12,6 @@ class Amplitude {
 
 abstract class IAudioRecorder {
   final Duration pollingRate;
-
   IAudioRecorder({required this.pollingRate});
 
   ReadonlySignal<bool> get isRecording;
@@ -22,4 +21,14 @@ abstract class IAudioRecorder {
   Future<void> pause();
   Future<void> resume();
   Future<void> dispose();
+}
+
+extension IAudioRecorderX on IAudioRecorder {
+  Future<void> toggleRecording() async {
+    if (isRecording.value) {
+      await pause();
+    } else {
+      await resume();
+    }
+  }
 }

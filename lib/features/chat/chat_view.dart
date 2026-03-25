@@ -12,6 +12,7 @@ import 'package:lingu/features/chat/logic/panel/panel_type.dart';
 import 'package:lingu/features/chat/ui/record/record_controller.dart';
 import 'package:lingu/features/chat/ui/record/record_display.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
+import 'package:lingu/features/chat/logic/record_input_handler.dart';
 import 'package:signals/signals_flutter.dart';
 
 @RoutePage()
@@ -27,7 +28,7 @@ class _ChatViewState extends State<ChatView> {
   final ChatMessagesListController _controller = ChatMessagesListController();
   final RecordController _recordController = RecordController();
   final BottomPanelController _bottomPanelController = BottomPanelController();
-
+  final RecordInputHandler _recordInputHandler = di<RecordInputHandler>();
   final PanelManager _panelManager = di<PanelManager>();
   final UserMessagesHandler _userMessagesInputHandler = di<UserMessagesHandler>();
 
@@ -58,24 +59,33 @@ class _ChatViewState extends State<ChatView> {
       _controller.setMessages(chatMessages);
     });
 
-    _userMessagesInputHandler.amplitudeStream.listen((amplitude) {
+    _recordInputHandler.amplitudeStream.listen((amplitude) {
       _recordController.updateAmplitude(amplitude);
     });
 
+
+    _recordController.onToggleRecording = (isPaused) {
+      _recordInputHandler.toggleRecording();
+    };
+
+    _recordController.onToggleLanguage = (isTargetLanguage) {
+      _recordInputHandler.toggleLanguage();
+    };
+
     _recordController.onStart = () {
       _panelManager.openMicPanel();
-      _userMessagesInputHandler.startRecording();
+      _recordInputHandler.startRecording();
     };
 
     _recordController.onStop = () {
       _panelManager.closePanel();
-      _userMessagesInputHandler.sendRecording();
+      _recordInputHandler.sendRecording();
     };
     
 
     _recordController.onCancel = () {
       _panelManager.closePanel();
-      _userMessagesInputHandler.cancelRecording();
+      _recordInputHandler.cancelRecording();
     };
 
     _bottomPanelController.onClose = () {
@@ -88,7 +98,7 @@ class _ChatViewState extends State<ChatView> {
     super.dispose();
 
     _recordController.dispose();
-    _userMessagesInputHandler.dispose();
+    _recordInputHandler.dispose();
   }
 
   @override

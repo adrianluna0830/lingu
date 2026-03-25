@@ -6,18 +6,26 @@ import 'package:lingu/core/audio/record/i_audio_recorder.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart' as rec;
 import 'package:signals/signals.dart';
+
 @Singleton(as: IAudioRecorder)
-class AudioRecorder extends IAudioRecorder {
+class UniversalPCMRecorder extends IAudioRecorder {
   final rec.AudioRecorder _recorder = rec.AudioRecorder();
   final StreamController<Amplitude> _amplitudeController =
       StreamController<Amplitude>.broadcast();
   Timer? _amplitudeTimer;
   String? _currentPath;
-
   final Signal<bool> _isRecording = signal(false);
 
-  AudioRecorder() : super(pollingRate: kDefaultPollingRate);
+  final rec.RecordConfig _recordConfig = rec.RecordConfig(
+    encoder: rec.AudioEncoder.wav,
+    numChannels: 1,
+      sampleRate: 16000,
+      bitRate: 128000
+  );
 
+  UniversalPCMRecorder() : super(pollingRate: const Duration(milliseconds: 100));
+
+ 
   @override
   ReadonlySignal<bool> get isRecording => _isRecording;
 
@@ -29,21 +37,16 @@ class AudioRecorder extends IAudioRecorder {
     if (!await _recorder.hasPermission()) {
       throw Exception('Microphone permission not granted');
     }
-
     final dir = await getTemporaryDirectory();
     _currentPath =
-        '${dir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+        '${dir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.wav';
 
     await _recorder.start(
-      const rec.RecordConfig(
-        encoder: rec.AudioEncoder.aacLc,
-        numChannels: 1,
-      ),
+      _recordConfig,
       path: _currentPath!,
     );
 
     _isRecording.value = true;
-
     _amplitudeTimer = Timer.periodic(pollingRate, (_) async {
       final amp = await _recorder.getAmplitude();
       _amplitudeController.add(Amplitude(
@@ -57,18 +60,20 @@ class AudioRecorder extends IAudioRecorder {
   Future<Uint8List> stop() async {
     _amplitudeTimer?.cancel();
     _amplitudeTimer = null;
-
     final path = await _recorder.stop();
-
     _isRecording.value = false;
-
     if (path == null) {
       throw Exception('Recording stopped but no file was produced');
     }
-
     final file = File(path);
     final bytes = await file.readAsBytes();
     await file.delete();
+
+    // Strip WAV header (44 bytes) to get raw PCM
+    if (bytes.length > 44) {
+      return bytes.sublist(44);
+    }
+    
     return bytes;
   }
 
@@ -83,9 +88,7 @@ class AudioRecorder extends IAudioRecorder {
   @override
   Future<void> resume() async {
     await _recorder.resume();
-
     _isRecording.value = true;
-
     _amplitudeTimer = Timer.periodic(pollingRate, (_) async {
       final amp = await _recorder.getAmplitude();
       _amplitudeController.add(Amplitude(
@@ -102,5 +105,4 @@ class AudioRecorder extends IAudioRecorder {
     _isRecording.value = false;
     _recorder.dispose();
   }
-
 }

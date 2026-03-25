@@ -148,18 +148,13 @@ class AIMessagesManager {
 @injectable
 class UserMessagesHandler {
   final ChatMessagesManager _messagesManager;
-  final IAudioRecorder _audioRecorder;
-  final IAudioPlayerManager _audioPlayerManager;
   final UserFeedbackAnalyzer _feedbackAnalyzer;
 
   UserMessagesHandler(
-    this._audioRecorder,
-    this._audioPlayerManager,
     this._messagesManager,
     this._feedbackAnalyzer,
   );
 
-  Stream<Amplitude> get amplitudeStream => _audioRecorder.onAmplitudeChanged;
 
   ReadonlySignal<List<ChatMessage>> get messages => _messagesManager.messages;
 
@@ -170,36 +165,4 @@ class UserMessagesHandler {
     _messagesManager.updateMessage(updatedMessage);
   }
 
-  Future<void> startRecording() async {
-    _audioRecorder.start();
-  }
-
-  Future<void> sendRecording() async {
-    final Uint8List audio = await _audioRecorder.stop();
-
-    final dir = await getTemporaryDirectory();
-
-    final filepath = path.join(
-      dir.path,
-      'recording_${DateTime.now().millisecondsSinceEpoch}.m4a',
-    );
-
-    final file = File(filepath);
-    await file.writeAsBytes(audio);
-
-    Duration duration = await _audioPlayerManager.getDuration(filepath);
-
-    await _messagesManager.addUserAudioMessage(
-      audioUrl: filepath,
-      duration: duration,
-    );
-  }
-
-  Future<void> cancelRecording() async {
-    await _audioRecorder.stop();
-  }
-
-  Future<void> dispose() async {
-    await _audioRecorder.dispose();
-  }
 }

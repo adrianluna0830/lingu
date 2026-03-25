@@ -76,10 +76,10 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
   }) async {
     if (_currentSource.value != source) {
       _currentSource.value = source;
-      await _player.setUrl(source);
+      await _player.setFilePath(source);
     } else if (_completed) {
       await _player.pause();
-      await _player.setUrl(source);
+      await _player.setFilePath(source);
     }
 
     _completed = false;
@@ -120,7 +120,8 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
   Future<Duration> _fetchDuration(String source) async {
     final tempPlayer = ja.AudioPlayer();
     try {
-      return await tempPlayer.setUrl(source) ?? Duration.zero;
+      await tempPlayer.setFilePath(source);
+      return tempPlayer.duration ?? Duration.zero;
     } finally {
       await tempPlayer.dispose();
     }

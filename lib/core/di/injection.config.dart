@@ -14,11 +14,15 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:lingu/core/ai/core/i_ai_model.dart' as _i250;
 import 'package:lingu/core/ai/core/i_ai_model_fabric.dart' as _i691;
 import 'package:lingu/core/ai/gemini/gemini_fabric.dart' as _i915;
+import 'package:lingu/core/audio/i_audio_merger.dart' as _i536;
+import 'package:lingu/core/audio/i_audio_utils.dart' as _i593;
+import 'package:lingu/core/audio/pcm_audio_merger.dart' as _i187;
+import 'package:lingu/core/audio/pcm_to_wav_audio_saver.dart' as _i338;
 import 'package:lingu/core/audio/playback/i_audio_playback.dart' as _i65;
 import 'package:lingu/core/audio/playback/just_audio_player_manager.dart'
     as _i198;
-import 'package:lingu/core/audio/record/audio_recorder.dart' as _i109;
 import 'package:lingu/core/audio/record/i_audio_recorder.dart' as _i709;
+import 'package:lingu/core/audio/record/universal_pcm_recorder.dart' as _i601;
 import 'package:lingu/core/router/app_router.dart' as _i1036;
 import 'package:lingu/core/router/guards/chat_guard.dart' as _i503;
 import 'package:lingu/core/router/guards/home_guard.dart' as _i597;
@@ -40,6 +44,7 @@ import 'package:lingu/features/chat/logic/feedback/user_feedback_analyzer.dart'
 import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart'
     as _i149;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
+import 'package:lingu/features/chat/logic/record_input_handler.dart' as _i320;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -54,11 +59,17 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i140.SharedPreferencesStore(),
     );
     gh.singleton<_i420.PanelManager>(() => _i420.PanelManager());
-    gh.singleton<_i709.IAudioRecorder>(() => _i109.AudioRecorder());
+    gh.singleton<_i709.IAudioRecorder>(() => _i601.UniversalPCMRecorder());
     gh.factory<_i155.UserFeedbackAnalyzer>(
       () => _i155.UserFeedbackAnalyzer(
         gh<_i250.IAIModel>(),
         gh<_i820.ChatLanguages>(),
+      ),
+    );
+    gh.factory<_i149.UserMessagesHandler>(
+      () => _i149.UserMessagesHandler(
+        gh<_i149.ChatMessagesManager>(),
+        gh<_i155.UserFeedbackAnalyzer>(),
       ),
     );
     gh.singleton<_i65.IAudioPlayerManager>(
@@ -76,6 +87,17 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1042.PronunciationAssessmentCredentialsService>(),
       ),
     );
+    gh.singleton<_i536.IAudioMerger>(() => _i187.PCMAudioMerger());
+    gh.singleton<_i593.IAudioPathSaver>(() => _i338.PCMToWavAudioSaver());
+    gh.factory<_i320.RecordInputHandler>(
+      () => _i320.RecordInputHandler(
+        gh<_i149.ChatMessagesManager>(),
+        gh<_i709.IAudioRecorder>(),
+        gh<_i65.IAudioPlayerManager>(),
+        gh<_i593.IAudioPathSaver>(),
+        gh<_i536.IAudioMerger>(),
+      ),
+    );
     await gh.singletonAsync<_i85.AICredentialsService>(
       () => _i85.AICredentialsService.create(gh<_i140.SecureStore>()),
       preResolve: true,
@@ -90,14 +112,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i140.SharedPreferencesStore>(),
       ),
       preResolve: true,
-    );
-    gh.factory<_i149.UserMessagesHandler>(
-      () => _i149.UserMessagesHandler(
-        gh<_i709.IAudioRecorder>(),
-        gh<_i65.IAudioPlayerManager>(),
-        gh<_i149.ChatMessagesManager>(),
-        gh<_i155.UserFeedbackAnalyzer>(),
-      ),
     );
     gh.factory<_i1033.NativeLocaleGuard>(
       () => _i1033.NativeLocaleGuard(gh<_i56.LocaleSettingsService>()),
