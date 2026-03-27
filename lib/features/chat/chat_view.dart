@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart';
+import 'package:lingu/features/chat/logic/message/text_input_handler.dart';
+import 'package:lingu/features/chat/logic/audio_input_handler.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
@@ -12,7 +14,6 @@ import 'package:lingu/features/chat/logic/panel/panel_type.dart';
 import 'package:lingu/features/chat/ui/record/record_controller.dart';
 import 'package:lingu/features/chat/ui/record/record_display.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
-import 'package:lingu/features/chat/logic/record_input_handler.dart';
 import 'package:signals/signals_flutter.dart';
 
 @RoutePage()
@@ -24,13 +25,15 @@ class ChatView extends StatefulWidget {
 }
 
 class _ChatViewState extends State<ChatView> {
+  final ChatMessagesManager _chatMessagesManager = di<ChatMessagesManager>();
+
   final InputBarController _inputBarController = InputBarController();
   final ChatMessagesListController _controller = ChatMessagesListController();
   final RecordController _recordController = RecordController();
   final BottomPanelController _bottomPanelController = BottomPanelController();
-  final RecordInputHandler _recordInputHandler = di<RecordInputHandler>();
+  final AudioInputHandler _recordInputHandler = di<AudioInputHandler>();
   final PanelManager _panelManager = di<PanelManager>();
-  final UserMessagesHandler _userMessagesInputHandler = di<UserMessagesHandler>();
+  final TextInputHandler _userMessagesInputHandler = di<TextInputHandler>();
 
   @override
   void initState() {
@@ -54,15 +57,9 @@ class _ChatViewState extends State<ChatView> {
       }
     });
 
-    effect(() {
-      final chatMessages = _userMessagesInputHandler.messages.value.toList();
-      _controller.setMessages(chatMessages);
-    });
-
     _recordInputHandler.amplitudeStream.listen((amplitude) {
       _recordController.updateAmplitude(amplitude);
     });
-
 
     _recordController.onToggleRecording = (isPaused) {
       _recordInputHandler.toggleRecording();
@@ -109,7 +106,12 @@ class _ChatViewState extends State<ChatView> {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(child: ChatMessagesList(controller: _controller)),
+          Expanded(
+            child: ChatMessagesList(
+              messages: _chatMessagesManager.messages.watch(context),
+              controller: _controller,
+            ),
+          ),
           if (_panelManager.currentPanel.watch(context) == PanelType.mic)
             Expanded(child: RecordDisplay(controller: _recordController)),
           if (_panelManager.currentPanel.watch(context) == PanelType.messageDetails)

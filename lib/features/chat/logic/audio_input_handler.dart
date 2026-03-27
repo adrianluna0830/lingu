@@ -5,19 +5,19 @@ import 'package:lingu/core/audio/i_audio_merger.dart';
 import 'package:lingu/core/audio/i_audio_utils.dart';
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
-import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart';
+import 'package:lingu/features/chat/logic/message/messages_manager.dart';
 import 'package:signals/signals.dart';
 
 @injectable
-class RecordInputHandler
+class AudioInputHandler
 {
-  final ChatMessagesManager _messagesManager;
+  final MessagesManager _messagesManager;
   final IAudioRecorder _audioRecorder;
   final IAudioPlayerManager _audioPlayerManager;
   final IAudioPathSaver _audioPathSaver;
   final IAudioMerger _audioMerger;
 
-  RecordInputHandler(this._messagesManager, this._audioRecorder, this._audioPlayerManager, this._audioPathSaver, this._audioMerger);
+  AudioInputHandler(this._messagesManager, this._audioRecorder, this._audioPlayerManager, this._audioPathSaver, this._audioMerger);
 
   
   Stream<Amplitude> get amplitudeStream => _audioRecorder.onAmplitudeChanged;
@@ -39,9 +39,9 @@ class RecordInputHandler
     
     Duration duration = await _audioPlayerManager.getDuration(filepath);
 
-    await _messagesManager.addUserAudioMessage(
+    await _messagesManager.addAudioMessage(
       audioUrl: filepath,
-      duration: duration,
+      duration: duration, isUser: true,
     );
 
     _audioChunks.clear();

@@ -1,20 +1,20 @@
 import 'dart:convert';
-
 import 'package:googleai_dart/googleai_dart.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/language_locale.dart';
 import 'package:lingu/features/chat/logic/chat_languages.dart';
-import 'package:lingu/features/chat/logic/feedback/feedback_correction_level.dart';
+import 'package:lingu/features/chat/logic/feedback/models/feedback_correction_level.dart';
+import 'package:lingu/features/chat/logic/feedback/models/feedback.dart';
 
 @injectable
-class UserFeedbackAnalyzer {
+class StatementFeedbackService {
   final IAIModel _aiModel;
   final ChatLanguages _languages;
 
-  UserFeedbackAnalyzer(this._aiModel, this._languages);
+  StatementFeedbackService(this._aiModel, this._languages);
 
-  Future<(UserFeedback? fluency, UserFeedback? grammar)> analyze(
+  Future<(Feedback? fluency, Feedback? grammar)> analyze(
       String statement) async {
     final schema = Schema(
       type: SchemaType.object,
@@ -68,8 +68,8 @@ class UserFeedbackAnalyzer {
     );
   }
 
-  UserFeedback _parseFeedback(Map<String, dynamic> json) {
-    return UserFeedback(
+  Feedback _parseFeedback(Map<String, dynamic> json) {
+    return Feedback(
       level: _parseLevel(json['level']),
       correction: json['correction'],
       explanation: json['explanation'],

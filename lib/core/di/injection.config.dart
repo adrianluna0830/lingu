@@ -39,12 +39,17 @@ import 'package:lingu/core/tts/core/i_tts_fabric.dart' as _i42;
 import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
 import 'package:lingu/features/chat/di/chat_module.dart' as _i437;
 import 'package:lingu/features/chat/logic/chat_languages.dart' as _i820;
-import 'package:lingu/features/chat/logic/feedback/user_feedback_analyzer.dart'
+import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart'
     as _i155;
-import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart'
+import 'package:lingu/features/chat/logic/message/ai_messages_manager.dart'
+    as _i196;
+import 'package:lingu/features/chat/logic/message/messages_manager.dart'
     as _i149;
+import 'package:lingu/features/chat/logic/message/text_input_handler.dart'
+    as _i294;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
-import 'package:lingu/features/chat/logic/record_input_handler.dart' as _i320;
+import 'package:lingu/features/chat/logic/audio_input_handler.dart'
+    as _i962;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -60,20 +65,17 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i420.PanelManager>(() => _i420.PanelManager());
     gh.singleton<_i709.IAudioRecorder>(() => _i601.UniversalPCMRecorder());
-    gh.factory<_i155.UserFeedbackAnalyzer>(
-      () => _i155.UserFeedbackAnalyzer(
+    gh.factory<_i155.StatementFeedbackService>(
+      () => _i155.StatementFeedbackService(
         gh<_i250.IAIModel>(),
         gh<_i820.ChatLanguages>(),
       ),
     );
-    gh.factory<_i149.UserMessagesHandler>(
-      () => _i149.UserMessagesHandler(
-        gh<_i149.ChatMessagesManager>(),
-        gh<_i155.UserFeedbackAnalyzer>(),
-      ),
-    );
     gh.singleton<_i65.IAudioPlayerManager>(
       () => _i198.JustAudioPlayerManager(),
+    );
+    gh.factory<_i294.TextInputHandler>(
+      () => _i294.TextInputHandler(gh<_i149.MessagesManager>()),
     );
     await gh.singletonAsync<_i1042.PronunciationAssessmentCredentialsService>(
       () => _i1042.PronunciationAssessmentCredentialsService.create(
@@ -89,9 +91,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i536.IAudioMerger>(() => _i187.PCMAudioMerger());
     gh.singleton<_i593.IAudioPathSaver>(() => _i338.PCMToWavAudioSaver());
-    gh.factory<_i320.RecordInputHandler>(
-      () => _i320.RecordInputHandler(
-        gh<_i149.ChatMessagesManager>(),
+    gh.factory<_i962.AudioInputHandler>(
+      () => _i962.AudioInputHandler(
+        gh<_i149.MessagesManager>(),
         gh<_i709.IAudioRecorder>(),
         gh<_i65.IAudioPlayerManager>(),
         gh<_i593.IAudioPathSaver>(),
@@ -162,8 +164,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh.factory<_i648.ITextToSpeechService>(
           () => chatModule.getTTS(gh<_i42.ITTSFabric>()),
         );
-        gh.singleton<_i149.ChatMessagesManager>(
-          () => _i149.ChatMessagesManager(),
+        gh.singleton<_i149.MessagesManager>(
+          () => _i149.MessagesManager(),
         );
         gh.factory<_i820.ChatLanguages>(
           () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
@@ -171,10 +173,10 @@ extension GetItInjectableX on _i174.GetIt {
         gh.factory<_i250.IAIModel>(
           () => chatModule.getAIModel(gh<_i691.IAIModelFabric>()),
         );
-        gh.singleton<_i149.AIMessagesManager>(
-          () => _i149.AIMessagesManager(
-            gh<_i149.ChatMessagesManager>(),
-            gh<_i149.UserMessagesHandler>(),
+        gh.singleton<_i196.AIMessagesManager>(
+          () => _i196.AIMessagesManager(
+            gh<_i149.MessagesManager>(),
+            gh<_i294.TextInputHandler>(),
             gh<_i648.ITextToSpeechService>(),
             gh<_i65.IAudioPlayerManager>(),
             gh<_i250.IAIModel>(),
