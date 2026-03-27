@@ -1,4 +1,4 @@
-import 'package:lingu/core/language_locale.dart';
+import 'package:lingu/core/models/language_locale.dart';
 
 class ChatLanguages {
   final LanguageLocale native;

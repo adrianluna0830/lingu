@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/ai/core/i_ai_model_fabric.dart';
 import 'package:lingu/core/ai/gemini/gemini_model.dart';
-import 'package:lingu/core/credential_results.dart';
+import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
 
 @Singleton(as: IAIModelFabric)

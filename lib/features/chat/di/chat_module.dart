@@ -4,7 +4,7 @@ import 'package:lingu/core/ai/core/i_ai_model_fabric.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/core/i_tts_fabric.dart';
-import 'package:lingu/features/chat/logic/chat_languages.dart';
+import 'package:lingu/features/chat/di/chat_languages.dart';
 
 @module
 abstract class ChatModule {

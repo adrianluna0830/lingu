@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
-import 'package:lingu/core/audio/i_audio_merger.dart';
-import 'package:lingu/core/audio/i_audio_utils.dart';
+import 'package:lingu/core/audio/misc/i_audio_merger.dart';
+import 'package:lingu/core/audio/misc/i_audio_utils.dart';
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
-import 'package:lingu/features/chat/logic/message/messages_manager.dart';
+import 'package:lingu/features/chat/logic/message/managers/messages_manager.dart';
 import 'package:signals/signals.dart';
 
 @injectable

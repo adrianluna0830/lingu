@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:lingu/core/language_locale.dart';
+import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/core/settings/stores.dart';
 
 @singleton

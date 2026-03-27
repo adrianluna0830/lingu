@@ -3,7 +3,7 @@ import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/router/app_router.dart';
 import 'package:lingu/features/chat/logic/feedback/models/text_feedback_state.dart';
-import 'package:lingu/features/chat/logic/message/messages_manager.dart';
+import 'package:lingu/features/chat/logic/message/managers/messages_manager.dart';
 import 'package:signals/signals.dart';
 import 'package:signals/signals_flutter.dart';
 class TextFeedback {

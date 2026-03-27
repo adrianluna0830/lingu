@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/ai/core/i_ai_model_fabric.dart';
-import 'package:lingu/core/credential_results.dart';
+import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
 import 'package:signals/signals_flutter.dart';

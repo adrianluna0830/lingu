@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:lingu/core/credential_results.dart';
+import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 import 'package:lingu/core/tts/core/i_tts_fabric.dart';

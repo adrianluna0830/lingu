@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:googleapis/texttospeech/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:injectable/injectable.dart';
-import 'package:lingu/core/credential_results.dart';
+import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/core/i_tts_fabric.dart';

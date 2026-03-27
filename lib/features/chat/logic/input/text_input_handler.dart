@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:injectable/injectable.dart';
-import 'package:lingu/features/chat/logic/message/messages_manager.dart';
+import 'package:lingu/features/chat/logic/message/managers/messages_manager.dart';
 
 @injectable
 class TextInputHandler {

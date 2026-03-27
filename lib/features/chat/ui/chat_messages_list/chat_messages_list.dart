@@ -3,8 +3,8 @@ import 'package:lingu/features/chat/logic/feedback/models/audio_feedback_state.d
 import 'package:lingu/features/chat/logic/feedback/models/feedback.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_correction_level.dart';
 import 'package:lingu/features/chat/logic/feedback/models/text_feedback_state.dart';
-import 'package:lingu/features/chat/logic/message/chat_message.dart';
-import 'package:lingu/features/chat/logic/message/message.dart';
+import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
+import 'package:lingu/features/chat/logic/message/models/message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
 import 'package:lingu/features/chat/ui/message_bubble.dart';
 import 'package:lingu/features/chat/ui/voice_note/voice_note.dart';

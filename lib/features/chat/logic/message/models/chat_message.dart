@@ -1,6 +1,6 @@
 import 'package:lingu/features/chat/logic/feedback/models/audio_feedback_state.dart';
 import 'package:lingu/features/chat/logic/feedback/models/text_feedback_state.dart';
-import 'package:lingu/features/chat/logic/message/message.dart';
+import 'package:lingu/features/chat/logic/message/models/message.dart';
 
 sealed class ChatMessage {
   final Message message;

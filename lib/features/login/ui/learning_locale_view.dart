@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
-import 'package:lingu/core/language_locale.dart';
+import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:signals/signals_flutter.dart';
 

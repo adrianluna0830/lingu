@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
-import 'package:lingu/features/chat/logic/message/chat_messages_manager.dart';
-import 'package:lingu/features/chat/logic/message/text_input_handler.dart';
-import 'package:lingu/features/chat/logic/audio_input_handler.dart';
+import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
+import 'package:lingu/features/chat/logic/input/text_input_handler.dart';
+import 'package:lingu/features/chat/logic/input/audio_input_handler.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';

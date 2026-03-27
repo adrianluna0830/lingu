@@ -2,8 +2,8 @@ import 'package:injectable/injectable.dart';
 import 'package:lingu/features/chat/logic/feedback/models/audio_feedback_state.dart';
 import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_service.dart';
 import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart';
-import 'package:lingu/features/chat/logic/message/message.dart';
-import 'package:lingu/features/chat/logic/message/messages_manager.dart';
+import 'package:lingu/features/chat/logic/message/models/message.dart';
+import 'package:lingu/features/chat/logic/message/managers/messages_manager.dart';
 import 'package:signals/signals.dart';
 
 @Singleton(scope: 'chat')
