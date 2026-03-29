@@ -7,6 +7,16 @@ sealed class ChatMessage {
   const ChatMessage({required this.id});
 }
 
+extension ChatMessageX on ChatMessage {
+  bool get isUser => this is UserTextMessage || this is UserAudioMessage;
+
+  bool get isClickable => switch (this) {
+        UserTextMessage m => m.feedbackResult is FeedbackReady,
+        UserAudioMessage m => m.feedbackResult is FeedbackReady,
+        AITextMessage _ || AIAudioMessage _ => true,
+      };
+}
+
 class UserTextMessage extends ChatMessage {
   final String text;
   final FeedbackState<TextFeedbackResult> feedbackResult;
