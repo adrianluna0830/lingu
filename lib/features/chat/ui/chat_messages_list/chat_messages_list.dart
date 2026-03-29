@@ -1,10 +1,7 @@
-import 'package:flutter/material.dart' hide Feedback;
-import 'package:lingu/features/chat/logic/feedback/models/audio_feedback_state.dart';
-import 'package:lingu/features/chat/logic/feedback/models/feedback.dart';
+import 'package:flutter/material.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_correction_level.dart';
-import 'package:lingu/features/chat/logic/feedback/models/text_feedback_state.dart';
+import 'package:lingu/features/chat/logic/feedback/models/feedback_state.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
-import 'package:lingu/features/chat/logic/message/models/message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
 import 'package:lingu/features/chat/ui/message_bubble.dart';
 import 'package:lingu/features/chat/ui/voice_note/voice_note.dart';
@@ -24,48 +21,46 @@ class ChatMessagesList extends StatefulWidget {
 }
 
 class _ChatMessagesListState extends State<ChatMessagesList> {
-  Color _getFeedbackColor(Feedback? feedback) {
-    if (feedback == null) return Colors.green;
-    return feedback.level == FeedbackCorrectionLevel.bad 
-        ? Colors.red 
-        : Colors.orange;
+  Color _getFeedbackColor(FeedbackCorrectionLevel? level) {
+    if (level == null) return Colors.green;
+    return level == FeedbackCorrectionLevel.bad ? Colors.red : Colors.orange;
   }
 
-  Color _getPronunciationColor(double score) {
-    if (score >= 80) return Colors.green;
-    if (score >= 60) return Colors.orange;
-    return Colors.red;
-  }
-
-  Widget _buildFeedbackIcons(ChatMessage chatMessage) {
+  Widget _buildFeedbackIcons(BuildContext context, ChatMessage chatMessage) {
     if (chatMessage is UserTextMessage) {
-      final state = chatMessage.feedbackState;
-      if (state is! TextFeedbackResult) return const SizedBox.shrink();
+      final state = chatMessage.feedbackResult;
       
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.spellcheck, size: 16, color: _getFeedbackColor(state.grammar)),
-          const SizedBox(width: 4),
-          Icon(Icons.auto_fix_high, size: 16, color: _getFeedbackColor(state.fluency)),
-        ],
-      );
+      return switch (state) {
+        FeedbackReady(data: final data) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.spellcheck, size: 16, color: _getFeedbackColor(data.grammar)),
+            const SizedBox(width: 4),
+            Icon(Icons.auto_fix_high, size: 16, color: _getFeedbackColor(data.fluency)),
+          ],
+        ),
+        FeedbackLoading() => const Text('Analyzing...', style: TextStyle(fontSize: 12, color: Colors.grey)),
+        _ => const SizedBox.shrink(),
+      };
     } 
     
     if (chatMessage is UserAudioMessage) {
-      final state = chatMessage.feedbackState;
-      if (state is! AudioFeedbackResult) return const SizedBox.shrink();
-
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.record_voice_over, size: 16, color: _getPronunciationColor(state.pronunciation.pronScore)),
-          const SizedBox(width: 4),
-          Icon(Icons.spellcheck, size: 16, color: _getFeedbackColor(state.grammar)),
-          const SizedBox(width: 4),
-          Icon(Icons.auto_fix_high, size: 16, color: _getFeedbackColor(state.fluency)),
-        ],
-      );
+      final state = chatMessage.feedbackResult;
+      
+      return switch (state) {
+        FeedbackReady(data: final data) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.record_voice_over, size: 16, color: _getFeedbackColor(data.pronunciation)),
+            const SizedBox(width: 4),
+            Icon(Icons.spellcheck, size: 16, color: _getFeedbackColor(data.grammar)),
+            const SizedBox(width: 4),
+            Icon(Icons.auto_fix_high, size: 16, color: _getFeedbackColor(data.fluency)),
+          ],
+        ),
+        FeedbackLoading() => const Text('Analyzing...', style: TextStyle(fontSize: 12, color: Colors.grey)),
+        _ => const SizedBox.shrink(),
+      };
     }
 
     return const SizedBox.shrink();
@@ -77,41 +72,61 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
       itemCount: widget.messages.length,
       itemBuilder: (context, index) {
         final chatMessage = widget.messages[index];
-        final message = chatMessage.message;
+        final isUserMessage = chatMessage is UserTextMessage || chatMessage is UserAudioMessage;
+
+        final isClickable = switch (chatMessage) {
+          UserTextMessage m => m.feedbackResult is FeedbackReady,
+          UserAudioMessage m => m.feedbackResult is FeedbackReady,
+          AITextMessage _ || AIAudioMessage _ => true,
+        };
 
         Widget content = switch (chatMessage) {
-          UserTextMessage m => Text((m.message.content as TextMessage).text),
-          UserAudioMessage m => VoiceNote(
-              audioUrl: (m.message.content as AudioMessage).audioUrl,
-              duration: (m.message.content as AudioMessage).duration,
+          UserTextMessage m => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              child: Text(m.text),
             ),
-          AITextMessage m => Text((m.message.content as TextMessage).text),
-          AIAudioMessage m => VoiceNote(
-              audioUrl: (m.message.content as AudioMessage).audioUrl,
-              duration: (m.message.content as AudioMessage).duration,
+          UserAudioMessage m => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+              child: VoiceNote(
+                audioUrl: m.fullMergedAudioUrl,
+                duration: m.duration,
+              ),
+            ),
+          AITextMessage m => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              child: Text(m.text),
+            ),
+          AIAudioMessage m => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+              child: VoiceNote(
+                audioUrl: m.audioUrl,
+                duration: m.duration,
+              ),
             ),
         };
 
         return Align(
-          alignment: message.isUserMessage 
+          alignment: isUserMessage 
               ? Alignment.centerRight 
               : Alignment.centerLeft,
           child: Column(
-            crossAxisAlignment: message.isUserMessage 
+            crossAxisAlignment: isUserMessage 
                 ? CrossAxisAlignment.end 
                 : CrossAxisAlignment.start,
             children: [
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 280),
                 child: GestureDetector(
-                  onTap: () => widget.controller?.onMessageTap?.call(chatMessage),
+                  onLongPress: isClickable
+                      ? () => widget.controller?.onMessageTap?.call(chatMessage)
+                      : null,
                   child: MessageBubble(content: content),
                 ),
               ),
-              if (message.isUserMessage)
+              if (isUserMessage)
                 Padding(
                   padding: const EdgeInsets.only(top: 4, right: 8),
-                  child: _buildFeedbackIcons(chatMessage),
+                  child: _buildFeedbackIcons(context, chatMessage),
                 ),
             ],
           ),
@@ -120,3 +135,4 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
     );
   }
 }
+

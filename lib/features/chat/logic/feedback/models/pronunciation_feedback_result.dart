@@ -1,11 +1,11 @@
-class PronunciationFeedback {
+class PronunciationFeedbackResult {
   final String transcript;
   final double accuracyScore;
   final double fluencyScore;
   final double completenessScore;
   final double pronScore;
 
-  PronunciationFeedback({
+  PronunciationFeedbackResult({
     required this.transcript,
     required this.accuracyScore,
     required this.fluencyScore,

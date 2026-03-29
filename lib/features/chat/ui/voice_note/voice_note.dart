@@ -43,22 +43,31 @@ class _VoiceNoteState extends State<VoiceNote> {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
           icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
           onPressed: canToggle ? () => controller.togglePlayStatus() : null,
         ),
         Flexible(
-          child: Slider(
-            value: currentMs,
-            max: maxMs,
-            onChangeStart: (v) {
-              controller.onSeekStart();
-            },
-            onChanged: (v) => controller.onSeekChanged(
-              Duration(milliseconds: v.toInt()),
+          child: SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 4.0,
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 12.0),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
             ),
-            onChangeEnd: (v) {
-              controller.onSeekEnd(Duration(milliseconds: v.toInt()));
-            },
+            child: Slider(
+              value: currentMs,
+              max: maxMs,
+              onChangeStart: (v) {
+                controller.onSeekStart();
+              },
+              onChanged: (v) => controller.onSeekChanged(
+                Duration(milliseconds: v.toInt()),
+              ),
+              onChangeEnd: (v) {
+                controller.onSeekEnd(Duration(milliseconds: v.toInt()));
+              },
+            ),
           ),
         ),
       ],

@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
-import 'package:lingu/features/chat/logic/input/text_input_handler.dart';
 import 'package:lingu/features/chat/logic/input/audio_input_handler.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list.dart';
@@ -10,11 +9,11 @@ import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_con
 import 'package:lingu/features/chat/ui/input_bar/input_bar.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
-import 'package:lingu/features/chat/logic/panel/panel_type.dart';
 import 'package:lingu/features/chat/ui/record/record_controller.dart';
 import 'package:lingu/features/chat/ui/record/record_display.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
 @RoutePage()
 class ChatView extends StatefulWidget {
@@ -26,80 +25,70 @@ class ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<ChatView> {
   final ChatMessagesManager _chatMessagesManager = di<ChatMessagesManager>();
-
   final InputBarController _inputBarController = InputBarController();
   final ChatMessagesListController _controller = ChatMessagesListController();
   final RecordController _recordController = RecordController();
   final BottomPanelController _bottomPanelController = BottomPanelController();
   final AudioInputHandler _recordInputHandler = di<AudioInputHandler>();
   final PanelManager _panelManager = di<PanelManager>();
-  final TextInputHandler _userMessagesInputHandler = di<TextInputHandler>();
 
   @override
   void initState() {
     super.initState();
     _inputBarController.onTextSubmit = (text) {
-      _userMessagesInputHandler.sendTextMessage(text: text);
+      _chatMessagesManager.addUserTextMessage(text: text);
     };
-
     _inputBarController.onStartRecording = () {
       _panelManager.openMicPanel();
     };
-
     _inputBarController.onChat = () {
       _panelManager.openChatPanel();
     };
-
     effect(() {
       _inputBarController.isFocused;
       if (_inputBarController.isFocused.value) {
         _panelManager.closePanel();
       }
     });
-
     _recordInputHandler.amplitudeStream.listen((amplitude) {
       _recordController.updateAmplitude(amplitude);
     });
-
     _recordController.onToggleRecording = (isPaused) {
       _recordInputHandler.toggleRecording();
     };
-
     _recordController.onToggleLanguage = (isTargetLanguage) {
       _recordInputHandler.toggleLanguage();
     };
-
     _recordController.onStart = () {
       _panelManager.openMicPanel();
       _recordInputHandler.startRecording();
     };
-
     _recordController.onStop = () {
       _panelManager.closePanel();
       _recordInputHandler.sendRecording();
     };
-    
-
     _recordController.onCancel = () {
       _panelManager.closePanel();
       _recordInputHandler.cancelRecording();
     };
-
     _bottomPanelController.onClose = () {
       _panelManager.closePanel();
+    };
+    _controller.onMessageTap = (message) {
+      _panelManager.selectMessage(message.id);
     };
   }
 
   @override
   void dispose() {
-    super.dispose();
-
     _recordController.dispose();
     _recordInputHandler.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final panelState = _panelManager.currentPanel.watch(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Chat View')),
       body: Column(
@@ -112,15 +101,151 @@ class _ChatViewState extends State<ChatView> {
               controller: _controller,
             ),
           ),
-          if (_panelManager.currentPanel.watch(context) == PanelType.mic)
+          if (panelState is MicPanelState)
             Expanded(child: RecordDisplay(controller: _recordController)),
-          if (_panelManager.currentPanel.watch(context) == PanelType.messageDetails)
-            BottomPanel(controller: _bottomPanelController),
-          if (_panelManager.currentPanel.watch(context) == PanelType.chat)
-            BottomPanel(controller: _bottomPanelController),
-          if (_panelManager.currentPanel.watch(context) != PanelType.mic)
+          if (panelState is ChatPanelState)
+            BottomPanel(
+                controller: _bottomPanelController,
+                child: const SizedBox(height: 200)),
+          if (panelState is UserTextMessageData)
+            BottomPanel(
+              controller: _bottomPanelController,
+              child: UserTextMessageDetails(
+                grammarFeedback: panelState.grammarFeedback,
+                fluencyFeedback: panelState.fluencyFeedback,
+              ),
+            ),
+          if (panelState is UserAudioMessageData)
+            BottomPanel(
+              controller: _bottomPanelController,
+              child: UserAudioMessageDetails(
+                transcript: panelState.transcript,
+                grammarFeedback: panelState.grammarFeedback,
+                fluencyFeedback: panelState.fluencyFeedback,
+              ),
+            ),
+          if (panelState is AITextMessageData)
+            BottomPanel(
+              controller: _bottomPanelController,
+              child: AITextMessageDetails(
+                translation: panelState.translation,
+              ),
+            ),
+          if (panelState is AIAudioMessageData)
+            BottomPanel(
+              controller: _bottomPanelController,
+              child: AIAudioMessageDetails(
+                transcript: panelState.transcript,
+                translation: panelState.translation,
+              ),
+            ),
+          if (panelState is! MicPanelState)
             InputBar(_inputBarController),
         ],
+      ),
+    );
+  }
+}
+
+class UserTextMessageDetails extends StatelessWidget {
+  final SentenceFeedback? grammarFeedback;
+  final SentenceFeedback? fluencyFeedback;
+
+  const UserTextMessageDetails({
+    super.key,
+    required this.grammarFeedback,
+    required this.fluencyFeedback,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: Text(
+          'Grammar: ${grammarFeedback?.correction ?? "Perfect"}\n'
+          'Fluency: ${fluencyFeedback?.correction ?? "Perfect"}',
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
+
+class UserAudioMessageDetails extends StatelessWidget {
+  final String transcript;
+  final SentenceFeedback? grammarFeedback;
+  final SentenceFeedback? fluencyFeedback;
+
+  const UserAudioMessageDetails({
+    super.key,
+    required this.transcript,
+    required this.grammarFeedback,
+    required this.fluencyFeedback,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: Text(
+          'Transcript: $transcript\n'
+          'Grammar: ${grammarFeedback?.correction ?? "Perfect"}\n'
+          'Fluency: ${fluencyFeedback?.correction ?? "Perfect"}',
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
+
+class AITextMessageDetails extends StatelessWidget {
+  final String? translation;
+
+  const AITextMessageDetails({
+    super.key,
+    this.translation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: Text(
+          'Translation: ${translation ?? "No translation available"}',
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
+
+class AIAudioMessageDetails extends StatelessWidget {
+  final String transcript;
+  final String? translation;
+
+  const AIAudioMessageDetails({
+    super.key,
+    required this.transcript,
+    this.translation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: Text(
+          'Transcript: $transcript\n'
+          'Translation: ${translation ?? "No translation available"}',
+          style: const TextStyle(fontSize: 16),
+        ),
       ),
     );
   }

@@ -1,55 +1,82 @@
+import 'dart:async';
+
 import 'package:injectable/injectable.dart';
-import 'package:lingu/features/chat/logic/feedback/managers/pronunciation_feedback_manager.dart';
-import 'package:lingu/features/chat/logic/feedback/managers/text_feedback_manager.dart';
-import 'package:lingu/features/chat/logic/feedback/models/audio_feedback_state.dart';
+import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
+import 'package:lingu/features/chat/logic/feedback/models/audio_feedback_result.dart';
+import 'package:lingu/features/chat/logic/feedback/models/text_feedback_result.dart';
+import 'package:lingu/features/chat/logic/feedback/models/feedback_state.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
-import 'package:lingu/features/chat/logic/message/models/message.dart';
-import 'package:lingu/features/chat/logic/message/managers/messages_manager.dart';
 import 'package:signals/signals.dart';
 
 @Singleton(scope: 'chat')
 class ChatMessagesManager {
-  final MessagesManager _messagesManager;
-  final PronunciationFeedbackManager _pronunciationFeedbackManager;
-  final TextFeedbackManager _textFeedbackManager;
+  final MessageDetailsManager _messageDetailsManager;
+  ChatMessagesManager(this._messageDetailsManager);
+  
+  final _messages = signal<List<ChatMessage>>([]);
+  ReadonlySignal<List<ChatMessage>> get messages => _messages;
 
-  ChatMessagesManager(
-    this._messagesManager,
-    this._pronunciationFeedbackManager,
-    this._textFeedbackManager,
-  );
+  int _nextId = 0;
+  int _generateId() => _nextId++;
 
-  late final messages = computed<List<ChatMessage>>(() {
-    final basicMessages = _messagesManager.messages.value;
+  void updateTextMessageFeedback(int id, FeedbackState<TextFeedbackResult> newState) {
+    _messages.value = [
+      for (final m in _messages.value)
+        if (m is UserTextMessage && m.id == id)
+          m.copyWith(feedbackResult: newState)
+        else
+          m
+    ];
+  }
 
-    return basicMessages.map((msg) {
-      if (msg.isUserMessage) {
-        if (msg.content is TextMessage) {
-          return UserTextMessage(
-            msg,
-            _textFeedbackManager.textFeedback(msg.id),
-          );
-        } else if (msg.content is AudioMessage) {
-          final feedback = _pronunciationFeedbackManager.audioFeedback(msg.id);
-          String transcript = '';
-          if (feedback is AudioFeedbackResult) {
-            transcript = feedback.pronunciation.transcript;
-          }
+  void updateAudioMessageFeedback(int id, FeedbackState<AudioFeedbackResult> newState) {
+    _messages.value = [
+      for (final m in _messages.value)
+        if (m is UserAudioMessage && m.id == id)
+          m.copyWith(feedbackResult: newState)
+        else
+          m
+    ];
+  }
 
-          return UserAudioMessage(
-            msg,
-            feedback,
-            transcript,
-          );
-        }
-      } else {
-        if (msg.content is TextMessage) {
-          return AITextMessage(msg);
-        } else if (msg.content is AudioMessage) {
-          return AIAudioMessage(msg, ''); 
-        }
-      }
-      return AITextMessage(msg); 
-    }).toList();
-  });
+  Future<void> addUserTextMessage({required String text}) async {
+    final id = _generateId();
+    final message = UserTextMessage(
+      id: id,
+      text: text, 
+      feedbackResult: const FeedbackLoading(),
+    );
+    _messages.value = [..._messages.value, message];
+    
+    try {
+      final summary = await _messageDetailsManager.fetchTextFeedback(id, text);
+      updateTextMessageFeedback(id, FeedbackReady(summary));
+    } catch (e) {
+      updateTextMessageFeedback(id, FeedbackError(e));
+    }
+  }
+
+  Future<void> addUserAudioMessage({
+    required String audioUrl, 
+    required Duration duration, 
+    required List<UserSpeechAudio> individualAudioUrls,
+    String transcript = "", // Temporary until transcription is integrated
+  }) async {
+    final id = _generateId();
+    final message = UserAudioMessage(
+      id: id,
+      fullMergedAudioUrl: audioUrl, 
+      duration: duration, 
+      feedbackResult: const FeedbackLoading(),
+      individualAudioUrls: individualAudioUrls,
+    );
+    _messages.value = [..._messages.value, message];
+    
+    try {
+      final summary = await _messageDetailsManager.fetchAudioFeedback(id, audioUrl, transcript);
+      updateAudioMessageFeedback(id, FeedbackReady(summary));
+    } catch (e) {
+      updateAudioMessageFeedback(id, FeedbackError(e));
+    }
+  }
 }

@@ -5,7 +5,12 @@ class MessageBubble extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
-  const MessageBubble({super.key, required this.content, this.onTap, this.onLongPress});
+  const MessageBubble({
+    super.key,
+    required this.content,
+    this.onTap,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +21,7 @@ class MessageBubble extends StatelessWidget {
         onTap: onTap,
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(8.0),
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: content,
-        ),
+        child: content,
       ),
     );
   }

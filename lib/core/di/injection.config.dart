@@ -39,24 +39,18 @@ import 'package:lingu/core/tts/core/i_tts_fabric.dart' as _i42;
 import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
 import 'package:lingu/features/chat/di/chat_languages.dart' as _i522;
 import 'package:lingu/features/chat/di/chat_module.dart' as _i437;
-import 'package:lingu/features/chat/logic/feedback/managers/pronunciation_feedback_manager.dart'
-    as _i904;
-import 'package:lingu/features/chat/logic/feedback/managers/text_feedback_manager.dart'
-    as _i785;
+import 'package:lingu/features/chat/logic/chatbot/chatbot_service.dart'
+    as _i1003;
+import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart'
+    as _i98;
 import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_service.dart'
     as _i847;
 import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart'
     as _i228;
 import 'package:lingu/features/chat/logic/input/audio_input_handler.dart'
     as _i86;
-import 'package:lingu/features/chat/logic/input/text_input_handler.dart'
-    as _i873;
-import 'package:lingu/features/chat/logic/message/managers/ai_messages_manager.dart'
-    as _i297;
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart'
     as _i433;
-import 'package:lingu/features/chat/logic/message/managers/messages_manager.dart'
-    as _i200;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -67,6 +61,7 @@ extension GetItInjectableX on _i174.GetIt {
   }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i597.HomeGuard>(() => _i597.HomeGuard());
+    gh.factory<_i1003.ChatbotService>(() => _i1003.ChatbotService());
     gh.factory<_i847.PronunciationFeedbackService>(
       () => _i847.PronunciationFeedbackService(),
     );
@@ -74,7 +69,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i140.SharedPreferencesStore>(
       () => _i140.SharedPreferencesStore(),
     );
-    gh.singleton<_i420.PanelManager>(() => _i420.PanelManager());
     gh.singleton<_i709.IAudioRecorder>(() => _i601.UniversalPCMRecorder());
     gh.singleton<_i303.IAudioPathSaver>(() => _i240.PCMToWavAudioSaver());
     gh.singleton<_i645.IAudioMerger>(() => _i491.PCMAudioMerger());
@@ -108,15 +102,6 @@ extension GetItInjectableX on _i174.GetIt {
       ),
       preResolve: true,
     );
-    gh.factory<_i86.AudioInputHandler>(
-      () => _i86.AudioInputHandler(
-        gh<_i200.MessagesManager>(),
-        gh<_i709.IAudioRecorder>(),
-        gh<_i65.IAudioPlayerManager>(),
-        gh<_i303.IAudioPathSaver>(),
-        gh<_i645.IAudioMerger>(),
-      ),
-    );
     gh.factory<_i228.StatementFeedbackService>(
       () => _i228.StatementFeedbackService(
         gh<_i250.IAIModel>(),
@@ -132,11 +117,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i691.IAIModelFabric>(
       () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
     );
-    gh.factory<_i873.TextInputHandler>(
-      () => _i873.TextInputHandler(gh<_i200.MessagesManager>()),
-    );
     gh.factory<_i42.ITTSFabric>(
       () => _i573.GoogleTTSFabric(gh<_i711.TextToSpeechSettingsService>()),
+    );
+    gh.factory<_i86.AudioInputHandler>(
+      () => _i86.AudioInputHandler(
+        gh<_i433.ChatMessagesManager>(),
+        gh<_i709.IAudioRecorder>(),
+        gh<_i65.IAudioPlayerManager>(),
+        gh<_i303.IAudioPathSaver>(),
+        gh<_i645.IAudioMerger>(),
+      ),
     );
     gh.factory<_i1033.TTSCredentialsGuard>(
       () => _i1033.TTSCredentialsGuard(gh<_i711.TextToSpeechSettingsService>()),
@@ -175,41 +166,23 @@ extension GetItInjectableX on _i174.GetIt {
         gh.factory<_i648.ITextToSpeechService>(
           () => chatModule.getTTS(gh<_i42.ITTSFabric>()),
         );
-        gh.singleton<_i200.MessagesManager>(() => _i200.MessagesManager());
         gh.factory<_i522.ChatLanguages>(
           () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
         );
         gh.factory<_i250.IAIModel>(
           () => chatModule.getAIModel(gh<_i691.IAIModelFabric>()),
         );
-        gh.singleton<_i904.PronunciationFeedbackManager>(
-          () => _i904.PronunciationFeedbackManager(
-            gh<_i200.MessagesManager>(),
+        gh.singleton<_i98.MessageDetailsManager>(
+          () => _i98.MessageDetailsManager(
             gh<_i847.PronunciationFeedbackService>(),
             gh<_i228.StatementFeedbackService>(),
           ),
         );
-        gh.singleton<_i785.TextFeedbackManager>(
-          () => _i785.TextFeedbackManager(
-            gh<_i200.MessagesManager>(),
-            gh<_i228.StatementFeedbackService>(),
-          ),
-        );
-        gh.singleton<_i297.AIMessagesManager>(
-          () => _i297.AIMessagesManager(
-            gh<_i200.MessagesManager>(),
-            gh<_i873.TextInputHandler>(),
-            gh<_i648.ITextToSpeechService>(),
-            gh<_i65.IAudioPlayerManager>(),
-            gh<_i250.IAIModel>(),
-          ),
-        );
         gh.singleton<_i433.ChatMessagesManager>(
-          () => _i433.ChatMessagesManager(
-            gh<_i200.MessagesManager>(),
-            gh<_i904.PronunciationFeedbackManager>(),
-            gh<_i785.TextFeedbackManager>(),
-          ),
+          () => _i433.ChatMessagesManager(gh<_i98.MessageDetailsManager>()),
+        );
+        gh.singleton<_i420.PanelManager>(
+          () => _i420.PanelManager(gh<_i98.MessageDetailsManager>()),
         );
       },
     );

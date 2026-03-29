@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
 
 class BottomPanel extends StatelessWidget {
-  final BottomPanelController controller;
+  final Widget child;
+  final BottomPanelController? controller;
 
-  const BottomPanel({super.key, required this.controller});
+  const BottomPanel({super.key, this.controller, required this.child});
+
 
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 600,
       width: double.infinity,
       color: Colors.grey[300],
       child: Column(children: [
         IconButton(onPressed: () {
-          controller.onClose?.call();
+          controller?.onClose?.call();
         }, icon: const Icon(Icons.close)),
-        const Text('Bottom Panel'),
-        const SizedBox(height: 20),
+        child,
       ]),
     );
   }

@@ -4,8 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
-import 'package:lingu/features/chat/logic/feedback/models/feedback_correction_level.dart';
-import 'package:lingu/features/chat/logic/feedback/models/feedback.dart';
+import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
 @injectable
 class StatementFeedbackService {
@@ -14,7 +13,7 @@ class StatementFeedbackService {
 
   StatementFeedbackService(this._aiModel, this._languages);
 
-  Future<(Feedback? fluency, Feedback? grammar)> analyze(
+  Future<(SentenceFeedback? fluency, SentenceFeedback? grammar)> analyze(
       String statement) async {
     final schema = Schema(
       type: SchemaType.object,
@@ -22,10 +21,6 @@ class StatementFeedbackService {
         'fluency': Schema(
           type: SchemaType.object,
           properties: {
-            'level': Schema(
-              type: SchemaType.string,
-              enumValues: ['bad', 'neutral'],
-            ),
             'correction': Schema(type: SchemaType.string),
             'explanation': Schema(type: SchemaType.string),
           },
@@ -34,10 +29,6 @@ class StatementFeedbackService {
         'grammar': Schema(
           type: SchemaType.object,
           properties: {
-            'level': Schema(
-              type: SchemaType.string,
-              enumValues: ['bad', 'neutral'],
-            ),
             'correction': Schema(type: SchemaType.string),
             'explanation': Schema(type: SchemaType.string),
           },
@@ -68,18 +59,10 @@ class StatementFeedbackService {
     );
   }
 
-  Feedback _parseFeedback(Map<String, dynamic> json) {
-    return Feedback(
-      level: _parseLevel(json['level']),
+  SentenceFeedback _parseFeedback(Map<String, dynamic> json) {
+    return SentenceFeedback(
       correction: json['correction'],
       explanation: json['explanation'],
-    );
-  }
-
-  FeedbackCorrectionLevel _parseLevel(String? level) {
-    return FeedbackCorrectionLevel.values.firstWhere(
-      (e) => e.name == level,
-      orElse: () => FeedbackCorrectionLevel.neutral,
     );
   }
 
