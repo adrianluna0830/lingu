@@ -9,8 +9,13 @@ import 'package:signals/signals_flutter.dart';
 @RoutePage()
 class TTSCredentialsView extends StatefulWidget {
   final VoidCallback onComplete;
+  final bool isSetupFlow;
 
-  const TTSCredentialsView({super.key, required this.onComplete});
+  const TTSCredentialsView({
+    super.key,
+    required this.onComplete,
+    this.isSetupFlow = false,
+  });
 
   @override
   State<TTSCredentialsView> createState() => _TTSCredentialsViewState();
@@ -63,8 +68,13 @@ class _TTSCredentialsViewState extends State<TTSCredentialsView> with SignalsMix
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('STT Credentials')),
+    return PopScope(
+      canPop: !widget.isSetupFlow,
+      child: Scaffold(
+        appBar: AppBar(
+        title: const Text('STT Credentials'),
+        automaticallyImplyLeading: !widget.isSetupFlow,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -98,6 +108,6 @@ class _TTSCredentialsViewState extends State<TTSCredentialsView> with SignalsMix
           }),
         ],
       ),
-    );
+    ));
   }
 }

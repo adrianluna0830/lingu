@@ -10,6 +10,7 @@ import 'package:lingu/features/home/ui/main_view.dart';
 import 'package:lingu/features/settings/ui/settings_view.dart';
 import 'package:lingu/features/login/ui/ai_credentials_view.dart';
 import 'package:lingu/features/login/ui/learning_locale_view.dart';
+import 'package:lingu/features/login/ui/cefr_level_view.dart';
 import 'package:lingu/features/login/ui/native_locale_view.dart';
 import 'package:lingu/features/login/ui/pronunciation_assessment_credentials_view.dart';
 import 'package:lingu/features/login/ui/tts_credentials_view.dart';
@@ -21,6 +22,7 @@ part 'app_router.gr.dart';
 class AppRouter extends RootStackRouter {
   final NativeLocaleGuard _nativeLocaleGuard;
   final LearningLocaleGuard _learningLocaleGuard;
+  final CEFRLevelGuard _cefrLevelGuard;
   final AICredentialsGuard _aiCredentialsGuard;
   final PronunciationAssessmentCredentialsGuard _pronunciationAssessmentCredentialGuard;
   final TTSCredentialsGuard _ttsCredentialsGuard;
@@ -30,6 +32,7 @@ class AppRouter extends RootStackRouter {
   AppRouter(
     this._nativeLocaleGuard,
     this._learningLocaleGuard,
+    this._cefrLevelGuard,
     this._aiCredentialsGuard,
     this._pronunciationAssessmentCredentialGuard,
     this._ttsCredentialsGuard,
@@ -41,6 +44,7 @@ class AppRouter extends RootStackRouter {
   List<AutoRouteGuard> get guards => [
     _nativeLocaleGuard,
     _learningLocaleGuard,
+    _cefrLevelGuard,
     _aiCredentialsGuard,
     _pronunciationAssessmentCredentialGuard,
     _ttsCredentialsGuard,
@@ -49,6 +53,7 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
     AutoRoute(page: NativeLocaleRoute.page),
     AutoRoute(page: LearningLocaleRoute.page),
+    AutoRoute(page: CEFRLevelRoute.page),
     AutoRoute(page: AICredentialsRoute.page),
     AutoRoute(page: PronunciationAssessmentCredentialsRoute.page),
     AutoRoute(page: TTSCredentialsRoute.page),

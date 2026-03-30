@@ -9,8 +9,13 @@ import 'package:signals/signals_flutter.dart';
 @RoutePage()
 class AICredentialsView extends StatefulWidget {
   final VoidCallback onComplete;
+  final bool isSetupFlow;
 
-  const AICredentialsView({super.key, required this.onComplete});
+  const AICredentialsView({
+    super.key,
+    required this.onComplete,
+    this.isSetupFlow = false,
+  });
 
   @override
   State<AICredentialsView> createState() => _AICredentialsViewState();
@@ -63,8 +68,13 @@ class _AICredentialsViewState extends State<AICredentialsView> with SignalsMixin
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Gemini Credentials')),
+    return PopScope(
+      canPop: !widget.isSetupFlow,
+      child: Scaffold(
+        appBar: AppBar(
+        title: const Text('Gemini Credentials'),
+        automaticallyImplyLeading: !widget.isSetupFlow,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -97,6 +107,7 @@ class _AICredentialsViewState extends State<AICredentialsView> with SignalsMixin
             );
           }),
         ],
+      ),
       ),
     );
   }

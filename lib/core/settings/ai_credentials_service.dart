@@ -1,6 +1,5 @@
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/settings/stores.dart';
-import 'package:signals/signals.dart';
 
 @singleton
 class AICredentialsService {
@@ -9,7 +8,7 @@ class AICredentialsService {
   AICredentialsService._(SecureStore secureStore)
     : apiKey = PersistedNullableStringSignal(
         null,
-        'geminiApiKey',
+        key: 'geminiApiKey',
         store: secureStore,
       );
 

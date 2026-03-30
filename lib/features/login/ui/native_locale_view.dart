@@ -8,8 +8,13 @@ import 'package:signals/signals_flutter.dart';
 @RoutePage()
 class NativeLocaleView extends StatefulWidget {
   final VoidCallback onComplete;
+  final bool isSetupFlow;
 
-  const NativeLocaleView({super.key, required this.onComplete});
+  const NativeLocaleView({
+    super.key,
+    required this.onComplete,
+    this.isSetupFlow = false,
+  });
 
   @override
   State<NativeLocaleView> createState() => _NativeLocaleViewState();
@@ -29,13 +34,19 @@ class _NativeLocaleViewState extends State<NativeLocaleView> with SignalsMixin {
     return switch (locale) {
       LanguageLocale.en => 'English',
       LanguageLocale.es => 'Spanish',
+      LanguageLocale.de => 'German',
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Native Locale')),
+    return PopScope(
+      canPop: !widget.isSetupFlow,
+      child: Scaffold(
+        appBar: AppBar(
+        title: const Text('Native Locale'),
+        automaticallyImplyLeading: !widget.isSetupFlow,
+      ),
       body: Column(
         children: [
           Expanded(
@@ -71,6 +82,6 @@ class _NativeLocaleViewState extends State<NativeLocaleView> with SignalsMixin {
           ),
         ],
       ),
-    );
+    ));
   }
 }

@@ -1,6 +1,5 @@
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/settings/stores.dart';
-import 'package:signals/signals.dart';
 
 @singleton
 class TextToSpeechSettingsService {
@@ -12,22 +11,22 @@ class TextToSpeechSettingsService {
   TextToSpeechSettingsService._(SharedPreferencesStore store)
     : apiKey = PersistedNullableStringSignal(
         null,
-        'ttsApiKey',
+        key: 'ttsApiKey',
         store: store,
-      )  
-    ,customVoiceEnabled = PersistedBoolSignal(
+      ),
+      customVoiceEnabled = PersistedBoolSignal(
         false,
-        'customVoiceEnabled',
+        key: 'customVoiceEnabled',
         store: store,
       ),
       customVoiceName = PersistedNullableStringSignal(
         null,
-        'customVoiceName',
+        key: 'customVoiceName',
         store: store,
       ),
       practiceModeSpeakingRate = PersistedDoubleSignal(
         1.0,
-        'practiceModeSpeakingRate',
+        key: 'practiceModeSpeakingRate',
         store: store,
       );
 
@@ -36,7 +35,7 @@ class TextToSpeechSettingsService {
     SharedPreferencesStore store,
   ) async {
     final instance = TextToSpeechSettingsService._(store);
-    await Future.wait([
+    await Future.wait<void>([
       instance.practiceModeSpeakingRate.init(),
       instance.customVoiceEnabled.init(),
       instance.customVoiceName.init(),

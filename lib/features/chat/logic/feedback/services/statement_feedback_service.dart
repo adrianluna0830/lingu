@@ -85,6 +85,8 @@ class StatementFeedbackService {
         return 'English';
       case LanguageLocale.es:
         return 'Spanish';
+      case LanguageLocale.de:
+        return 'German';
     }
   }
 }

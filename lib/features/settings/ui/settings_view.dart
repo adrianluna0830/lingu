@@ -7,6 +7,7 @@ import 'package:lingu/core/settings/pronunciation_assessment_credentials_service
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 import 'package:lingu/core/router/app_router.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:lingu/core/models/cefr.dart';
 
 @RoutePage()
 class SettingsView extends StatelessWidget {
@@ -32,6 +33,11 @@ class SettingsView extends StatelessWidget {
             title: 'Learning Language',
             value: localeService.learningLocale.watch(context)?.name ?? 'Not set',
             onTap: () => context.router.push(LearningLocaleRoute(onComplete: () => context.router.maybePop())),
+          ),
+          _SettingTile(
+            title: 'CEFR Level',
+            value: localeService.currentTargetLanguageCEFR.watch(context)?.name.toUpperCase() ?? 'Not set',
+            onTap: () => context.router.push(CEFRLevelRoute(onComplete: () => context.router.maybePop())),
           ),
           _SecretSettingTile(
             title: 'AI API Key',

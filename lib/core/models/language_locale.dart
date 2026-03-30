@@ -1,6 +1,7 @@
 enum LanguageLocale {
   en('en-US'),
-  es('es-MX');
+  es('es-MX'),
+  de('de-DE');
 
   final String bcp47;
   const LanguageLocale(this.bcp47);

@@ -2,14 +2,20 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/models/language_locale.dart';
+import 'package:lingu/core/router/app_router.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:signals/signals_flutter.dart';
 
 @RoutePage()
 class LearningLocaleView extends StatefulWidget {
   final VoidCallback onComplete;
+  final bool isSetupFlow;
 
-  const LearningLocaleView({super.key, required this.onComplete});
+  const LearningLocaleView({
+    super.key,
+    required this.onComplete,
+    this.isSetupFlow = false,
+  });
 
   @override
   State<LearningLocaleView> createState() => _LearningLocaleViewState();
@@ -29,13 +35,19 @@ class _LearningLocaleViewState extends State<LearningLocaleView> with SignalsMix
     return switch (locale) {
       LanguageLocale.en => 'English',
       LanguageLocale.es => 'Spanish',
+      LanguageLocale.de => 'German',
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Learning Locale')),
+    return PopScope(
+      canPop: !widget.isSetupFlow,
+      child: Scaffold(
+        appBar: AppBar(
+        title: const Text('Learning Locale'),
+        automaticallyImplyLeading: !widget.isSetupFlow,
+      ),
       body: Column(
         children: [
           Expanded(
@@ -60,10 +72,23 @@ class _LearningLocaleViewState extends State<LearningLocaleView> with SignalsMix
               return ElevatedButton(
                 onPressed: (_selectedLocale.value == null || _isProcessing.value)
                     ? null
-                    : () {
+                    : () async {
                         _isProcessing.value = true;
-                        di<LocaleSettingsService>().learningLocale.value = _selectedLocale.value;
-                        widget.onComplete();
+                        final settings = di<LocaleSettingsService>();
+                        settings.learningLocale.value = _selectedLocale.value;
+                        
+                        await settings.currentTargetLanguageCEFR.reload();
+                        
+                        if (!context.mounted) return;
+
+                        if (settings.currentTargetLanguageCEFR.value == null) {
+                          context.router.replace(CEFRLevelRoute(
+                            onComplete: widget.onComplete,
+                            isSetupFlow: widget.isSetupFlow,
+                          ));
+                        } else {
+                          widget.onComplete();
+                        }
                       },
                 child: const Text("Continue"),
               );
@@ -71,6 +96,7 @@ class _LearningLocaleViewState extends State<LearningLocaleView> with SignalsMix
           ),
         ],
       ),
-    );
+    ));
   }
 }
+

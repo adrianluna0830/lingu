@@ -114,6 +114,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1033.LearningLocaleGuard>(
       () => _i1033.LearningLocaleGuard(gh<_i56.LocaleSettingsService>()),
     );
+    gh.factory<_i1033.CEFRLevelGuard>(
+      () => _i1033.CEFRLevelGuard(gh<_i56.LocaleSettingsService>()),
+    );
     gh.singleton<_i691.IAIModelFabric>(
       () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
     );
@@ -146,6 +149,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i1036.AppRouter(
         gh<_i1033.NativeLocaleGuard>(),
         gh<_i1033.LearningLocaleGuard>(),
+        gh<_i1033.CEFRLevelGuard>(),
         gh<_i1033.AICredentialsGuard>(),
         gh<_i1033.PronunciationAssessmentCredentialsGuard>(),
         gh<_i1033.TTSCredentialsGuard>(),

@@ -1,6 +1,5 @@
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/settings/stores.dart';
-import 'package:signals/signals.dart';
 
 @singleton
 class PronunciationAssessmentCredentialsService {
@@ -12,12 +11,12 @@ class PronunciationAssessmentCredentialsService {
     SharedPreferencesStore store,
   ) : apiKey = PersistedNullableStringSignal(
         null,
-        'sttApiKey',
+        key: 'sttApiKey',
         store: secureStore,
       ),
       endpoint = PersistedNullableStringSignal(
         null,
-        'sttEndpoint',
+        key: 'sttEndpoint',
         store: store,
       );
 
@@ -30,7 +29,7 @@ class PronunciationAssessmentCredentialsService {
       secureStore,
       store,
     );
-    await Future.wait([instance.apiKey.init(), instance.endpoint.init()]);
+    await Future.wait<void>([instance.apiKey.init(), instance.endpoint.init()]);
     return instance;
   }
 

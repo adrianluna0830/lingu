@@ -7,8 +7,13 @@ import 'package:signals/signals_flutter.dart';
 @RoutePage()
 class PronunciationAssessmentCredentialsView extends StatefulWidget {
   final VoidCallback onComplete;
+  final bool isSetupFlow;
 
-  const PronunciationAssessmentCredentialsView({super.key, required this.onComplete});
+  const PronunciationAssessmentCredentialsView({
+    super.key,
+    required this.onComplete,
+    this.isSetupFlow = false,
+  });
 
   @override
   State<PronunciationAssessmentCredentialsView> createState() =>
@@ -51,8 +56,13 @@ class _PronunciationAssessmentCredentialsViewState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Pronunciation Assessment')),
+    return PopScope(
+      canPop: !widget.isSetupFlow,
+      child: Scaffold(
+        appBar: AppBar(
+        title: const Text('Pronunciation Assessment'),
+        automaticallyImplyLeading: !widget.isSetupFlow,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -94,6 +104,6 @@ class _PronunciationAssessmentCredentialsViewState
           }),
         ],
       ),
-    );
+      ));
   }
 }

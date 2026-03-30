@@ -9,6 +9,7 @@ import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 final _setupRoutes = {
   NativeLocaleRoute.name,
   LearningLocaleRoute.name,
+  CEFRLevelRoute.name,
   AICredentialsRoute.name,
   TTSCredentialsRoute.name,
   PronunciationAssessmentCredentialsRoute.name,
@@ -30,7 +31,9 @@ class NativeLocaleGuard extends AutoRouteGuard {
     if (_localeSettings.nativeLocale.value == null) {
       bool isResolved = false;
       resolver.redirectUntil(
-        NativeLocaleRoute(onComplete: () {
+        NativeLocaleRoute(
+          isSetupFlow: true,
+          onComplete: () {
           if (!isResolved) {
             isResolved = true;
             resolver.next(true);
@@ -59,7 +62,40 @@ class LearningLocaleGuard extends AutoRouteGuard {
     if (_localeSettings.learningLocale.value == null) {
       bool isResolved = false;
       resolver.redirectUntil(
-        LearningLocaleRoute(onComplete: () {
+        LearningLocaleRoute(
+          isSetupFlow: true,
+          onComplete: () {
+          if (!isResolved) {
+            isResolved = true;
+            resolver.next(true);
+          }
+        }),
+      );
+    } else {
+      resolver.next(true);
+    }
+  }
+}
+
+@injectable
+class CEFRLevelGuard extends AutoRouteGuard {
+  final LocaleSettingsService _localeSettings;
+
+  CEFRLevelGuard(this._localeSettings);
+
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    if (_setupRoutes.contains(resolver.routeName)) {
+      resolver.next(true);
+      return;
+    }
+
+    if (_localeSettings.currentTargetLanguageCEFR.value == null) {
+      bool isResolved = false;
+      resolver.redirectUntil(
+        CEFRLevelRoute(
+          isSetupFlow: true,
+          onComplete: () {
           if (!isResolved) {
             isResolved = true;
             resolver.next(true);
@@ -74,6 +110,7 @@ class LearningLocaleGuard extends AutoRouteGuard {
 
 @injectable
 class AICredentialsGuard extends AutoRouteGuard {
+
   final AICredentialsService _aiCredentials;
 
   AICredentialsGuard(this._aiCredentials);
@@ -88,7 +125,9 @@ class AICredentialsGuard extends AutoRouteGuard {
     if (_aiCredentials.apiKey.value == null) {
       bool isResolved = false;
       resolver.redirectUntil(
-        AICredentialsRoute(onComplete: () {
+        AICredentialsRoute(
+          isSetupFlow: true,
+          onComplete: () {
           if (!isResolved) {
             isResolved = true;
             resolver.next(true);
@@ -118,6 +157,7 @@ class PronunciationAssessmentCredentialsGuard extends AutoRouteGuard {
       bool isResolved = false;
       resolver.redirectUntil(
         PronunciationAssessmentCredentialsRoute(
+          isSetupFlow: true,
           onComplete: () {
             if (!isResolved) {
               isResolved = true;
@@ -148,7 +188,9 @@ class TTSCredentialsGuard extends AutoRouteGuard {
     if (_ttsCredentials.apiKey.value == null) {
       bool isResolved = false;
       resolver.redirectUntil(
-        TTSCredentialsRoute(onComplete: () {
+        TTSCredentialsRoute(
+          isSetupFlow: true,
+          onComplete: () {
           if (!isResolved) {
             isResolved = true;
             resolver.next(true);
