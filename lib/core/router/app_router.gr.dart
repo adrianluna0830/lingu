@@ -458,3 +458,19 @@ class TTSCredentialsRouteArgs {
   @override
   int get hashCode => key.hashCode ^ onComplete.hashCode ^ isSetupFlow.hashCode;
 }
+
+/// generated route for
+/// [TopicsView]
+class TopicsRoute extends PageRouteInfo<void> {
+  const TopicsRoute({List<PageRouteInfo>? children})
+    : super(TopicsRoute.name, initialChildren: children);
+
+  static const String name = 'TopicsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const TopicsView();
+    },
+  );
+}

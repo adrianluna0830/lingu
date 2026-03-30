@@ -14,6 +14,7 @@ import 'package:lingu/features/login/ui/cefr_level_view.dart';
 import 'package:lingu/features/login/ui/native_locale_view.dart';
 import 'package:lingu/features/login/ui/pronunciation_assessment_credentials_view.dart';
 import 'package:lingu/features/login/ui/tts_credentials_view.dart';
+import 'package:lingu/features/topics/topics_view.dart';
 
 part 'app_router.gr.dart';
 
@@ -52,6 +53,7 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes => [
     AutoRoute(page: NativeLocaleRoute.page),
+    AutoRoute(page: TopicsRoute.page),
     AutoRoute(page: LearningLocaleRoute.page),
     AutoRoute(page: CEFRLevelRoute.page),
     AutoRoute(page: AICredentialsRoute.page),
@@ -64,6 +66,7 @@ class AppRouter extends RootStackRouter {
       children: [
         AutoRoute(page: MainRoute.page, initial: true),
         AutoRoute(page: SettingsRoute.page),
+        AutoRoute(page: TopicsRoute.page),
       ],
     ),
     AutoRoute(page: ChatRoute.page, guards: [_chatGuard]),
