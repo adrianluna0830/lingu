@@ -52,6 +52,8 @@ import 'package:lingu/features/chat/logic/input/audio_input_handler.dart'
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart'
     as _i433;
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart' as _i420;
+import 'package:lingu/features/topics/repository/topics_repository.dart'
+    as _i652;
 import 'package:lingu/features/topics/topics_manager.dart' as _i211;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -66,10 +68,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i847.PronunciationFeedbackService>(
       () => _i847.PronunciationFeedbackService(),
     );
-    gh.factory<_i211.TopicsManager>(() => _i211.TopicsManager());
     gh.singleton<_i140.SecureStore>(() => _i140.SecureStore());
     gh.singleton<_i140.SharedPreferencesStore>(
       () => _i140.SharedPreferencesStore(),
+    );
+    await gh.singletonAsync<_i652.TopicDataRepository>(
+      () => _i652.TopicDataRepository.create(),
+      preResolve: true,
     );
     gh.singleton<_i709.IAudioRecorder>(() => _i601.UniversalPCMRecorder());
     gh.singleton<_i303.IAudioPathSaver>(() => _i240.PCMToWavAudioSaver());
@@ -144,6 +149,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i503.ChatGuard(
         gh<_i85.AICredentialsService>(),
         gh<_i711.TextToSpeechSettingsService>(),
+        gh<_i56.LocaleSettingsService>(),
+      ),
+    );
+    gh.factory<_i211.TopicsManager>(
+      () => _i211.TopicsManager(
+        gh<_i652.TopicDataRepository>(),
         gh<_i56.LocaleSettingsService>(),
       ),
     );

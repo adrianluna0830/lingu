@@ -1,52 +1,172 @@
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/models/cefr.dart';
+import 'package:lingu/core/models/language_locale.dart';
+import 'package:lingu/core/settings/locale_settings_service.dart';
+import 'package:lingu/features/topics/repository/topics_repository.dart';
 import 'package:lingu/features/topics/topic.dart';
 import 'package:lingu/features/topics/topic_view_state.dart';
-import 'package:lingu/features/topics/topics_view.dart';
 import 'package:signals/signals_flutter.dart';
 
 @injectable
 class TopicsManager {
+  final TopicDataRepository _repository;
+  final LocaleSettingsService _localeSettings;
+
   final _state = signal<TopicViewState>(IdleState());
   ReadonlySignal<TopicViewState> get state => _state;
 
-  final _topics = listSignal<Topic>([
-    Topic(title: 'Greetings', subtitle: 'Basic hello and goodbye', level: CEFR.a1),
-    Topic(title: 'Food', subtitle: 'Ordering at a restaurant', level: CEFR.a2),
-    Topic(title: 'Travel', subtitle: 'Asking for directions', level: CEFR.b1),
-    Topic(title: 'Work', subtitle: 'Professional conversations', level: CEFR.b2),
-  ]);
-  ReadonlySignal<List<Topic>> get topics => _topics;
+  final _topics = listSignal<TopicData>([]);
+  
+  late final filteredTopics = computed(() {
+    final language = _localeSettings.learningLocale.value;
+    return _topics.value.where((t) => t.topic.language == language).toList();
+  });
+
+  TopicsManager(this._repository, this._localeSettings) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    await _loadTopics();
+  }
+
+  Future<void> _loadTopics() async {
+    final storedTopics = await _repository.getAll();
+    storedTopics.sort((a, b) => a.order.compareTo(b.order));
+    _topics.value = storedTopics;
+  }
 
   void enableAdding() => _state.value = AddTopicState();
 
-  void add(String title, String? subtitle, String? description, CEFR? level) {
-    _topics.add(Topic(title: title, subtitle: subtitle, description: description, level: level));
+  Future<void> add(String title, String? subtitle, String? description, CEFR? level, TopicStatus status) async {
+    final language = _localeSettings.learningLocale.value ?? LanguageLocale.en;
+    final topic = Topic(
+      language: language,
+      title: title,
+      subtitle: subtitle,
+      description: description,
+      level: level,
+    );
+    final topicData = TopicData(
+      topic: topic,
+      order: _topics.length,
+      status: status,
+    );
+    await _repository.put(topicData);
+    _topics.add(topicData);
     _state.value = IdleState();
   }
 
   void enableDeleting() => _state.value = DeletingState();
   void enableReordering() => _state.value = ReorderingState();
 
-  void delete(List<int> indices) {
-    indices.sort((a, b) => b.compareTo(a));
-    for (final i in indices) _topics.removeAt(i);
+  Future<void> delete(List<int> filteredIndices) async {
+    final topicsToDelete = filteredIndices.map((i) => filteredTopics.value[i]).toList();
+    
+    for (final data in topicsToDelete) {
+      await _repository.delete(data.id);
+      _topics.removeWhere((t) => t.id == data.id);
+    }
+
+    for (int i = 0; i < _topics.length; i++) {
+      if (_topics[i].order != i) {
+        final updated = TopicData(
+          topic: _topics[i].topic,
+          order: i,
+          scoresNormalized: _topics[i].scoresNormalized,
+          status: _topics[i].status,
+        );
+        _topics[i] = updated;
+        await _repository.put(updated);
+      }
+    }
+
     _state.value = IdleState();
   }
 
-  void reorder(int oldIndex, int newIndex) {
-    if (newIndex > oldIndex) newIndex--;
-    final topic = _topics.removeAt(oldIndex);
-    _topics.insert(newIndex, topic);
+  Future<void> bulkUpdateStatus(List<int> filteredIndices, TopicStatus newStatus) async {
+    final topicsToUpdate = filteredIndices.map((i) => filteredTopics.value[i]).toList();
+
+    for (final data in topicsToUpdate) {
+      final newData = TopicData(
+        topic: data.topic,
+        order: data.order,
+        scoresNormalized: data.scoresNormalized,
+        status: newStatus,
+      );
+
+      final masterIndex = _topics.indexWhere((t) => t.id == data.id);
+      _topics[masterIndex] = newData;
+      await _repository.put(newData);
+    }
+    _state.value = IdleState();
   }
 
-  void showEdit(int index) {
-    final topic = _topics[index];
-    _state.value = EditingState(index, topic.title, topic.subtitle, topic.description, topic.level);
+  Future<void> reorder(int oldFilteredIndex, int newFilteredIndex) async {
+    final filteredList = List<TopicData>.from(filteredTopics.value);
+    
+    if (newFilteredIndex > oldFilteredIndex) newFilteredIndex--;
+    final movedTopic = filteredList.removeAt(oldFilteredIndex);
+    filteredList.insert(newFilteredIndex, movedTopic);
+
+    for (int i = 0; i < filteredList.length; i++) {
+      final oldData = filteredList[i];
+      final newData = TopicData(
+        topic: oldData.topic,
+        order: i, 
+        scoresNormalized: oldData.scoresNormalized,
+        status: oldData.status,
+      );
+      
+      final masterIndex = _topics.indexWhere((t) => t.id == oldData.id);
+      _topics[masterIndex] = newData;
+      await _repository.put(newData);
+    }
+    
+    _topics.sort((a, b) => a.order.compareTo(b.order));
+    for (int i = 0; i < _topics.length; i++) {
+      if (_topics[i].order != i) {
+        final updated = TopicData(
+          topic: _topics[i].topic,
+          order: i,
+          scoresNormalized: _topics[i].scoresNormalized,
+          status: _topics[i].status,
+        );
+        _topics[i] = updated;
+        await _repository.put(updated);
+      }
+    }
   }
 
-  void saveEdit(int index, String title, String? subtitle, String? description, CEFR? level) {
-    _topics[index] = Topic(title: title, subtitle: subtitle, description: description, level: level);
+  void showEdit(int filteredIndex) {
+    final data = filteredTopics.value[filteredIndex];
+    _state.value = EditingState(filteredIndex, data.topic.title, data.topic.subtitle, data.topic.description, data.topic.level, data.status);
+  }
+
+  Future<void> saveEdit(int filteredIndex, String title, String? subtitle, String? description, CEFR? level, TopicStatus status) async {
+    final oldData = filteredTopics.value[filteredIndex];
+    final newTopic = Topic(
+      language: oldData.topic.language,
+      title: title,
+      subtitle: subtitle,
+      description: description,
+      level: level,
+    );
+
+    final newData = TopicData(
+      topic: newTopic,
+      order: oldData.order,
+      scoresNormalized: oldData.scoresNormalized,
+      status: status,
+    );
+
+    final masterIndex = _topics.indexWhere((t) => t.id == oldData.id);
+
+    if (oldData.id != newData.id) {
+      await _repository.delete(oldData.id);
+    }
+    await _repository.put(newData);
+    _topics[masterIndex] = newData;
     _state.value = IdleState();
   }
 

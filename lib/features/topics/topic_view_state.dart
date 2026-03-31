@@ -1,4 +1,5 @@
 import 'package:lingu/core/models/cefr.dart';
+import 'package:lingu/features/topics/topic.dart';
 
 sealed class TopicViewState {}
 class IdleState extends TopicViewState {}
@@ -10,6 +11,7 @@ class EditingState extends TopicViewState {
   final String? subtitle;
   final String? description;
   final CEFR? level;
-  EditingState(this.index, this.title, this.subtitle, this.description, this.level);
+  final TopicStatus status;
+  EditingState(this.index, this.title, this.subtitle, this.description, this.level, this.status);
 }
 class AddTopicState extends TopicViewState {}
