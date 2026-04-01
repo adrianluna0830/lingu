@@ -63,7 +63,11 @@ class _TTSCredentialsViewState extends State<TTSCredentialsView> with SignalsMix
       widget.onComplete();
     } else {
       _isProcessing.value = false;
-      _errorText.value = 'Invalid API Key or Network Error';
+      if (result is CredentialInvalid) {
+        _errorText.value = result.reason;
+      } else {
+        _errorText.value = 'Network Error. Please check your connection.';
+      }
     }
   }
 

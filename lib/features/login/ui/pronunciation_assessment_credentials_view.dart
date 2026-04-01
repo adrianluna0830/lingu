@@ -1,6 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
+import 'package:lingu/core/interfaces/i_fabric.dart';
+import 'package:lingu/core/models/credential_results.dart';
+import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -28,6 +31,7 @@ class _PronunciationAssessmentCredentialsViewState
   late final TextEditingController _endpointController;
   late final _apiKeyText = createSignal('');
   late final _endpointText = createSignal('');
+  late final _errorText = createSignal<String?>(null);
 
   @override
   void initState() {
@@ -44,6 +48,31 @@ class _PronunciationAssessmentCredentialsViewState
 
   void _onApiKeyChanged() => _apiKeyText.value = _apiKeyController.text;
   void _onEndpointChanged() => _endpointText.value = _endpointController.text;
+
+  Future<void> _validateAndContinue() async {
+    _isProcessing.value = true;
+    _errorText.value = null;
+
+    final service = di<PronunciationAssessmentCredentialsService>();
+    service.apiKey.value = _apiKeyController.text;
+    service.endpoint.value = _endpointController.text;
+
+    final fabric = di<IAPIFabric<IPronunciationAssessment>>();
+    final result = await fabric.validate();
+
+    if (!mounted) return;
+
+    if (result is CredentialValid) {
+      widget.onComplete();
+    } else {
+      _isProcessing.value = false;
+      if (result is CredentialInvalid) {
+        _errorText.value = result.reason;
+      } else {
+        _errorText.value = 'Network Error. Please check your connection.';
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -72,6 +101,7 @@ class _PronunciationAssessmentCredentialsViewState
               obscureText: _obscureApiKey.value,
               decoration: InputDecoration(
                 labelText: 'API Key',
+                errorText: _errorText.value,
                 suffixIcon: IconButton(
                   icon: Icon(_obscureApiKey.value ? Icons.visibility : Icons.visibility_off),
                   onPressed: () => _obscureApiKey.value = !_obscureApiKey.value,
@@ -90,16 +120,14 @@ class _PronunciationAssessmentCredentialsViewState
                 _endpointText.value.isNotEmpty &&
                 !_isProcessing.value;
             return ElevatedButton(
-              onPressed: canContinue
-                  ? () {
-                      _isProcessing.value = true;
-                      final service = di<PronunciationAssessmentCredentialsService>();
-                      service.apiKey.value = _apiKeyController.text;
-                      service.endpoint.value = _endpointController.text;
-                      widget.onComplete();
-                    }
-                  : null,
-              child: const Text("Continue"),
+              onPressed: canContinue ? _validateAndContinue : null,
+              child: _isProcessing.value
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text("Continue"),
             );
           }),
         ],

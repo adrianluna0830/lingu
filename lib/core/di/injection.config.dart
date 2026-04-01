@@ -23,6 +23,10 @@ import 'package:lingu/core/audio/playback/just_audio_player_manager.dart'
 import 'package:lingu/core/audio/record/i_audio_recorder.dart' as _i709;
 import 'package:lingu/core/audio/record/universal_pcm_recorder.dart' as _i601;
 import 'package:lingu/core/interfaces/i_fabric.dart' as _i939;
+import 'package:lingu/core/pronunciation/pronunciation_assessment_fabric.dart'
+    as _i740;
+import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart'
+    as _i399;
 import 'package:lingu/core/router/app_router.dart' as _i1036;
 import 'package:lingu/core/router/guards/chat_guard.dart' as _i503;
 import 'package:lingu/core/router/guards/home_guard.dart' as _i597;
@@ -148,6 +152,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i56.LocaleSettingsService>(),
       ),
     );
+    gh.factory<_i939.IAPIFabric<_i399.IPronunciationAssessment>>(
+      () => _i740.PronunciationAssessmentFabric(
+        gh<_i1042.PronunciationAssessmentCredentialsService>(),
+      ),
+    );
     gh.singleton<_i1036.AppRouter>(
       () => _i1036.AppRouter(
         gh<_i1033.NativeLocaleGuard>(),
@@ -170,6 +179,12 @@ extension GetItInjectableX on _i174.GetIt {
       dispose: dispose,
       init: (_i526.GetItHelper gh) async {
         final chatModule = _$ChatModule();
+        await gh.factoryAsync<_i399.IPronunciationAssessment>(
+          () => chatModule.getPronunciationAssessment(
+            gh<_i939.IAPIFabric<_i399.IPronunciationAssessment>>(),
+          ),
+          preResolve: true,
+        );
         await gh.factoryAsync<_i250.IAIModel>(
           () => chatModule.getAIModel(gh<_i939.IAPIFabric<_i250.IAIModel>>()),
           preResolve: true,
