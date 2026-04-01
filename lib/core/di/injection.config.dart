@@ -94,6 +94,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1042.PronunciationAssessmentCredentialsService>(),
       ),
     );
+    gh.factory<_i939.IPronunciationAssessmentFabric>(
+      () => _i740.PronunciationAssessmentFabric(
+        gh<_i1042.PronunciationAssessmentCredentialsService>(),
+      ),
+    );
     await gh.singletonAsync<_i85.AICredentialsService>(
       () => _i85.AICredentialsService.create(gh<_i140.SecureStore>()),
       preResolve: true,
@@ -118,10 +123,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1033.CEFRLevelGuard>(
       () => _i1033.CEFRLevelGuard(gh<_i56.LocaleSettingsService>()),
     );
-    gh.factory<_i939.IAPIFabric<_i648.ITextToSpeechService>>(
-      () => _i573.GoogleTTSFabric(gh<_i711.TextToSpeechSettingsService>()),
-    );
-    gh.singleton<_i939.IAPIFabric<_i250.IAIService>>(
+    gh.singleton<_i939.IAIFabric>(
       () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
     );
     gh.factory<_i86.AudioInputHandler>(
@@ -152,10 +154,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i56.LocaleSettingsService>(),
       ),
     );
-    gh.factory<_i939.IAPIFabric<_i399.IPronunciationAssessmentService>>(
-      () => _i740.PronunciationAssessmentFabric(
-        gh<_i1042.PronunciationAssessmentCredentialsService>(),
-      ),
+    gh.factory<_i939.ITTSFabric>(
+      () => _i573.GoogleTTSFabric(gh<_i711.TextToSpeechSettingsService>()),
     );
     gh.singleton<_i1036.AppRouter>(
       () => _i1036.AppRouter(
@@ -179,29 +179,27 @@ extension GetItInjectableX on _i174.GetIt {
       dispose: dispose,
       init: (_i526.GetItHelper gh) async {
         final chatModule = _$ChatModule();
-        gh.factory<_i847.PronunciationFeedbackService>(
+        await gh.singletonAsync<_i648.ITextToSpeechService>(
+          () => chatModule.getTTS(gh<_i573.GoogleTTSFabric>()),
+          preResolve: true,
+        );
+        await gh.singletonAsync<_i399.IPronunciationAssessmentService>(
+          () => chatModule.getPronunciationAssessment(
+            gh<_i740.PronunciationAssessmentFabric>(),
+          ),
+          preResolve: true,
+        );
+        gh.lazySingleton<_i847.PronunciationFeedbackService>(
           () => _i847.PronunciationFeedbackService(),
         );
-        await gh.factoryAsync<_i648.ITextToSpeechService>(
-          () => chatModule.getTTS(
-            gh<_i939.IAPIFabric<_i648.ITextToSpeechService>>(),
-          ),
-          preResolve: true,
-        );
-        gh.factory<_i522.ChatLanguages>(
+        gh.singleton<_i522.ChatLanguages>(
           () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
         );
-        await gh.factoryAsync<_i399.IPronunciationAssessmentService>(
-          () => chatModule.getPronunciationAssessment(
-            gh<_i939.IAPIFabric<_i399.IPronunciationAssessmentService>>(),
-          ),
+        await gh.singletonAsync<_i250.IAIService>(
+          () => chatModule.getAIModel(gh<_i915.GeminiFabric>()),
           preResolve: true,
         );
-        await gh.factoryAsync<_i250.IAIService>(
-          () => chatModule.getAIModel(gh<_i939.IAPIFabric<_i250.IAIService>>()),
-          preResolve: true,
-        );
-        gh.factory<_i228.StatementFeedbackService>(
+        gh.lazySingleton<_i228.StatementFeedbackService>(
           () => _i228.StatementFeedbackService(
             gh<_i250.IAIService>(),
             gh<_i522.ChatLanguages>(),

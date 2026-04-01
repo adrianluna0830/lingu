@@ -8,8 +8,8 @@ import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/google/google_tts_service.dart';
 
-@Injectable(as: IAPIFabric<ITextToSpeechService>)
-class GoogleTTSFabric implements IAPIFabric<ITextToSpeechService> {
+@Injectable(as: ITTSFabric)
+class GoogleTTSFabric implements ITTSFabric {
   final TextToSpeechSettingsService _settingsService;
 
   GoogleTTSFabric(this._settingsService);

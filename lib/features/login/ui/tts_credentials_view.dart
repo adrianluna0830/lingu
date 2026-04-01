@@ -54,7 +54,7 @@ class _TTSCredentialsViewState extends State<TTSCredentialsView> with SignalsMix
     _errorText.value = null;
 
     di<TextToSpeechSettingsService>().apiKey.value = _apiKeyController.text;
-    final fabric = di<IAPIFabric<ITextToSpeechService>>();
+    final fabric = di<ITTSFabric>();
     final result = await fabric.validate();
 
     if (!mounted) return;

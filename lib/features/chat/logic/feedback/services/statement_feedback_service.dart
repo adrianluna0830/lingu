@@ -7,7 +7,7 @@ import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
 @Scope('chat')
-@injectable
+@lazySingleton
 class StatementFeedbackService {
   final IAIService _aiModel;
   final ChatLanguages _languages;
