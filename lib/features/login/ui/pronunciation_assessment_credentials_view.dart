@@ -57,7 +57,7 @@ class _PronunciationAssessmentCredentialsViewState
     service.apiKey.value = _apiKeyController.text;
     service.endpoint.value = _endpointController.text;
 
-    final fabric = di<IAPIFabric<IPronunciationAssessment>>();
+    final fabric = di<IAPIFabric<IPronunciationAssessmentService>>();
     final result = await fabric.validate();
 
     if (!mounted) return;

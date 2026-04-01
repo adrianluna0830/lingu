@@ -10,7 +10,7 @@ import 'package:lingu/features/chat/di/chat_languages.dart';
 abstract class ChatModule {
   @preResolve
   @Scope('chat')
-  Future<IAIModel> getAIModel(IAPIFabric<IAIModel> fabric) => fabric.create();
+  Future<IAIService> getAIModel(IAPIFabric<IAIService> fabric) => fabric.create();
 
   @preResolve
   @Scope('chat')
@@ -18,8 +18,8 @@ abstract class ChatModule {
 
   @preResolve
   @Scope('chat')
-  Future<IPronunciationAssessment> getPronunciationAssessment(
-    IAPIFabric<IPronunciationAssessment> fabric,
+  Future<IPronunciationAssessmentService> getPronunciationAssessment(
+    IAPIFabric<IPronunciationAssessmentService> fabric,
   ) =>
       fabric.create();
 

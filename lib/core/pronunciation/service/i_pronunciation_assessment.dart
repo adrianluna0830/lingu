@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:lingu/core/pronunciation/models/raw_pronunciation_assessment_response.dart';
 
-abstract class IPronunciationAssessment {
+abstract class IPronunciationAssessmentService {
 
   Future<RawPronunciationAssessmentResponse> assessFromWavAsync(
     Uint8List wavBytes, {

@@ -7,7 +7,7 @@ import 'package:lingu/core/pronunciation/models/raw_pronunciation_assessment_res
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
 
 
-class LinuxPronunciationAssessmentService implements IPronunciationAssessment {
+class LinuxPronunciationAssessmentService implements IPronunciationAssessmentService {
   Process? _process;
   bool _isEvaluating = false;
   StreamSubscription<String>? _stdoutSub;

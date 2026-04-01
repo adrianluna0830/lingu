@@ -8,14 +8,14 @@ import 'package:lingu/core/pronunciation/service/linux/linux_pronunciation_asses
 import 'package:lingu/core/pronunciation/service/mobile_windows_mac_pronunciation/web_pronunciation_assessment_service.dart';
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
 
-@Injectable(as: IAPIFabric<IPronunciationAssessment>)
-class PronunciationAssessmentFabric extends IAPIFabric<IPronunciationAssessment> {
+@Injectable(as: IAPIFabric<IPronunciationAssessmentService>)
+class PronunciationAssessmentFabric extends IAPIFabric<IPronunciationAssessmentService> {
   final PronunciationAssessmentCredentialsService _credentialsService;
 
   PronunciationAssessmentFabric(this._credentialsService);
 
   @override
-  Future<IPronunciationAssessment> create() async {
+  Future<IPronunciationAssessmentService> create() async {
     assert(
       _credentialsService.endpoint.value != null,
       'Endpoint must not be null before calling create().',

@@ -6,13 +6,13 @@ import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
 
-@Singleton(as: IAPIFabric<IAIModel>)
-class GeminiFabric implements IAPIFabric<IAIModel> {
+@Singleton(as: IAPIFabric<IAIService>)
+class GeminiFabric implements IAPIFabric<IAIService> {
   final AICredentialsService _credentialsService;
   GeminiFabric(this._credentialsService);
 
   @override
-  Future<IAIModel> create() async {
+  Future<IAIService> create() async {
     final apiKey = _credentialsService.apiKey.value;
     assert(apiKey != null, 'API key must be configured');
     assert(apiKey!.isNotEmpty, 'API key cannot be empty');

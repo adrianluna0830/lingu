@@ -54,7 +54,7 @@ class _AICredentialsViewState extends State<AICredentialsView> with SignalsMixin
     _errorText.value = null;
 
     di<AICredentialsService>().apiKey.value = _apiKeyController.text;
-    final fabric = di<IAPIFabric<IAIModel>>();
+    final fabric = di<IAPIFabric<IAIService>>();
     final result = await fabric.validate();
 
     if (!mounted) return;

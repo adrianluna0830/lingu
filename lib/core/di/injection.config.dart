@@ -121,7 +121,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i939.IAPIFabric<_i648.ITextToSpeechService>>(
       () => _i573.GoogleTTSFabric(gh<_i711.TextToSpeechSettingsService>()),
     );
-    gh.singleton<_i939.IAPIFabric<_i250.IAIModel>>(
+    gh.singleton<_i939.IAPIFabric<_i250.IAIService>>(
       () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
     );
     gh.factory<_i86.AudioInputHandler>(
@@ -152,7 +152,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i56.LocaleSettingsService>(),
       ),
     );
-    gh.factory<_i939.IAPIFabric<_i399.IPronunciationAssessment>>(
+    gh.factory<_i939.IAPIFabric<_i399.IPronunciationAssessmentService>>(
       () => _i740.PronunciationAssessmentFabric(
         gh<_i1042.PronunciationAssessmentCredentialsService>(),
       ),
@@ -179,16 +179,6 @@ extension GetItInjectableX on _i174.GetIt {
       dispose: dispose,
       init: (_i526.GetItHelper gh) async {
         final chatModule = _$ChatModule();
-        await gh.factoryAsync<_i399.IPronunciationAssessment>(
-          () => chatModule.getPronunciationAssessment(
-            gh<_i939.IAPIFabric<_i399.IPronunciationAssessment>>(),
-          ),
-          preResolve: true,
-        );
-        await gh.factoryAsync<_i250.IAIModel>(
-          () => chatModule.getAIModel(gh<_i939.IAPIFabric<_i250.IAIModel>>()),
-          preResolve: true,
-        );
         gh.factory<_i847.PronunciationFeedbackService>(
           () => _i847.PronunciationFeedbackService(),
         );
@@ -201,9 +191,19 @@ extension GetItInjectableX on _i174.GetIt {
         gh.factory<_i522.ChatLanguages>(
           () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
         );
+        await gh.factoryAsync<_i399.IPronunciationAssessmentService>(
+          () => chatModule.getPronunciationAssessment(
+            gh<_i939.IAPIFabric<_i399.IPronunciationAssessmentService>>(),
+          ),
+          preResolve: true,
+        );
+        await gh.factoryAsync<_i250.IAIService>(
+          () => chatModule.getAIModel(gh<_i939.IAPIFabric<_i250.IAIService>>()),
+          preResolve: true,
+        );
         gh.factory<_i228.StatementFeedbackService>(
           () => _i228.StatementFeedbackService(
-            gh<_i250.IAIModel>(),
+            gh<_i250.IAIService>(),
             gh<_i522.ChatLanguages>(),
           ),
         );

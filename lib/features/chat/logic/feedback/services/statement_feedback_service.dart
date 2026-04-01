@@ -9,7 +9,7 @@ import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart
 @Scope('chat')
 @injectable
 class StatementFeedbackService {
-  final IAIModel _aiModel;
+  final IAIService _aiModel;
   final ChatLanguages _languages;
 
   StatementFeedbackService(this._aiModel, this._languages);

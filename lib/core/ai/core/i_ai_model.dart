@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:lingu/core/ai/core/ai_chat_history.dart';
 
-abstract class IAIModel {
+abstract class IAIService {
   Future<String> generateContent({
     required String prompt,
     String? systemInstructions,

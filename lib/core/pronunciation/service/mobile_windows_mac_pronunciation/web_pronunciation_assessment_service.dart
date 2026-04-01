@@ -9,7 +9,7 @@ import '../../models/pronunciation_assessment_errors.dart';
 import '../../models/raw_pronunciation_assessment_response.dart';
 
 
-class WebViewPronunciationAssessmentService implements IPronunciationAssessment {
+class WebViewPronunciationAssessmentService implements IPronunciationAssessmentService {
   HeadlessInAppWebView? _headlessWebView;
   InAppWebViewController? _webViewController;
   Completer<Map<String, dynamic>>? _assessmentCompleter;
