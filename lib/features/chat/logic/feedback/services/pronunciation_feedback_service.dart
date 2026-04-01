@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback_result.dart';
 
+@Scope('chat')
 @injectable
 class PronunciationFeedbackService {
   Future<PronunciationFeedbackResult> getFeedback(String audioUrl) async {

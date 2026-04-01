@@ -6,6 +6,7 @@ import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
+@Scope('chat')
 @injectable
 class StatementFeedbackService {
   final IAIModel _aiModel;

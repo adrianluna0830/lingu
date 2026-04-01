@@ -40,19 +40,11 @@ class ChatGuard extends AutoRouteGuard {
           await di.popScopesTill('chat', inclusive: true);
         } catch (_) {}
 
-        di.initChatScope();
+        await di.initChatScope();
 
         resolver.next(true);
       } catch (e) {
-        // Drop scope on error if it was partially initialized or if initChatScope threw
         try {
-          // We can't easily check if scope is active, but popping it is safe?
-          // Actually, if initChatScope fails, it might not have pushed the scope or might have left it half-baked.
-          // initChatScope usually pushes the scope.
-          // But GetIt scopes are a stack.
-          // If initChatScope throws, we should try to cleanup.
-          // Since we don't know the state, we can try to drop scope if we are in it?
-          // But 'dropScope' is not a standard GetIt method, popScopesTill is.
            await di.popScopesTill('chat', inclusive: true);
         } catch (_) {}
         

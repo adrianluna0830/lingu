@@ -12,7 +12,6 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:lingu/core/ai/core/i_ai_model.dart' as _i250;
-import 'package:lingu/core/ai/core/i_ai_model_fabric.dart' as _i691;
 import 'package:lingu/core/ai/gemini/gemini_fabric.dart' as _i915;
 import 'package:lingu/core/audio/misc/i_audio_merger.dart' as _i645;
 import 'package:lingu/core/audio/misc/i_audio_utils.dart' as _i303;
@@ -23,6 +22,7 @@ import 'package:lingu/core/audio/playback/just_audio_player_manager.dart'
     as _i198;
 import 'package:lingu/core/audio/record/i_audio_recorder.dart' as _i709;
 import 'package:lingu/core/audio/record/universal_pcm_recorder.dart' as _i601;
+import 'package:lingu/core/interfaces/i_fabric.dart' as _i939;
 import 'package:lingu/core/router/app_router.dart' as _i1036;
 import 'package:lingu/core/router/guards/chat_guard.dart' as _i503;
 import 'package:lingu/core/router/guards/home_guard.dart' as _i597;
@@ -35,7 +35,6 @@ import 'package:lingu/core/settings/stores.dart' as _i140;
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart'
     as _i711;
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart' as _i648;
-import 'package:lingu/core/tts/core/i_tts_fabric.dart' as _i42;
 import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
 import 'package:lingu/features/chat/di/chat_languages.dart' as _i522;
 import 'package:lingu/features/chat/di/chat_module.dart' as _i437;
@@ -65,9 +64,6 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i597.HomeGuard>(() => _i597.HomeGuard());
     gh.factory<_i1003.ChatbotService>(() => _i1003.ChatbotService());
-    gh.factory<_i847.PronunciationFeedbackService>(
-      () => _i847.PronunciationFeedbackService(),
-    );
     gh.singleton<_i140.SecureStore>(() => _i140.SecureStore());
     gh.singleton<_i140.SharedPreferencesStore>(
       () => _i140.SharedPreferencesStore(),
@@ -109,12 +105,6 @@ extension GetItInjectableX on _i174.GetIt {
       ),
       preResolve: true,
     );
-    gh.factory<_i228.StatementFeedbackService>(
-      () => _i228.StatementFeedbackService(
-        gh<_i250.IAIModel>(),
-        gh<_i522.ChatLanguages>(),
-      ),
-    );
     gh.factory<_i1033.NativeLocaleGuard>(
       () => _i1033.NativeLocaleGuard(gh<_i56.LocaleSettingsService>()),
     );
@@ -124,11 +114,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1033.CEFRLevelGuard>(
       () => _i1033.CEFRLevelGuard(gh<_i56.LocaleSettingsService>()),
     );
-    gh.singleton<_i691.IAIModelFabric>(
-      () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
-    );
-    gh.factory<_i42.ITTSFabric>(
+    gh.factory<_i939.IAPIFabric<_i648.ITextToSpeechService>>(
       () => _i573.GoogleTTSFabric(gh<_i711.TextToSpeechSettingsService>()),
+    );
+    gh.singleton<_i939.IAPIFabric<_i250.IAIModel>>(
+      () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
     );
     gh.factory<_i86.AudioInputHandler>(
       () => _i86.AudioInputHandler(
@@ -174,20 +164,33 @@ extension GetItInjectableX on _i174.GetIt {
   }
 
   // initializes the registration of chat-scope dependencies inside of GetIt
-  _i174.GetIt initChatScope({_i174.ScopeDisposeFunc? dispose}) {
-    return _i526.GetItHelper(this).initScope(
+  Future<_i174.GetIt> initChatScope({_i174.ScopeDisposeFunc? dispose}) async {
+    return _i526.GetItHelper(this).initScopeAsync(
       'chat',
       dispose: dispose,
-      init: (_i526.GetItHelper gh) {
+      init: (_i526.GetItHelper gh) async {
         final chatModule = _$ChatModule();
-        gh.factory<_i648.ITextToSpeechService>(
-          () => chatModule.getTTS(gh<_i42.ITTSFabric>()),
+        await gh.factoryAsync<_i250.IAIModel>(
+          () => chatModule.getAIModel(gh<_i939.IAPIFabric<_i250.IAIModel>>()),
+          preResolve: true,
+        );
+        gh.factory<_i847.PronunciationFeedbackService>(
+          () => _i847.PronunciationFeedbackService(),
+        );
+        await gh.factoryAsync<_i648.ITextToSpeechService>(
+          () => chatModule.getTTS(
+            gh<_i939.IAPIFabric<_i648.ITextToSpeechService>>(),
+          ),
+          preResolve: true,
         );
         gh.factory<_i522.ChatLanguages>(
           () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
         );
-        gh.factory<_i250.IAIModel>(
-          () => chatModule.getAIModel(gh<_i691.IAIModelFabric>()),
+        gh.factory<_i228.StatementFeedbackService>(
+          () => _i228.StatementFeedbackService(
+            gh<_i250.IAIModel>(),
+            gh<_i522.ChatLanguages>(),
+          ),
         );
         gh.singleton<_i98.MessageDetailsManager>(
           () => _i98.MessageDetailsManager(

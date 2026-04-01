@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:lingu/core/ai/core/i_ai_model_fabric.dart';
+import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
@@ -53,7 +54,7 @@ class _AICredentialsViewState extends State<AICredentialsView> with SignalsMixin
     _errorText.value = null;
 
     di<AICredentialsService>().apiKey.value = _apiKeyController.text;
-    final fabric = di<IAIModelFabric>();
+    final fabric = di<IAPIFabric<IAIModel>>();
     final result = await fabric.validate();
 
     if (!mounted) return;

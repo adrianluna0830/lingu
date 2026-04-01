@@ -1,16 +1,15 @@
 import 'dart:async';
-
 import 'package:googleapis/texttospeech/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:injectable/injectable.dart';
+import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
-import 'package:lingu/core/tts/core/i_tts_fabric.dart';
 import 'package:lingu/core/tts/google/google_tts_service.dart';
 
-@Injectable(as: ITTSFabric)
-class GoogleTTSFabric implements ITTSFabric {
+@Injectable(as: IAPIFabric<ITextToSpeechService>)
+class GoogleTTSFabric implements IAPIFabric<ITextToSpeechService> {
   final TextToSpeechSettingsService _settingsService;
 
   GoogleTTSFabric(this._settingsService);
@@ -44,13 +43,14 @@ class GoogleTTSFabric implements ITTSFabric {
   }
 
   @override
-  ITextToSpeechService create() {
+  Future<ITextToSpeechService> create() async {
     final apiKey = _settingsService.apiKey.value;
     assert(apiKey != null, 'TTS API key must be configured');
     assert(apiKey!.isNotEmpty, 'TTS API key cannot be empty');
 
     final client = clientViaApiKey(apiKey!);
     final ttsApi = TexttospeechApi(client);
+
     return GoogleTTSService(
       api: ttsApi,
       httpClient: client,
