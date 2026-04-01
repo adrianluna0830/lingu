@@ -1,17 +1,23 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
+import 'package:lingu/core/pronunciation/service/linux/linux_pronunciation_assessment_service.dart';
+import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/logic/feedback/models/audio_feedback_result.dart';
 import 'package:lingu/features/chat/logic/feedback/models/text_feedback_result.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_state.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:signals/signals.dart';
+import 'package:http/http.dart' as http;
 
 @Singleton(scope: 'chat')
 class ChatMessagesManager {
+  final PronunciationAssessmentCredentialsService _credentialsService;
   final MessageDetailsManager _messageDetailsManager;
-  ChatMessagesManager(this._messageDetailsManager);
+  ChatMessagesManager(this._messageDetailsManager, this._credentialsService);
   
   final _messages = signal<List<ChatMessage>>([]);
   ReadonlySignal<List<ChatMessage>> get messages => _messages;
@@ -60,7 +66,6 @@ class ChatMessagesManager {
     required String audioUrl, 
     required Duration duration, 
     required List<UserSpeechAudio> individualAudioUrls,
-    String transcript = "", // Temporary until transcription is integrated
   }) async {
     final id = _generateId();
     final message = UserAudioMessage(
@@ -71,9 +76,9 @@ class ChatMessagesManager {
       individualAudioUrls: individualAudioUrls,
     );
     _messages.value = [..._messages.value, message];
-    
+
     try {
-      final summary = await _messageDetailsManager.fetchAudioFeedback(id, audioUrl, transcript);
+      final summary = await _messageDetailsManager.fetchAudioFeedback(id, audioUrl);
       updateAudioMessageFeedback(id, FeedbackReady(summary));
     } catch (e) {
       updateAudioMessageFeedback(id, FeedbackError(e));

@@ -45,11 +45,11 @@ class MessageDetailsManager {
     );
   }
 
-  Future<AudioFeedbackResult> fetchAudioFeedback(int messageId, String audioUrl, String transcript) async {
+  Future<AudioFeedbackResult> fetchAudioFeedback(int messageId, String audioUrl) async {
     await Future.delayed(const Duration(seconds: 1));
 
     final pronunciationResult = PronunciationFeedbackResult(
-      transcript: transcript,
+      transcript: "Dummy transcript for audio message",
       accuracyScore: 90.0,
       fluencyScore: 85.0,
       completenessScore: 100.0,
@@ -66,7 +66,7 @@ class MessageDetailsManager {
     );
 
     _messageDetails[messageId] = UserAudioMessageData(
-      transcript: transcript,
+      transcript: pronunciationResult.transcript,
       grammarFeedback: grammar,
       fluencyFeedback: fluency,
       pronunciationFeedback: pronunciationResult,

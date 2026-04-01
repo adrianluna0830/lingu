@@ -196,7 +196,10 @@ extension GetItInjectableX on _i174.GetIt {
           ),
         );
         gh.singleton<_i433.ChatMessagesManager>(
-          () => _i433.ChatMessagesManager(gh<_i98.MessageDetailsManager>()),
+          () => _i433.ChatMessagesManager(
+            gh<_i98.MessageDetailsManager>(),
+            gh<_i1042.PronunciationAssessmentCredentialsService>(),
+          ),
         );
         gh.singleton<_i420.PanelManager>(
           () => _i420.PanelManager(gh<_i98.MessageDetailsManager>()),
