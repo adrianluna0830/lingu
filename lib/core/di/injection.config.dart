@@ -38,6 +38,8 @@ import 'package:lingu/core/settings/pronunciation_assessment_credentials_service
 import 'package:lingu/core/settings/stores.dart' as _i140;
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart'
     as _i711;
+import 'package:lingu/core/stt/google_speech_to_text_fabric.dart' as _i611;
+import 'package:lingu/core/stt/i_speech_to_text_service.dart' as _i597;
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart' as _i648;
 import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
 import 'package:lingu/features/chat/di/chat_languages.dart' as _i522;
@@ -113,6 +115,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i140.SharedPreferencesStore>(),
       ),
       preResolve: true,
+    );
+    gh.lazySingleton<_i939.ISTTFabric>(
+      () => _i611.GoogleSpeechToTextFabric(gh<_i85.AICredentialsService>()),
     );
     gh.factory<_i1033.NativeLocaleGuard>(
       () => _i1033.NativeLocaleGuard(gh<_i56.LocaleSettingsService>()),
@@ -197,6 +202,10 @@ extension GetItInjectableX on _i174.GetIt {
         );
         await gh.singletonAsync<_i250.IAIService>(
           () => chatModule.getAIModel(gh<_i915.GeminiFabric>()),
+          preResolve: true,
+        );
+        await gh.lazySingletonAsync<_i597.ISpeechToTextService>(
+          () => chatModule.getSTT(gh<_i611.GoogleSpeechToTextFabric>()),
           preResolve: true,
         );
         gh.lazySingleton<_i228.StatementFeedbackService>(

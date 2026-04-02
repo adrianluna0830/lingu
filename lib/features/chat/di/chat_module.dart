@@ -6,6 +6,8 @@ import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/google/google_tts_fabric.dart';
+import 'package:lingu/core/stt/i_speech_to_text_service.dart';
+import 'package:lingu/core/stt/google_speech_to_text_fabric.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 
 @module
@@ -14,6 +16,11 @@ abstract class ChatModule {
   @Scope('chat')
   @singleton
   Future<IAIService> getAIModel(GeminiFabric fabric) => fabric.create();
+
+  @preResolve
+  @Scope('chat')
+  @lazySingleton
+  Future<ISpeechToTextService> getSTT(GoogleSpeechToTextFabric fabric) => fabric.create();
 
   @preResolve
   @Scope('chat')
