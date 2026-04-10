@@ -36,6 +36,7 @@ import 'package:lingu/core/settings/locale_settings_service.dart' as _i56;
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart'
     as _i1042;
 import 'package:lingu/core/settings/stores.dart' as _i140;
+import 'package:lingu/core/settings/stt_credentials_service.dart' as _i111;
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart'
     as _i711;
 import 'package:lingu/core/stt/google_speech_to_text_fabric.dart' as _i611;
@@ -105,6 +106,10 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i85.AICredentialsService.create(gh<_i140.SecureStore>()),
       preResolve: true,
     );
+    await gh.singletonAsync<_i111.STTCredentialsService>(
+      () => _i111.STTCredentialsService.create(gh<_i140.SecureStore>()),
+      preResolve: true,
+    );
     await gh.singletonAsync<_i56.LocaleSettingsService>(
       () =>
           _i56.LocaleSettingsService.create(gh<_i140.SharedPreferencesStore>()),
@@ -116,9 +121,6 @@ extension GetItInjectableX on _i174.GetIt {
       ),
       preResolve: true,
     );
-    gh.lazySingleton<_i939.ISTTFabric>(
-      () => _i611.GoogleSpeechToTextFabric(gh<_i85.AICredentialsService>()),
-    );
     gh.factory<_i1033.NativeLocaleGuard>(
       () => _i1033.NativeLocaleGuard(gh<_i56.LocaleSettingsService>()),
     );
@@ -127,6 +129,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i1033.CEFRLevelGuard>(
       () => _i1033.CEFRLevelGuard(gh<_i56.LocaleSettingsService>()),
+    );
+    gh.factory<_i1033.STTCredentialsGuard>(
+      () => _i1033.STTCredentialsGuard(gh<_i111.STTCredentialsService>()),
+    );
+    gh.lazySingleton<_i939.ISTTFabric>(
+      () => _i611.GoogleSpeechToTextFabric(gh<_i111.STTCredentialsService>()),
     );
     gh.singleton<_i939.IAIFabric>(
       () => _i915.GeminiFabric(gh<_i85.AICredentialsService>()),
@@ -168,6 +176,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1033.LearningLocaleGuard>(),
         gh<_i1033.CEFRLevelGuard>(),
         gh<_i1033.AICredentialsGuard>(),
+        gh<_i1033.STTCredentialsGuard>(),
         gh<_i1033.PronunciationAssessmentCredentialsGuard>(),
         gh<_i1033.TTSCredentialsGuard>(),
         gh<_i503.ChatGuard>(),

@@ -2,24 +2,28 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:googleapis/speech/v1.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
-import 'package:lingu/core/models/api_key_client.dart';
 import 'package:lingu/core/models/credential_results.dart';
-import 'package:lingu/core/settings/ai_credentials_service.dart';
+import 'package:lingu/core/settings/stt_credentials_service.dart';
 import 'package:lingu/core/stt/google_speech_to_text_service.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 
 @LazySingleton(as: ISTTFabric)
 class GoogleSpeechToTextFabric implements ISTTFabric {
-  final AICredentialsService _credentialsService;
+  final STTCredentialsService _credentialsService;
 
   GoogleSpeechToTextFabric(this._credentialsService);
 
   @override
   Future<CredentialValidationResult> validate() async {
-    final apiKey = _credentialsService.apiKey.value!;
-    final client = ApiKeyClient(apiKey);
+    final apiKey = _credentialsService.apiKey.value;
+    if (apiKey == null || apiKey.isEmpty) {
+      return CredentialInvalid('API key vacía');
+    }
+
+    final client = clientViaApiKey(apiKey);
 
     try {
       final speechApi = SpeechApi(client);
@@ -38,10 +42,10 @@ class GoogleSpeechToTextFabric implements ISTTFabric {
             'Endpoint not found. Verify the resource URL.',
           );
         default:
-          return CredentialInvalid('Unexpected response: \${e.status}.');
+          return CredentialInvalid('Unexpected response: ${e.status}.');
       }
     } on ApiRequestError catch (e) {
-      return CredentialInvalid('API error: \${e.message}');
+      return CredentialInvalid('API error: ${e.message}');
     } on SocketException {
       return CredentialNetworkError();
     } on TimeoutException {
@@ -56,7 +60,7 @@ class GoogleSpeechToTextFabric implements ISTTFabric {
   @override
   Future<ISpeechToTextService> create() async {
     final apiKey = _credentialsService.apiKey.value!;
-    final client = ApiKeyClient(apiKey);
+    final client = clientViaApiKey(apiKey);
     final speechApi = SpeechApi(client);
 
     return GoogleSpeechToTextService(speechApi);

@@ -380,6 +380,70 @@ class PronunciationAssessmentCredentialsRouteArgs {
 }
 
 /// generated route for
+/// [STTCredentialsView]
+class STTCredentialsRoute extends PageRouteInfo<STTCredentialsRouteArgs> {
+  STTCredentialsRoute({
+    Key? key,
+    required VoidCallback onComplete,
+    bool isSetupFlow = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+         STTCredentialsRoute.name,
+         args: STTCredentialsRouteArgs(
+           key: key,
+           onComplete: onComplete,
+           isSetupFlow: isSetupFlow,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'STTCredentialsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<STTCredentialsRouteArgs>();
+      return STTCredentialsView(
+        key: args.key,
+        onComplete: args.onComplete,
+        isSetupFlow: args.isSetupFlow,
+      );
+    },
+  );
+}
+
+class STTCredentialsRouteArgs {
+  const STTCredentialsRouteArgs({
+    this.key,
+    required this.onComplete,
+    this.isSetupFlow = false,
+  });
+
+  final Key? key;
+
+  final VoidCallback onComplete;
+
+  final bool isSetupFlow;
+
+  @override
+  String toString() {
+    return 'STTCredentialsRouteArgs{key: $key, onComplete: $onComplete, isSetupFlow: $isSetupFlow}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! STTCredentialsRouteArgs) return false;
+    return key == other.key &&
+        onComplete == other.onComplete &&
+        isSetupFlow == other.isSetupFlow;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ onComplete.hashCode ^ isSetupFlow.hashCode;
+}
+
+/// generated route for
 /// [SettingsView]
 class SettingsRoute extends PageRouteInfo<void> {
   const SettingsRoute({List<PageRouteInfo>? children})

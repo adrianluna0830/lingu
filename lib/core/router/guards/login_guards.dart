@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lingu/core/router/app_router.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
+import 'package:lingu/core/settings/stt_credentials_service.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
@@ -11,6 +12,7 @@ final _setupRoutes = {
   LearningLocaleRoute.name,
   CEFRLevelRoute.name,
   AICredentialsRoute.name,
+  STTCredentialsRoute.name,
   TTSCredentialsRoute.name,
   PronunciationAssessmentCredentialsRoute.name,
 };
@@ -133,6 +135,38 @@ class AICredentialsGuard extends AutoRouteGuard {
             resolver.next(true);
           }
         }),
+      );
+    } else {
+      resolver.next(true);
+    }
+  }
+}
+
+@injectable
+class STTCredentialsGuard extends AutoRouteGuard {
+  final STTCredentialsService _sttCredentials;
+
+  STTCredentialsGuard(this._sttCredentials);
+
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    if (_setupRoutes.contains(resolver.routeName)) {
+      resolver.next(true);
+      return;
+    }
+
+    if (_sttCredentials.apiKey.value == null) {
+      bool isResolved = false;
+      resolver.redirectUntil(
+        STTCredentialsRoute(
+          isSetupFlow: true,
+          onComplete: () {
+            if (!isResolved) {
+              isResolved = true;
+              resolver.next(true);
+            }
+          },
+        ),
       );
     } else {
       resolver.next(true);

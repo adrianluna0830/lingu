@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
+import 'package:lingu/core/settings/stt_credentials_service.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
@@ -16,6 +17,7 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final aiService = di<AICredentialsService>();
+    final sttService = di<STTCredentialsService>();
     final localeService = di<LocaleSettingsService>();
     final pronunciationService = di<PronunciationAssessmentCredentialsService>();
     final ttsService = di<TextToSpeechSettingsService>();
@@ -43,6 +45,11 @@ class SettingsView extends StatelessWidget {
             title: 'AI API Key',
             value: aiService.apiKey.watch(context) ?? 'Not set',
             onTap: () => context.router.push(AICredentialsRoute(onComplete: () => context.router.maybePop())),
+          ),
+          _SecretSettingTile(
+            title: 'STT API Key',
+            value: sttService.apiKey.watch(context) ?? 'Not set',
+            onTap: () => context.router.push(STTCredentialsRoute(onComplete: () => context.router.maybePop())),
           ),
           _PronunciationSettingTile(
             apiKey: pronunciationService.apiKey.watch(context) ?? 'Not set',

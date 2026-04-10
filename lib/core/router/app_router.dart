@@ -9,6 +9,7 @@ import 'package:lingu/features/home/ui/home_view.dart';
 import 'package:lingu/features/home/ui/main_view.dart';
 import 'package:lingu/features/settings/ui/settings_view.dart';
 import 'package:lingu/features/login/ui/ai_credentials_view.dart';
+import 'package:lingu/features/login/ui/stt_credentials_view.dart';
 import 'package:lingu/features/login/ui/learning_locale_view.dart';
 import 'package:lingu/features/login/ui/cefr_level_view.dart';
 import 'package:lingu/features/login/ui/native_locale_view.dart';
@@ -25,6 +26,7 @@ class AppRouter extends RootStackRouter {
   final LearningLocaleGuard _learningLocaleGuard;
   final CEFRLevelGuard _cefrLevelGuard;
   final AICredentialsGuard _aiCredentialsGuard;
+  final STTCredentialsGuard _sttCredentialsGuard;
   final PronunciationAssessmentCredentialsGuard _pronunciationAssessmentCredentialGuard;
   final TTSCredentialsGuard _ttsCredentialsGuard;
   final ChatGuard _chatGuard;
@@ -35,6 +37,7 @@ class AppRouter extends RootStackRouter {
     this._learningLocaleGuard,
     this._cefrLevelGuard,
     this._aiCredentialsGuard,
+    this._sttCredentialsGuard,
     this._pronunciationAssessmentCredentialGuard,
     this._ttsCredentialsGuard,
     this._chatGuard,
@@ -47,6 +50,7 @@ class AppRouter extends RootStackRouter {
     _learningLocaleGuard,
     _cefrLevelGuard,
     _aiCredentialsGuard,
+    _sttCredentialsGuard,
     _pronunciationAssessmentCredentialGuard,
     _ttsCredentialsGuard,
   ];
@@ -57,6 +61,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: LearningLocaleRoute.page),
     AutoRoute(page: CEFRLevelRoute.page),
     AutoRoute(page: AICredentialsRoute.page),
+    AutoRoute(page: STTCredentialsRoute.page),
     AutoRoute(page: PronunciationAssessmentCredentialsRoute.page),
     AutoRoute(page: TTSCredentialsRoute.page),
     AutoRoute(
