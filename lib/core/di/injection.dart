@@ -28,7 +28,6 @@ import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/google/google_tts_fabric.dart';
 import 'package:lingu/features/chat/chat_view.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
-import 'package:lingu/features/chat/di/chat_module.dart';
 import 'package:lingu/features/chat/logic/chatbot/chatbot_service.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_manager.dart';
@@ -56,9 +55,7 @@ class DependencyInjection {
       await di.pushNewScopeAsync(
         scopeName: 'chat',
         init: (di) async {
-          final chatModule = ChatModule();
-
-          _ChatDependencies.registerCore(chatModule);
+          _ChatDependencies.registerCore();
 
           await di.allReady();
 
@@ -184,25 +181,30 @@ class _StartupDependencies {
 }
 
 class _ChatDependencies {
-  static void registerCore(ChatModule chatModule) {
+  static void registerCore() {
     di.registerSingleton<ChatMessagesManager>(ChatMessagesManager());
-    di.registerSingleton<ChatLanguages>(
-      chatModule.getChatLanguages(di<LocaleSettingsService>()),
-    );
+    
+    di.registerSingleton<ChatLanguages>(() {
+      final service = di<LocaleSettingsService>();
+      final native = service.nativeLocale.value;
+      final target = service.learningLocale.value;
+      if (native == null || target == null) {
+        throw Exception("Chat languages not configured");
+      }
+      return ChatLanguages(native: native, target: target);
+    }());
 
     di.registerSingletonAsync<IAIService>(
-      () async => await chatModule.getAIModel(di<IAIFabric>()),
+      () async => await di<IAIFabric>().create(),
     );
     di.registerSingletonAsync<IPronunciationAssessmentService>(
-      () async => await chatModule.getPronunciationAssessment(
-        di<IPronunciationAssessmentFabric>(),
-      ),
+      () async => await di<IPronunciationAssessmentFabric>().create(),
     );
     di.registerSingletonAsync<ITextToSpeechService>(
-      () async => await chatModule.getTTS(di<ITTSFabric>()),
+      () async => await di<ITTSFabric>().create(),
     );
     di.registerSingletonAsync<ISpeechToTextService>(
-      () async => await chatModule.getSTT(di<ISTTFabric>()),
+      () async => await di<ISTTFabric>().create(),
     );
   }
 
