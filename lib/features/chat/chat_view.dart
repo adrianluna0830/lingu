@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
+import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/input/audio_input_handler.dart';
@@ -176,8 +177,8 @@ class _ChatViewState extends State<ChatView> {
   @override
   void initState() {
     super.initState();
-    _inputBarController.onTextSubmit = (text) {
-      _chatMessagesManager.addUserTextMessage(text: text);
+    _inputBarController.onUserTextMessage = ({required text, required individualTextInputs}) {
+      _chatMessagesManager.addUserTextMessage(text: text, individualTextInputs: individualTextInputs);
     };
     _inputBarController.onStartRecording = () {
       _panelManager.openMicPanel();
@@ -185,15 +186,11 @@ class _ChatViewState extends State<ChatView> {
     _inputBarController.onChat = () {
       _panelManager.openChatPanel();
     };
-    effect(() {
-      _inputBarController.isFocused;
-      if (_inputBarController.isFocused.value) {
+    _inputBarController.onFocusChange = (isFocused) {
+      if (isFocused) {
         _panelManager.closePanel();
       }
-    });
-    _recordInputHandler.amplitudeStream.listen((amplitude) {
-      _recordController.updateAmplitude(amplitude);
-    });
+    };
     _recordController.onToggleRecording = (isPaused) {
       _recordInputHandler.toggleRecording();
     };
@@ -222,7 +219,6 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   void dispose() {
-    _recordController.dispose();
     _recordInputHandler.dispose();
     super.dispose();
   }
@@ -230,6 +226,8 @@ class _ChatViewState extends State<ChatView> {
   @override
   Widget build(BuildContext context) {
     final panelState = _panelManager.currentPanel.watch(context);
+    final chatLanguages = di<ChatLanguages>();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Chat View')),
       body: Column(
@@ -243,7 +241,15 @@ class _ChatViewState extends State<ChatView> {
             ),
           ),
           if (panelState is MicPanelState)
-            Expanded(child: RecordDisplay(controller: _recordController)),
+            Expanded(
+              child: RecordDisplay(
+                controller: _recordController,
+                amplitudeStream: _recordInputHandler.amplitudeStream
+                    .map((a) => (a.value, a.maxValue)),
+                nativeLocale: chatLanguages.native,
+                targetLocale: chatLanguages.target,
+              ),
+            ),
           if (panelState is ChatPanelState)
             BottomPanel(
                 controller: _bottomPanelController,
@@ -281,7 +287,10 @@ class _ChatViewState extends State<ChatView> {
               ),
             ),
           if (panelState is! MicPanelState)
-            InputBar(_inputBarController),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InputBar(_inputBarController),
+            ),
         ],
       ),
     );

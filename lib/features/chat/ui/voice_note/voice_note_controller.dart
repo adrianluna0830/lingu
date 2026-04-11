@@ -5,10 +5,17 @@ import 'package:lingu/core/di/injection.dart';
 import 'package:signals/signals_flutter.dart';
 
 class VoiceNoteController {
+  // Optional public controller for future callbacks
+}
+
+class VoiceNoteInternalController {
+  final VoiceNoteController? controller;
   final IAudioPlayerManager _audioPlayerManager;
 
-  VoiceNoteController({IAudioPlayerManager? audioPlayerManager})
-      : _audioPlayerManager = audioPlayerManager ?? di<IAudioPlayerManager>();
+  VoiceNoteInternalController({
+    this.controller,
+    IAudioPlayerManager? audioPlayerManager,
+  }) : _audioPlayerManager = audioPlayerManager ?? di<IAudioPlayerManager>();
 
   late final String _audioUrl;
   late final Duration _duration;

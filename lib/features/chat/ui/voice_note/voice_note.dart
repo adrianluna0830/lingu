@@ -3,21 +3,22 @@ import 'package:lingu/features/chat/ui/voice_note/voice_note_controller.dart';
 import 'package:signals/signals_flutter.dart';
 
 class VoiceNote extends StatefulWidget {
+  final VoiceNoteController? controller;
   final String audioUrl;
   final Duration duration;
-  const VoiceNote({super.key, required this.audioUrl, required this.duration});
+  const VoiceNote({super.key, this.controller, required this.audioUrl, required this.duration});
 
   @override
   State<VoiceNote> createState() => _VoiceNoteState();
 }
 
 class _VoiceNoteState extends State<VoiceNote> {
-  final VoiceNoteController controller = VoiceNoteController();
+  late final VoiceNoteInternalController _internalController = VoiceNoteInternalController(controller: widget.controller);
 
   @override
   void initState() {
     super.initState();
-    controller.init(
+    _internalController.init(
       widget.audioUrl,
       widget.duration,
     );
@@ -25,18 +26,18 @@ class _VoiceNoteState extends State<VoiceNote> {
 
   @override
   void dispose() {
-    controller.dispose();
+    _internalController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final maxMs = widget.duration.inMilliseconds.toDouble();
-    final currentMs = controller.currentPosition
+    final currentMs = _internalController.currentPosition
         .watch(context)
         .inMilliseconds.clamp(0, maxMs).toDouble();
-    final isPlaying = controller.isPlaying.watch(context);
-    final canToggle = controller.canTogglePlay.watch(context);
+    final isPlaying = _internalController.isPlaying.watch(context);
+    final canToggle = _internalController.canTogglePlay.watch(context);
 
 
     return Row(
@@ -46,7 +47,7 @@ class _VoiceNoteState extends State<VoiceNote> {
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-          onPressed: canToggle ? () => controller.togglePlayStatus() : null,
+          onPressed: canToggle ? () => _internalController.togglePlayStatus() : null,
         ),
         Flexible(
           child: SliderTheme(
@@ -59,13 +60,13 @@ class _VoiceNoteState extends State<VoiceNote> {
               value: currentMs,
               max: maxMs,
               onChangeStart: (v) {
-                controller.onSeekStart();
+                _internalController.onSeekStart();
               },
-              onChanged: (v) => controller.onSeekChanged(
+              onChanged: (v) => _internalController.onSeekChanged(
                 Duration(milliseconds: v.toInt()),
               ),
               onChangeEnd: (v) {
-                controller.onSeekEnd(Duration(milliseconds: v.toInt()));
+                _internalController.onSeekEnd(Duration(milliseconds: v.toInt()));
               },
             ),
           ),

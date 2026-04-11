@@ -15,11 +15,11 @@ class ChatMessagesManager {
   int _generateId() => _nextId++;
 
 
-  Future<void> addUserTextMessage({required String text}) async {
+  Future<void> addUserTextMessage({required String text, required List<UserTextInput> individualTextInputs}) async {
     final id = _generateId();
     final message = UserTextMessage(
       id: id,
-      text: text, 
+      text: text, individualTextInputs: individualTextInputs, 
     );
     _messages.value = [..._messages.value, message];
     _newMessageController.add(message);

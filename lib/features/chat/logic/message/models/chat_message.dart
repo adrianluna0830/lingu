@@ -10,21 +10,32 @@ extension ChatMessageX on ChatMessage {
 
 class UserTextMessage extends ChatMessage {
   final String text;
+  final List<UserTextInput> individualTextInputs;
 
   const UserTextMessage({
     required super.id,
-    required this.text,
+    required this.text, required this.individualTextInputs,
   });
 
   UserTextMessage copyWith({
     int? id,
     String? text,
+    List<UserTextInput>? individualTextInputs,
   }) {
     return UserTextMessage(
       id: id ?? this.id,
       text: text ?? this.text,
+      individualTextInputs: individualTextInputs ?? this.individualTextInputs,
     );
   }
+}
+
+class UserTextInput
+{
+  final String text;
+  final bool isTargetLanguage;
+
+  UserTextInput(this.text, this.isTargetLanguage);
 }
 
 class UserSpeechAudio {
