@@ -1,5 +1,5 @@
-import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
+import 'package:lingu/features/chat/chat_view.dart';
 
 class ChatMessagesListController {
-  Function(ChatMessage)? onMessageTap;
+  Function(MessageViewDTO)? onMessageTap;
 }

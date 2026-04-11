@@ -34,7 +34,7 @@ class AudioInputHandler {
     final Uint8List audio = await _audioRecorder.stop();
     final path = await _audioPathSaver.saveToPath(audio, true);
     _audioChunks.add(UserSpeechAudio(
-        audioUrl: path, isTargetLanguage: _speakingTargetLanguage.value));
+        filePath: path, isTargetLanguage: _speakingTargetLanguage.value));
   }
 
   Future<void> sendRecording() async {
@@ -46,7 +46,7 @@ class AudioInputHandler {
 
     final List<Uint8List> pcmChunks = [];
     for (final chunk in _audioChunks) {
-      final bytes = await File(chunk.audioUrl).readAsBytes();
+      final bytes = await File(chunk.filePath).readAsBytes();
       // Skip 44 bytes of WAV header to get raw PCM data
       if (bytes.length > 44) {
         pcmChunks.add(bytes.sublist(44));

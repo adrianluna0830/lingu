@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:googleapis/speech/v1.dart';
-import 'package:lingu/core/stt/audio_encoding.dart';
+import 'package:lingu/core/stt/audio_encoding_enum.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/core/stt/speech_result.dart';
 import 'package:lingu/core/stt/word_detail.dart';
@@ -11,11 +11,12 @@ class GoogleSpeechToTextService implements ISpeechToTextService {
   GoogleSpeechToTextService(this._speechApi);
 
   @override
-  Future<SpeechResult> recognize(
-    Uint8List audioBytes, {
-    required AudioEncoding encoding,
-    required int sampleRateHertz,
-    required String languageCode,
+  Future<SpeechResult> recognize({
+    required Uint8List audioBytes,
+    bool enableAutomaticPunctuation = false,
+    AudioEncodingEnum encoding = AudioEncodingEnum.linear16,
+    int sampleRateHertz = 16000,
+    String bcp47ToRecognize = 'en-US',
   }) async {
     final audio = RecognitionAudio();
     audio.contentAsBytes = audioBytes;
@@ -24,7 +25,8 @@ class GoogleSpeechToTextService implements ISpeechToTextService {
       config: RecognitionConfig(
         encoding: encoding.value,
         sampleRateHertz: sampleRateHertz,
-        languageCode: languageCode,
+        enableAutomaticPunctuation: enableAutomaticPunctuation,
+        languageCode: bcp47ToRecognize,
         enableWordConfidence: true,
         enableWordTimeOffsets: true,
       ),

@@ -19,15 +19,20 @@ import json
 import base64
 import azure.cognitiveservices.speech as speechsdk
 
+def debug_print(msg: str):
+    sys.stderr.write(f"[Python Debug] {msg}\n")
+    sys.stderr.flush()
 
 class PronunciationAssessmentService:
 
     def __init__(self, subscription_key: str, endpoint: str):
+        debug_print(f"Initializing PronunciationAssessmentService with endpoint: {endpoint}")
         self._speech_config = speechsdk.SpeechConfig(
             subscription=subscription_key,
             endpoint=endpoint,
         )
         self._speech_config.request_word_level_timestamps()
+        debug_print("SpeechConfig created successfully.")
 
     def assess(
         self,
@@ -44,6 +49,9 @@ class PronunciationAssessmentService:
         enable_miscue: bool = False,
         enable_prosody_assessment: bool = False,
     ) -> dict:
+        debug_print(f"Starting assess() with {len(wav_bytes)} bytes of audio data")
+        debug_print(f"Config: lang={language}, rate={sample_rate}, ref_text='{reference_text}'")
+
         pronunciation_config = speechsdk.PronunciationAssessmentConfig(
             json_string=json.dumps({
                 'referenceText': reference_text,
@@ -63,9 +71,12 @@ class PronunciationAssessmentService:
             bits_per_sample=bits_per_sample,
             channels=channels,
         )
+        debug_print("Audio stream format created")
+
         push_stream = speechsdk.audio.PushAudioInputStream(stream_format=audio_format)
         push_stream.write(wav_bytes)
         push_stream.close()
+        debug_print("Wav bytes written to push_stream")
 
         self._speech_config.speech_recognition_language = language
 
@@ -74,31 +85,51 @@ class PronunciationAssessmentService:
             audio_config=speechsdk.AudioConfig(stream=push_stream),
         )
         pronunciation_config.apply_to(recognizer)
+        debug_print("Recognizer configured. Calling recognize_once()...")
 
         result = recognizer.recognize_once()
+        debug_print(f"recognize_once() returned with reason: {result.reason}")
 
         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
             raw_json = result.properties.get(speechsdk.PropertyId.SpeechServiceResponse_JsonResult)
+            debug_print(f"Raw JSON result available: {bool(raw_json)}")
             if not raw_json:
-                raise RuntimeError("No JSON result in response")
+                return {"success": False, "error_code": "INTERNAL_ERROR", "message": "No JSON result in response"}
+            
             parsed = json.loads(raw_json)
             if not ("NBest" in parsed and isinstance(parsed["NBest"], list) and parsed["NBest"]):
-                raise RuntimeError("Invalid or incomplete response")
-            return parsed
+                return {"success": False, "error_code": "INTERNAL_ERROR", "message": "Invalid or incomplete response from Azure"}
+            
+            debug_print("Successfully parsed response")
+            return {"success": True, "data": parsed}
 
         elif result.reason == speechsdk.ResultReason.NoMatch:
-            raise RuntimeError(f"No speech recognized: {result.no_match_details}")
+            debug_print(f"No match details: {result.no_match_details}")
+            return {"success": False, "error_code": "NO_SPEECH", "message": str(result.no_match_details)}
 
         elif result.reason == speechsdk.ResultReason.Canceled:
-            details = speechsdk.CancellationDetails.from_result(result)
-            raise RuntimeError(f"Canceled: {details.reason} | {details.error_details}")
+            details = result.cancellation_details
+            debug_print(f"Canceled reason: {details.reason}, error details: {details.error_details}")
+            
+            error_code = "UNKNOWN_ERROR"
+            if details.reason == speechsdk.CancellationReason.Error:
+                if "401" in details.error_details or "403" in details.error_details or "Authentication" in details.error_details:
+                    error_code = "AUTH_ERROR"
+                elif "429" in details.error_details or "TooManyRequests" in details.error_details:
+                    error_code = "QUOTA_ERROR"
+                elif "DNS" in details.error_details or "Connection" in details.error_details or "WebSocket" in details.error_details:
+                    error_code = "NETWORK_ERROR"
+            
+            return {"success": False, "error_code": error_code, "message": details.error_details}
 
-        raise RuntimeError(f"Unexpected result: {result.reason}")
+        return {"success": False, "error_code": "UNKNOWN_ERROR", "message": f"Unexpected result: {result.reason}"}
 
 
 if __name__ == "__main__":
     sys.stdin.reconfigure(line_buffering=True)
     sys.stdout.reconfigure(line_buffering=True)
+
+    debug_print("Starting Python script...")
 
     try:
         service = PronunciationAssessmentService(
@@ -106,20 +137,28 @@ if __name__ == "__main__":
             endpoint=os.environ["SPEECH_ENDPOINT"],
         )
     except KeyError as e:
-        print(json.dumps({"success": False, "error": f"Missing environment variable: {e}"}), flush=True)
+        debug_print(f"Missing environment variable: {e}")
+        print(json.dumps({"success": False, "error_code": "AUTH_ERROR", "message": f"Missing environment variable: {e}"}), flush=True)
         sys.exit(1)
     except Exception as e:
-        print(json.dumps({"success": False, "error": f"Initialization error: {e}"}), flush=True)
+        debug_print(f"Initialization error: {e}")
+        print(json.dumps({"success": False, "error_code": "INTERNAL_ERROR", "message": f"Initialization error: {e}"}), flush=True)
         sys.exit(1)
+
+    debug_print("Service initialized, listening on stdin...")
 
     for line in sys.stdin:
         line = line.strip()
         if not line:
             continue
         try:
+            debug_print(f"Received request line of length: {len(line)}")
             req = json.loads(line)
+            debug_print("JSON request parsed.")
+            
+            wav_bytes = base64.b64decode(req["audio_base64"])
             result = service.assess(
-                wav_bytes=base64.b64decode(req["audio_base64"]),
+                wav_bytes=wav_bytes,
                 language=req["language"],
                 sample_rate=req.get("sample_rate", 16000),
                 bits_per_sample=req.get("bits_per_sample", 16),
@@ -132,6 +171,7 @@ if __name__ == "__main__":
                 enable_miscue=req.get("enable_miscue", False),
                 enable_prosody_assessment=req.get("enable_prosody_assessment", False),
             )
-            print(json.dumps({"success": True, "data": result}), flush=True)
+            print(json.dumps(result), flush=True)
         except Exception as e:
-            print(json.dumps({"success": False, "error": str(e)}), flush=True)
+            debug_print(f"Error processing request: {e}")
+            print(json.dumps({"success": False, "error_code": "INTERNAL_ERROR", "message": str(e)}), flush=True)

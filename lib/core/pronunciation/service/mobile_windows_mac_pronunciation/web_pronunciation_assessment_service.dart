@@ -252,7 +252,7 @@ class WebViewPronunciationAssessmentService implements IPronunciationAssessmentS
 
   @override
   Future<RawPronunciationAssessmentResponse> assessFromWavAsync(
-    Uint8List wavBytes, {
+    {required Uint8List wavBytes,
     required String language,
     int sampleRate = 16000,
     int bitsPerSample = 16,

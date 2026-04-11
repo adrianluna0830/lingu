@@ -47,3 +47,23 @@ final class AssessmentError extends PronunciationAssessmentUsageError {
 final class AssessmentTimeoutError extends PronunciationAssessmentUsageError {
   const AssessmentTimeoutError(super.message);
 }
+
+final class AuthenticationError extends PronunciationAssessmentUsageError {
+  const AuthenticationError(super.message);
+}
+
+final class NetworkError extends PronunciationAssessmentUsageError {
+  const NetworkError(super.message);
+}
+
+final class NoSpeechError extends PronunciationAssessmentUsageError {
+  const NoSpeechError() : super('No speech was recognized. Please check your microphone and try again.');
+}
+
+final class QuotaExceededError extends PronunciationAssessmentUsageError {
+  const QuotaExceededError(super.message);
+}
+
+final class InternalServiceError extends PronunciationAssessmentUsageError {
+  const InternalServiceError(super.message);
+}

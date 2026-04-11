@@ -58,7 +58,7 @@ class LinuxPronunciationAssessmentService implements IPronunciationAssessmentSer
 
   @override
   Future<RawPronunciationAssessmentResponse> assessFromWavAsync(
-    Uint8List wavBytes, {
+    {required Uint8List wavBytes,
     required String language,
     int sampleRate = 16000,
     int bitsPerSample = 16,
@@ -109,11 +109,26 @@ class LinuxPronunciationAssessmentService implements IPronunciationAssessmentSer
       );
 
       final responseJson = jsonDecode(responseString);
-
       if (responseJson['success'] == true) {
         return RawPronunciationAssessmentResponse.fromMap(responseJson['data']);
       } else {
-        throw AssessmentError(responseJson['error'] ?? 'unknown error in python script');
+        final errorCode = responseJson['error_code'] as String?;
+        final message = (responseJson['message'] ?? responseJson['error']) as String? ?? 'unknown error in python script';
+
+        switch (errorCode) {
+          case 'AUTH_ERROR':
+            throw AuthenticationError(message);
+          case 'NO_SPEECH':
+            throw const NoSpeechError();
+          case 'NETWORK_ERROR':
+            throw NetworkError(message);
+          case 'QUOTA_ERROR':
+            throw QuotaExceededError(message);
+          case 'INTERNAL_ERROR':
+            throw InternalServiceError(message);
+          default:
+            throw AssessmentError(message);
+        }
       }
     } on FormatException catch (e) {
       throw AssessmentError('failed to decode response: $e');

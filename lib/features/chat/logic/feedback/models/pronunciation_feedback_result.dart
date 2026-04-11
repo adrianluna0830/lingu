@@ -1,15 +1,8 @@
 class PronunciationFeedbackResult {
-  final String transcript;
-  final double accuracyScore;
-  final double fluencyScore;
-  final double completenessScore;
-  final double pronScore;
+  final String originalTranscript;
 
-  PronunciationFeedbackResult({
-    required this.transcript,
-    required this.accuracyScore,
-    required this.fluencyScore,
-    required this.completenessScore,
-    required this.pronScore,
-  });
+  PronunciationFeedbackResult({required this.originalTranscript});
+
+
+
 }

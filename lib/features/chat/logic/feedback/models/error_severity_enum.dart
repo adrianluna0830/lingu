@@ -1,0 +1,5 @@
+enum ErrorSeverityEnum
+{
+  bad,
+  neutral
+}

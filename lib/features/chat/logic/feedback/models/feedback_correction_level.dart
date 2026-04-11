@@ -1,5 +1,0 @@
-enum FeedbackCorrectionLevel
-{
-  bad,
-  neutral
-}

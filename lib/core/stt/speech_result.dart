@@ -1,4 +1,3 @@
-import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/core/stt/word_detail.dart';
 
 class SpeechResult {

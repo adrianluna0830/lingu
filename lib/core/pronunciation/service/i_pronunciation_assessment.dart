@@ -5,7 +5,7 @@ import 'package:lingu/core/pronunciation/models/raw_pronunciation_assessment_res
 abstract class IPronunciationAssessmentService {
 
   Future<RawPronunciationAssessmentResponse> assessFromWavAsync(
-    Uint8List wavBytes, {
+    { required Uint8List wavBytes,
     required String language,
     int sampleRate = 16000,
     int bitsPerSample = 16,

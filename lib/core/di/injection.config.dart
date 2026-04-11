@@ -43,16 +43,17 @@ import 'package:lingu/core/stt/google_speech_to_text_fabric.dart' as _i611;
 import 'package:lingu/core/stt/i_speech_to_text_service.dart' as _i597;
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart' as _i648;
 import 'package:lingu/core/tts/google/google_tts_fabric.dart' as _i573;
+import 'package:lingu/features/chat/chat_view.dart' as _i761;
 import 'package:lingu/features/chat/di/chat_languages.dart' as _i522;
 import 'package:lingu/features/chat/di/chat_module.dart' as _i437;
 import 'package:lingu/features/chat/logic/chatbot/chatbot_service.dart'
     as _i1003;
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart'
     as _i98;
-import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_service.dart'
-    as _i847;
-import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart'
-    as _i228;
+import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_manager.dart'
+    as _i626;
+import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_manager.dart'
+    as _i188;
 import 'package:lingu/features/chat/logic/input/audio_input_handler.dart'
     as _i86;
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart'
@@ -120,6 +121,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i140.SharedPreferencesStore>(),
       ),
       preResolve: true,
+    );
+    gh.lazySingleton<_i761.MessageViewDTOComputed>(
+      () => _i761.MessageViewDTOComputed(
+        chatMessagesManager: gh<_i433.ChatMessagesManager>(),
+        messageDetailsManager: gh<_i98.MessageDetailsManager>(),
+      ),
     );
     gh.factory<_i1033.NativeLocaleGuard>(
       () => _i1033.NativeLocaleGuard(gh<_i56.LocaleSettingsService>()),
@@ -193,46 +200,49 @@ extension GetItInjectableX on _i174.GetIt {
       dispose: dispose,
       init: (_i526.GetItHelper gh) async {
         final chatModule = _$ChatModule();
-        await gh.singletonAsync<_i648.ITextToSpeechService>(
-          () => chatModule.getTTS(gh<_i573.GoogleTTSFabric>()),
+        await gh.singletonAsync<_i250.IAIService>(
+          () => chatModule.getAIModel(gh<_i939.IAIFabric>()),
           preResolve: true,
         );
         await gh.singletonAsync<_i399.IPronunciationAssessmentService>(
           () => chatModule.getPronunciationAssessment(
-            gh<_i740.PronunciationAssessmentFabric>(),
+            gh<_i939.IPronunciationAssessmentFabric>(),
           ),
           preResolve: true,
         );
-        gh.lazySingleton<_i847.PronunciationFeedbackService>(
-          () => _i847.PronunciationFeedbackService(),
+        gh.singleton<_i433.ChatMessagesManager>(
+          () => _i433.ChatMessagesManager(),
         );
         gh.singleton<_i522.ChatLanguages>(
           () => chatModule.getChatLanguages(gh<_i56.LocaleSettingsService>()),
         );
-        await gh.singletonAsync<_i250.IAIService>(
-          () => chatModule.getAIModel(gh<_i915.GeminiFabric>()),
+        await gh.singletonAsync<_i648.ITextToSpeechService>(
+          () => chatModule.getTTS(gh<_i939.ITTSFabric>()),
           preResolve: true,
         );
         await gh.lazySingletonAsync<_i597.ISpeechToTextService>(
-          () => chatModule.getSTT(gh<_i611.GoogleSpeechToTextFabric>()),
+          () => chatModule.getSTT(gh<_i939.ISTTFabric>()),
           preResolve: true,
         );
-        gh.lazySingleton<_i228.StatementFeedbackService>(
-          () => _i228.StatementFeedbackService(
+        gh.lazySingleton<_i626.PronunciationFeedbackManager>(
+          () => _i626.PronunciationFeedbackManager(
+            gh<_i399.IPronunciationAssessmentService>(),
+            gh<_i250.IAIService>(),
+            gh<_i597.ISpeechToTextService>(),
+            gh<_i522.ChatLanguages>(),
+          ),
+        );
+        gh.lazySingleton<_i188.StatementFeedbackManager>(
+          () => _i188.StatementFeedbackManager(
             gh<_i250.IAIService>(),
             gh<_i522.ChatLanguages>(),
           ),
         );
         gh.singleton<_i98.MessageDetailsManager>(
           () => _i98.MessageDetailsManager(
-            gh<_i847.PronunciationFeedbackService>(),
-            gh<_i228.StatementFeedbackService>(),
-          ),
-        );
-        gh.singleton<_i433.ChatMessagesManager>(
-          () => _i433.ChatMessagesManager(
-            gh<_i98.MessageDetailsManager>(),
-            gh<_i1042.PronunciationAssessmentCredentialsService>(),
+            gh<_i433.ChatMessagesManager>(),
+            gh<_i626.PronunciationFeedbackManager>(),
+            gh<_i188.StatementFeedbackManager>(),
           ),
         );
         gh.singleton<_i420.PanelManager>(
