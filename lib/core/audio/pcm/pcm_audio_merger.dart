@@ -1,9 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/audio/misc/i_audio_merger.dart';
 
-@Singleton(as: IAudioMerger)
 class PCMAudioMerger implements IAudioMerger {
   @override
   Future<Uint8List> merge(

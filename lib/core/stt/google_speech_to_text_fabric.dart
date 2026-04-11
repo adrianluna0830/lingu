@@ -3,14 +3,12 @@ import 'dart:io';
 
 import 'package:googleapis/speech/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/settings/stt_credentials_service.dart';
 import 'package:lingu/core/stt/google_speech_to_text_service.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 
-@LazySingleton(as: ISTTFabric)
 class GoogleSpeechToTextFabric implements ISTTFabric {
   final STTCredentialsService _credentialsService;
 

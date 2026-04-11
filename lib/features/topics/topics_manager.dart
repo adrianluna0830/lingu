@@ -1,4 +1,3 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/models/cefr.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
@@ -7,7 +6,6 @@ import 'package:lingu/features/topics/topic.dart';
 import 'package:lingu/features/topics/topic_view_state.dart';
 import 'package:signals/signals_flutter.dart';
 
-@injectable
 class TopicsManager {
   final TopicDataRepository _repository;
   final LocaleSettingsService _localeSettings;

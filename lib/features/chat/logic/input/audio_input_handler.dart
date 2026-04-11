@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/audio/misc/i_audio_merger.dart';
 import 'package:lingu/core/audio/misc/i_audio_utils.dart';
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
@@ -9,7 +8,6 @@ import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:signals/signals.dart';
 
-@injectable
 class AudioInputHandler {
   final ChatMessagesManager _messagesManager;
   final IAudioRecorder _audioRecorder;

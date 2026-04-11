@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
@@ -8,7 +7,6 @@ import 'package:lingu/core/pronunciation/service/linux/linux_pronunciation_asses
 import 'package:lingu/core/pronunciation/service/mobile_windows_mac_pronunciation/web_pronunciation_assessment_service.dart';
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
 
-@Injectable(as: IPronunciationAssessmentFabric)
 class PronunciationAssessmentFabric implements IPronunciationAssessmentFabric {
   final PronunciationAssessmentCredentialsService _credentialsService;
 

@@ -1,7 +1,5 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/settings/stores.dart';
 
-@singleton
 class PronunciationAssessmentCredentialsService {
   final PersistedNullableStringSignal apiKey;
   final PersistedNullableStringSignal endpoint;
@@ -19,9 +17,7 @@ class PronunciationAssessmentCredentialsService {
         key: 'sttEndpoint',
         store: store,
       );
-
-  @FactoryMethod(preResolve: true)
-  static Future<PronunciationAssessmentCredentialsService> create(
+static Future<PronunciationAssessmentCredentialsService> create(
     SecureStore secureStore,
     SharedPreferencesStore store,
   ) async {

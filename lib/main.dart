@@ -17,7 +17,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapters();
   JustAudioMediaKit.ensureInitialized();
-  await configureDependencies();
+  await DependencyInjection.init();
 
   // di<AICredentialsService>().apiKey.value = null;
   // di<STTCredentialsService>().apiKey.value = null;

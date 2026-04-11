@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:signals/signals.dart';
 
-@Singleton(scope: 'chat')
 class ChatMessagesManager {
   ChatMessagesManager();
   

@@ -1,7 +1,5 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/settings/stores.dart';
 
-@singleton
 class TextToSpeechSettingsService {
   final PersistedNullableStringSignal apiKey;
   final PersistedBoolSignal customVoiceEnabled;
@@ -29,9 +27,7 @@ class TextToSpeechSettingsService {
         key: 'practiceModeSpeakingRate',
         store: store,
       );
-
-  @FactoryMethod(preResolve: true)
-  static Future<TextToSpeechSettingsService> create(
+static Future<TextToSpeechSettingsService> create(
     SharedPreferencesStore store,
   ) async {
     final instance = TextToSpeechSettingsService._(store);

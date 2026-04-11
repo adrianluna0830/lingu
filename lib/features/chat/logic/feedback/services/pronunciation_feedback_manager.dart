@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
 import 'package:lingu/core/stt/audio_encoding_enum.dart';
@@ -10,8 +9,6 @@ import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback_result.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 
-@Scope('chat')
-@lazySingleton
 class PronunciationFeedbackManager {
   final IPronunciationAssessmentService _assessmentService;
   final IAIService _aiModel;

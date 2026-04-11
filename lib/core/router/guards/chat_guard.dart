@@ -2,14 +2,11 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/di/injection.dart';
-import 'package:lingu/core/di/injection.config.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 
-@injectable
 class ChatGuard extends AutoRouteGuard {
   final AICredentialsService _aiCredentials;
   final TextToSpeechSettingsService _ttsSettings;
@@ -40,7 +37,7 @@ class ChatGuard extends AutoRouteGuard {
           await di.popScopesTill('chat', inclusive: true);
         } catch (_) {}
 
-        await di.initChatScope();
+        await DependencyInjection.initChatScope();
 
         resolver.next(true);
       } catch (e) {

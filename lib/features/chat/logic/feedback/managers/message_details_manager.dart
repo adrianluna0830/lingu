@@ -1,4 +1,3 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_manager.dart';
 import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_manager.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
@@ -6,7 +5,6 @@ import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
 import 'package:signals/signals.dart';
 
-@Singleton(scope: 'chat')
 class MessageDetailsManager {
   final ChatMessagesManager _chatMessagesManager;
   final PronunciationFeedbackManager _pronunciationFeedbackService;

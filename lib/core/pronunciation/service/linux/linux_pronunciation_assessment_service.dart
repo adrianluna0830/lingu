@@ -67,7 +67,7 @@ class LinuxPronunciationAssessmentService implements IPronunciationAssessmentSer
     String gradingSystem = 'HundredMark',
     String granularity = 'Phoneme',
     String phonemeAlphabet = 'IPA',
-    int nBestPhonemeCount = 5,
+    int nBestPhonemeCount = 1,
     bool enableMiscue = false,
     bool enableProsodyAssessment = false,
     Duration timeout = const Duration(seconds: 180),

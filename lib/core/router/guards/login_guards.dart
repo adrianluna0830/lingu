@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/router/app_router.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
 import 'package:lingu/core/settings/stt_credentials_service.dart';
@@ -17,7 +16,6 @@ final _setupRoutes = {
   PronunciationAssessmentCredentialsRoute.name,
 };
 
-@injectable
 class NativeLocaleGuard extends AutoRouteGuard {
   final LocaleSettingsService _localeSettings;
 
@@ -48,7 +46,6 @@ class NativeLocaleGuard extends AutoRouteGuard {
   }
 }
 
-@injectable
 class LearningLocaleGuard extends AutoRouteGuard {
   final LocaleSettingsService _localeSettings;
 
@@ -79,7 +76,6 @@ class LearningLocaleGuard extends AutoRouteGuard {
   }
 }
 
-@injectable
 class CEFRLevelGuard extends AutoRouteGuard {
   final LocaleSettingsService _localeSettings;
 
@@ -110,7 +106,6 @@ class CEFRLevelGuard extends AutoRouteGuard {
   }
 }
 
-@injectable
 class AICredentialsGuard extends AutoRouteGuard {
 
   final AICredentialsService _aiCredentials;
@@ -142,7 +137,6 @@ class AICredentialsGuard extends AutoRouteGuard {
   }
 }
 
-@injectable
 class STTCredentialsGuard extends AutoRouteGuard {
   final STTCredentialsService _sttCredentials;
 
@@ -174,7 +168,6 @@ class STTCredentialsGuard extends AutoRouteGuard {
   }
 }
 
-@injectable
 class PronunciationAssessmentCredentialsGuard extends AutoRouteGuard {
   final PronunciationAssessmentCredentialsService _credentials;
 
@@ -206,7 +199,6 @@ class PronunciationAssessmentCredentialsGuard extends AutoRouteGuard {
   }
 }
 
-@injectable
 class TTSCredentialsGuard extends AutoRouteGuard {
   final TextToSpeechSettingsService _ttsCredentials;
 

@@ -1,9 +1,7 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/core/models/cefr.dart';
 import 'package:lingu/core/settings/stores.dart';
 
-@singleton
 class LocaleSettingsService {
   final PersistedNullableEnumSignal<LanguageLocale> nativeLocale;
   final PersistedNullableEnumSignal<LanguageLocale> learningLocale;
@@ -26,9 +24,7 @@ class LocaleSettingsService {
       cefrValues: CEFR.values,
     );
   }
-
-  @FactoryMethod(preResolve: true)
-  static Future<LocaleSettingsService> create(
+static Future<LocaleSettingsService> create(
     SharedPreferencesStore store,
   ) async {
     final instance = LocaleSettingsService._(store);

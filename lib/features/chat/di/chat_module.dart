@@ -1,4 +1,3 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
@@ -7,33 +6,18 @@ import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 
-@module
-abstract class ChatModule {
-  @preResolve
-  @Scope('chat')
-  @singleton
+class ChatModule {
   Future<IAIService> getAIModel(IAIFabric fabric) => fabric.create();
 
-  @preResolve
-  @Scope('chat')
-  @lazySingleton
   Future<ISpeechToTextService> getSTT(ISTTFabric fabric) => fabric.create();
 
-  @preResolve
-  @Scope('chat')
-  @singleton
   Future<ITextToSpeechService> getTTS(ITTSFabric fabric) => fabric.create();
 
-  @preResolve
-  @Scope('chat')
-  @singleton
   Future<IPronunciationAssessmentService> getPronunciationAssessment(
     IPronunciationAssessmentFabric fabric,
   ) =>
       fabric.create();
 
-  @Scope('chat')
-  @singleton
   ChatLanguages getChatLanguages(LocaleSettingsService service) {
     final native = service.nativeLocale.value;
     final target = service.learningLocale.value;

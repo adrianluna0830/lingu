@@ -1,7 +1,5 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/settings/stores.dart';
 
-@singleton
 class AICredentialsService {
   final PersistedNullableStringSignal apiKey;
 
@@ -11,9 +9,7 @@ class AICredentialsService {
         key: 'geminiApiKey',
         store: secureStore,
       );
-
-  @FactoryMethod(preResolve: true)
-  static Future<AICredentialsService> create(SecureStore secureStore) async {
+static Future<AICredentialsService> create(SecureStore secureStore) async {
     final instance = AICredentialsService._(secureStore);
     await instance.apiKey.init();
     return instance;

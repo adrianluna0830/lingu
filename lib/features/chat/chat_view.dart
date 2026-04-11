@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
@@ -18,7 +17,6 @@ import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
-@lazySingleton
 class MessageViewDTOComputed extends Computed<List<MessageViewDTO>> {
   MessageViewDTOComputed(
       {required ChatMessagesManager chatMessagesManager,

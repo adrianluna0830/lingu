@@ -1,12 +1,10 @@
 import 'package:googleai_dart/googleai_dart.dart';
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/ai/gemini/gemini_model.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
 
-@Singleton(as: IAIFabric)
 class GeminiFabric implements IAIFabric {
   final AICredentialsService _credentialsService;
   GeminiFabric(this._credentialsService);

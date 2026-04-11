@@ -1,11 +1,9 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signals/signals_flutter.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
-@singleton
 class SecureStore implements SignalsKeyValueStore {
   SecureStore() : _storage = const FlutterSecureStorage();
   final FlutterSecureStorage _storage;
@@ -21,7 +19,6 @@ class SecureStore implements SignalsKeyValueStore {
       _storage.write(key: key, value: value);
 }
 
-@singleton
 class SharedPreferencesStore implements SignalsKeyValueStore {
   SharedPreferences? _prefs;
 

@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:injectable/injectable.dart';
 import 'package:lingu/core/audio/misc/i_audio_utils.dart';
 import 'package:path_provider/path_provider.dart';
 
-@Singleton(as: IAudioPathSaver)
 class PCMToWavAudioSaver implements IAudioPathSaver {
   @override
   Future<String> saveToPath(

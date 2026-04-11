@@ -1,4 +1,3 @@
-import 'package:injectable/injectable.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback_result.dart';
@@ -50,7 +49,6 @@ class AIAudioMessageData implements PanelState, MessageDetailsData {
   AIAudioMessageData({required this.transcript, required this.translation});
 }
 
-@Singleton(scope: 'chat')
 class PanelManager {
   final MessageDetailsManager _messageDetailsManager;
 
