@@ -1,10 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:lingu/core/ai/core/i_ai_model.dart';
 import 'package:lingu/core/ai/gemini/gemini_fabric.dart';
-import 'package:lingu/core/audio/misc/i_audio_merger.dart';
 import 'package:lingu/core/audio/misc/i_audio_utils.dart';
-import 'package:lingu/core/audio/pcm/pcm_audio_merger.dart';
-import 'package:lingu/core/audio/pcm/pcm_to_wav_audio_saver.dart';
+import 'package:lingu/core/audio/pcm/pcm_audio_utils.dart';
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:lingu/core/audio/playback/just_audio_player_manager.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
@@ -26,7 +24,6 @@ import 'package:lingu/core/stt/google_speech_to_text_fabric.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/google/google_tts_fabric.dart';
-import 'package:lingu/features/chat/chat_view.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/chatbot/chatbot_service.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
@@ -35,6 +32,7 @@ import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_m
 import 'package:lingu/features/chat/logic/input/audio_input_handler.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/logic/message_view_dto_computed.dart';
 import 'package:lingu/features/topics/repository/topics_repository.dart';
 import 'package:lingu/features/topics/topics_manager.dart';
 
@@ -102,9 +100,8 @@ class _StartupDependencies {
   }
 
   static void registerAudioAndFabrics() {
-    di.registerSingleton<IAudioRecorder>(UniversalPCMRecorder());
-    di.registerSingleton<IAudioPathSaver>(PCMToWavAudioSaver());
-    di.registerSingleton<IAudioMerger>(PCMAudioMerger());
+    di.registerSingleton<IAudioUtils>(PCMAudioUtils());
+    di.registerSingleton<IAudioRecorder>(UniversalPCMRecorder(di<IAudioUtils>()));
     di.registerSingleton<IAudioPlayerManager>(JustAudioPlayerManager());
 
     di.registerFactory<IPronunciationAssessmentFabric>(
@@ -214,7 +211,9 @@ class _ChatDependencies {
         di<IPronunciationAssessmentService>(),
         di<IAIService>(),
         di<ISpeechToTextService>(),
+        di<IAudioUtils>(),
         di<ChatLanguages>(),
+        di<ITextToSpeechService>(),
       ),
     );
     di.registerLazySingleton<StatementFeedbackManager>(
@@ -222,9 +221,11 @@ class _ChatDependencies {
     );
     di.registerSingleton<MessageDetailsManager>(
       MessageDetailsManager(
+        di<IAIService>(),
         di<ChatMessagesManager>(),
         di<PronunciationFeedbackManager>(),
         di<StatementFeedbackManager>(),
+        di<ChatLanguages>(),
       ),
     );
     di.registerSingleton<PanelManager>(
@@ -244,8 +245,7 @@ class _ChatDependencies {
         di<ChatMessagesManager>(),
         di<IAudioRecorder>(),
         di<IAudioPlayerManager>(),
-        di<IAudioPathSaver>(),
-        di<IAudioMerger>(),
+        di<IAudioUtils>(),
       ),
     );
   }

@@ -3,9 +3,9 @@ import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
 import 'package:signals/signals_flutter.dart' show FlutterReadonlySignalUtils;
 
 class _RichTextEditingController extends TextEditingController {
-  final InputBarInternalController internalController;
+  final List<(String, bool)> Function() getChars;
 
-  _RichTextEditingController(this.internalController);
+  _RichTextEditingController(this.getChars);
 
   @override
   TextSpan buildTextSpan({
@@ -13,7 +13,7 @@ class _RichTextEditingController extends TextEditingController {
     TextStyle? style,
     required bool withComposing,
   }) {
-    final chars = internalController.textChars.value;
+    final chars = getChars();
 
     if (chars.length != text.length) {
       return TextSpan(text: text, style: style);
@@ -57,8 +57,10 @@ class InputBar extends StatefulWidget {
 }
 
 class _InputBarState extends State<InputBar> {
-  late final InputBarInternalController _internalController = InputBarInternalController(controller: widget.controller);
-  late final TextEditingController _textController = _RichTextEditingController(_internalController);
+  late final InputBarInternalController _internalController =
+      InputBarInternalController(controller: widget.controller);
+  late final TextEditingController _textController =
+      _RichTextEditingController(() => _internalController.textChars.value);
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -78,7 +80,8 @@ class _InputBarState extends State<InputBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isTargetLang = _internalController.isTypingInTargetLanguage.watch(context);
+    final isTargetLang =
+        _internalController.isTypingInTargetLanguage.watch(context);
 
     return Row(
       children: [
@@ -101,7 +104,7 @@ class _InputBarState extends State<InputBar> {
                 borderSide: BorderSide(width: 1.5),
               ),
             ),
-            onChanged:(value) {
+            onChanged: (value) {
               _internalController.updateText(value);
             },
           ),
@@ -115,24 +118,28 @@ class _InputBarState extends State<InputBar> {
             icon: Icon(isTargetLang ? Icons.toggle_on : Icons.toggle_off),
             style: IconButton.styleFrom(
               backgroundColor: Colors.blue.shade200,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
             ),
           ),
           const SizedBox(width: 8.0),
         ],
         IconButton(
-          onPressed:() {
-            if(_internalController.showTextIcon.watch(context)) {
+          onPressed: () {
+            if (_internalController.showTextIcon.watch(context)) {
               _internalController.submitText();
               _textController.clear();
             } else {
               _internalController.startRecording();
             }
           },
-          icon: Icon(_internalController.showTextIcon.watch(context) ? Icons.send : Icons.mic),
+          icon: Icon(_internalController.showTextIcon.watch(context)
+              ? Icons.send
+              : Icons.mic),
           style: IconButton.styleFrom(
             backgroundColor: Colors.blue.shade200,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
           ),
         ),
         const SizedBox(width: 8.0),
@@ -141,10 +148,10 @@ class _InputBarState extends State<InputBar> {
           icon: const Icon(Icons.message),
           style: IconButton.styleFrom(
             backgroundColor: Colors.blue.shade200,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
           ),
-        )
-
+        ),
       ],
     );
   }

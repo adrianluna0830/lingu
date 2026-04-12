@@ -9,12 +9,12 @@ class PronunciationAssessmentCredentialsService {
     SharedPreferencesStore store,
   ) : apiKey = PersistedNullableStringSignal(
         null,
-        key: 'sttApiKey',
+        key: 'pronunciationApiKey',
         store: secureStore,
       ),
       endpoint = PersistedNullableStringSignal(
         null,
-        key: 'sttEndpoint',
+        key: 'pronunciationEndpoint',
         store: store,
       );
 static Future<PronunciationAssessmentCredentialsService> create(

@@ -21,11 +21,11 @@ class GoogleTTSService implements ITextToSpeechService {
         _apiKey = apiKey;
 
   @override
-  Future<Uint8List> synthesizeSpeechText(
-    String text,
-    String? voiceName,
-    String speechBcp47, {
-    double speakingRate = 1.0,
+  Future<Uint8List> synthesizeSpeechText({
+    required String text,
+    required String? voiceName,
+    required String speechBcp47,
+    required double speakingRate,
   }) async {
     try {
       final response = await _api.text.synthesize(
@@ -54,11 +54,11 @@ class GoogleTTSService implements ITextToSpeechService {
   }
 
   @override
-  Future<Uint8List> synthesizeSpeechSSML(
-    String ssml,
-    String? voiceName,
-    String speechBcp47, {
-    double speakingRate = 1.0,
+  Future<Uint8List> synthesizeSpeechSSML({
+    required String ssml,
+    required String? voiceName,
+    required String speechBcp47,
+    required double speakingRate,
   }) async {
     try {
       final response = await _api.text.synthesize(
@@ -87,7 +87,7 @@ class GoogleTTSService implements ITextToSpeechService {
   }
 
   @override
-  Future<List<String>> getAvailableVoices(String? code) async {
+  Future<List<String>> getAvailableVoices({required String? code}) async {
     try {
       final response = await _api.voices.list(languageCode: code);
       return (response.voices ?? [])
@@ -102,11 +102,11 @@ class GoogleTTSService implements ITextToSpeechService {
   }
 
   @override
-  Future<SynthesisWithTimepointsResponse> synthesizeSpeechWithTimepoints(
-    String text,
-    String? voiceName,
-    String speechBcp47, {
-    double speakingRate = 1.0,
+  Future<SynthesisWithTimepointsResponse> synthesizeSpeechWithTimepoints({
+    required String text,
+    required String? voiceName,
+    required String speechBcp47,
+    required double speakingRate,
   }) async {
     try {
       final ssml = _buildSsmlWithMarks(text);

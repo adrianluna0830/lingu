@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:lingu/core/audio/misc/i_audio_utils.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart' as rec;
@@ -8,6 +9,7 @@ import 'package:signals/signals.dart';
 
 class UniversalPCMRecorder extends IAudioRecorder {
   final rec.AudioRecorder _recorder = rec.AudioRecorder();
+  final IAudioUtils _audioUtils;
   final StreamController<Amplitude> _amplitudeController =
       StreamController<Amplitude>.broadcast();
   Timer? _amplitudeTimer;
@@ -21,7 +23,7 @@ class UniversalPCMRecorder extends IAudioRecorder {
       bitRate: 128000
   );
 
-  UniversalPCMRecorder() : super(pollingRate: const Duration(milliseconds: 100));
+  UniversalPCMRecorder(this._audioUtils) : super(pollingRate: const Duration(milliseconds: 100));
 
  
   @override
@@ -63,13 +65,12 @@ class UniversalPCMRecorder extends IAudioRecorder {
     if (path == null) {
       throw Exception('Recording stopped but no file was produced');
     }
+    
+    final bytes = await _audioUtils.retrieve(path);
+    
     final file = File(path);
-    final bytes = await file.readAsBytes();
-    await file.delete();
-
-    // Strip WAV header (44 bytes) to get raw PCM
-    if (bytes.length > 44) {
-      return bytes.sublist(44);
+    if (await file.exists()) {
+      await file.delete();
     }
     
     return bytes;

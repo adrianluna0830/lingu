@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:lingu/core/audio/misc/i_audio_merger.dart';
 import 'package:lingu/core/audio/misc/i_audio_utils.dart';
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
@@ -12,11 +10,13 @@ class AudioInputHandler {
   final ChatMessagesManager _messagesManager;
   final IAudioRecorder _audioRecorder;
   final IAudioPlayerManager _audioPlayerManager;
-  final IAudioPathSaver _audioPathSaver;
-  final IAudioMerger _audioMerger;
+  final IAudioUtils _audioUtils;
 
-  AudioInputHandler(this._messagesManager, this._audioRecorder,
-      this._audioPlayerManager, this._audioPathSaver, this._audioMerger);
+  AudioInputHandler(
+      this._messagesManager,
+      this._audioRecorder,
+      this._audioPlayerManager,
+      this._audioUtils);
 
   Stream<Amplitude> get amplitudeStream => _audioRecorder.onAmplitudeChanged;
 
@@ -30,7 +30,7 @@ class AudioInputHandler {
 
   Future<void> _saveCurrentChunk() async {
     final Uint8List audio = await _audioRecorder.stop();
-    final path = await _audioPathSaver.saveToPath(audio, true);
+    final path = await _audioUtils.saveToPath(audio, true);
     _audioChunks.add(UserSpeechAudio(
         filePath: path, isTargetLanguage: _speakingTargetLanguage.value));
   }
@@ -44,17 +44,12 @@ class AudioInputHandler {
 
     final List<Uint8List> pcmChunks = [];
     for (final chunk in _audioChunks) {
-      final bytes = await File(chunk.filePath).readAsBytes();
-      // Skip 44 bytes of WAV header to get raw PCM data
-      if (bytes.length > 44) {
-        pcmChunks.add(bytes.sublist(44));
-      } else {
-        pcmChunks.add(bytes);
-      }
+      final bytes = await _audioUtils.retrieve(chunk.filePath);
+      pcmChunks.add(bytes);
     }
 
-    final mergedAudio = await _audioMerger.merge(pcmChunks);
-    final filepath = await _audioPathSaver.saveToPath(mergedAudio, true);
+    final mergedAudio = await _audioUtils.merge(pcmChunks);
+    final filepath = await _audioUtils.saveToPath(mergedAudio, true);
 
     Duration duration = await _audioPlayerManager.getDuration(filepath);
 

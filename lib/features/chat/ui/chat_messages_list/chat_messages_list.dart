@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/features/chat/chat_view.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
 import 'package:lingu/features/chat/ui/message_bubble.dart';
 import 'package:lingu/features/chat/ui/voice_note/voice_note.dart';
@@ -56,10 +56,12 @@ class _MessageItem extends StatelessWidget {
   bool get _isClickable {
     if (message is UserTextMessageViewDTO) {
       final m = message as UserTextMessageViewDTO;
+      if (m.translatedText != null) return true;
       return m.grammarErrorSeverity != null && m.fluencyCorrection != null;
     }
     if (message is UserAudioMessageViewDTO) {
       final m = message as UserAudioMessageViewDTO;
+      if (m.translatedText != null) return true;
       return m.grammarErrorSeverity != null &&
           m.fluencyCorrection != null &&
           m.pronunciationErrorSeverity != null;
@@ -91,17 +93,53 @@ class _MessageItem extends StatelessWidget {
     if (msg is UserTextMessageViewDTO) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        child: Text(msg.text),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(msg.text),
+            if (msg.translatedText != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                '"${msg.translatedText!}"',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.black.withOpacity(0.7),
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
+        ),
       );
     } else if (msg is UserAudioMessageViewDTO) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-        child: VoiceNote(
-          audioUrl: msg.audioUrl,
-          duration: msg.duration,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            VoiceNote(
+              audioUrl: msg.audioUrl,
+              duration: msg.duration,
+            ),
+            if (msg.translatedText != null)
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 4.0),
+                child: Text(
+                  '"${msg.translatedText!}"',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.black.withOpacity(0.7),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+          ],
         ),
       );
-    } else if (msg is AITextMessageViewDTO) {
+    }
+ else if (msg is AITextMessageViewDTO) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: Text(msg.text),
