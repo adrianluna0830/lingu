@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/features/chat/logic/feedback/models/message_details_data.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 
 class UserTextMessageDetails extends StatelessWidget {
-  final UserTextMessageData data;
+  final UserTextMessageDetailsViewDto data;
 
   const UserTextMessageDetails({
     super.key,

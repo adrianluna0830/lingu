@@ -1,6 +1,6 @@
 import 'package:googleai_dart/googleai_dart.dart';
-import 'package:lingu/core/ai/core/i_ai_model.dart';
-import 'package:lingu/core/ai/gemini/gemini_model.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
+import 'package:lingu/core/ai/gemini/gemini_service.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
@@ -10,7 +10,7 @@ class GeminiFabric implements IAIFabric {
   GeminiFabric(this._credentialsService);
 
   @override
-  Future<IAIService> create() async {
+  Future<IAiService> create() async {
     final apiKey = _credentialsService.apiKey.value;
     assert(apiKey != null, 'API key must be configured');
     assert(apiKey!.isNotEmpty, 'API key cannot be empty');
@@ -30,7 +30,7 @@ class GeminiFabric implements IAIFabric {
       ),
     );
 
-    return GeminiModel(
+    return GeminiService(
       client: googleClient,
       modelType: GeminiModelType.gemini25FlashLite,
     );

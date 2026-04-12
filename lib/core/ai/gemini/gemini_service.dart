@@ -1,7 +1,7 @@
 import 'package:googleai_dart/googleai_dart.dart';
 import 'package:lingu/core/ai/core/ai_chat_history.dart';
 import 'package:lingu/core/ai/core/ai_chat_message.dart';
-import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/ai/gemini/gemini_exception_mapper.dart';
 
 enum GeminiModelType {
@@ -15,11 +15,11 @@ enum GeminiModelType {
   final String value;
 }
 
-class GeminiModel extends IAIService {
+class GeminiService extends IAiService {
   final GoogleAIClient _client;
   final GeminiModelType modelType;
 
-  GeminiModel({required GoogleAIClient client, required this.modelType}) : _client = client;
+  GeminiService({required GoogleAIClient client, required this.modelType}) : _client = client;
 
 @override
 Future<String> generateContent({

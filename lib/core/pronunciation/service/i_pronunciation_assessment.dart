@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:lingu/core/pronunciation/models/raw_pronunciation_assessment_response.dart';
+import 'package:lingu/core/pronunciation/models/pronunciation_assessment_dto.dart';
 
 abstract class IPronunciationAssessmentService {
 
-  Future<RawPronunciationAssessmentResponse> assessFromWavAsync(
+  Future<PronunciationAssessmentDto> assessFromWavAsync(
     { required Uint8List wavBytes,
     required String language,
     int sampleRate = 16000,

@@ -4,7 +4,7 @@ import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/ai_audio_message_details.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/ai_text_message_details.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
-import 'package:lingu/features/chat/logic/feedback/models/message_details_data.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_state.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/logic/message_view_dto_computed.dart';
@@ -20,7 +20,7 @@ import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_audio_message_details.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_text_message_details.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:lingu/features/chat/logic/input/audio_input_handler.dart';
+import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
 
 @RoutePage()
 class ChatView extends StatefulWidget {
@@ -36,9 +36,9 @@ class _ChatViewState extends State<ChatView> {
   final ChatMessagesListController _controller = ChatMessagesListController();
   final RecordController _recordController = RecordController();
   final BottomPanelController _bottomPanelController = BottomPanelController();
-  final AudioInputHandler _recordInputHandler = di<AudioInputHandler>();
+  final AudioInputManager _recordInputHandler = di<AudioInputManager>();
   final PanelManager _panelManager = di<PanelManager>();
-  late final MessageViewDTOComputed _messageViewDTOComputed = di<MessageViewDTOComputed>();
+  late final MessageViewDtoComputed _messageViewDtoComputed = di<MessageViewDtoComputed>();
 
   @override
   void initState() {
@@ -102,7 +102,7 @@ class _ChatViewState extends State<ChatView> {
         children: [
           Expanded(
             child: ChatMessagesList(
-              messages: _messageViewDTOComputed.watch(context),
+              messages: _messageViewDtoComputed.watch(context),
               controller: _controller,
             ),
           ),
@@ -123,22 +123,22 @@ class _ChatViewState extends State<ChatView> {
           if (panelState is MessageDetailsPanelState)
             Builder(builder: (context) {
               final data = panelState.data;
-              if (data is UserTextMessageData) {
+              if (data is UserTextMessageDetailsViewDto) {
                 return BottomPanel(
                   controller: _bottomPanelController,
                   child: UserTextMessageDetails(data: data),
                 );
-              } else if (data is UserAudioMessageData) {
+              } else if (data is UserAudioMessageDetailsViewDto) {
                 return BottomPanel(
                   controller: _bottomPanelController,
                   child: UserAudioMessageDetails(data: data),
                 );
-              } else if (data is AITextMessageData) {
+              } else if (data is AITextMessageDetailsViewDto) {
                 return BottomPanel(
                   controller: _bottomPanelController,
                   child: AITextMessageDetails(data: data),
                 );
-              } else if (data is AIAudioMessageData) {
+              } else if (data is AIAudioMessageDetailsViewDto) {
                 return BottomPanel(
                   controller: _bottomPanelController,
                   child: AIAudioMessageDetails(data: data),

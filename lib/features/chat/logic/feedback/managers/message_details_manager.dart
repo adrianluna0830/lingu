@@ -1,17 +1,17 @@
-import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
-import 'package:lingu/features/chat/logic/feedback/models/message_details_data.dart';
-import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_manager.dart';
-import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_manager.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
+import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_service.dart';
+import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:signals/signals.dart';
 
 class MessageDetailsManager {
   final ChatMessagesManager _chatMessagesManager;
-  final PronunciationFeedbackManager _pronunciationFeedbackService;
-  final StatementFeedbackManager _statementFeedbackService;
-  final IAIService _aiModel;
+  final PronunciationFeedbackService _pronunciationFeedbackService;
+  final StatementFeedbackService _statementFeedbackService;
+  final IAiService _aiModel;
   final ChatLanguages _languages;
 
   MessageDetailsManager(
@@ -31,8 +31,8 @@ class MessageDetailsManager {
     });
   }
 
-  final _messageDetails = mapSignal<int, MessageDetailsData>({});
-  ReadonlySignal<Map<int, MessageDetailsData>> get messageDetails =>
+  final _messageDetails = mapSignal<int, MessageDetailsViewDto>({});
+  ReadonlySignal<Map<int, MessageDetailsViewDto>> get messageDetails =>
       _messageDetails;
 
   Future<void> fetchTextFeedback(
@@ -44,7 +44,7 @@ class MessageDetailsManager {
 
     if (anyNative) {
       final targetText = await _rephraseToTarget(fullText);
-      _messageDetails[messageId] = UserTextMessageData(
+      _messageDetails[messageId] = UserTextMessageDetailsViewDto(
         translatedText: targetText,
         grammarFeedback: null,
         fluencyFeedback: null,
@@ -53,7 +53,7 @@ class MessageDetailsManager {
     }
 
     final feedback = await _statementFeedbackService.analyze(fullText);
-    _messageDetails[messageId] = UserTextMessageData(
+    _messageDetails[messageId] = UserTextMessageDetailsViewDto(
       translatedText: null,
       grammarFeedback: feedback.$2,
       fluencyFeedback: feedback.$1,
@@ -70,7 +70,7 @@ class MessageDetailsManager {
 
     if (anyNative) {
       final targetText = await _rephraseToTarget(result.rawTranscript);
-      _messageDetails[messageId] = UserAudioMessageData(
+      _messageDetails[messageId] = UserAudioMessageDetailsViewDto(
         translatedText: targetText,
         grammarFeedback: null,
         fluencyFeedback: null,
@@ -80,7 +80,7 @@ class MessageDetailsManager {
     }
 
     final feedback = await _statementFeedbackService.analyze(result.rawTranscript);
-    _messageDetails[messageId] = UserAudioMessageData(
+    _messageDetails[messageId] = UserAudioMessageDetailsViewDto(
       translatedText: null,
       grammarFeedback: feedback.$2,
       fluencyFeedback: feedback.$1,

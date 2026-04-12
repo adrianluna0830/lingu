@@ -1,4 +1,4 @@
-import 'package:lingu/features/chat/logic/feedback/models/message_details_data.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 
 sealed class PanelState {}
 
@@ -9,7 +9,7 @@ class ChatPanelState implements PanelState {}
 class MicPanelState implements PanelState {}
 
 class MessageDetailsPanelState implements PanelState {
-  final MessageDetailsData data;
+  final MessageDetailsViewDto data;
 
   MessageDetailsPanelState(this.data);
 }

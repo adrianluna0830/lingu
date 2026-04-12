@@ -32,14 +32,14 @@ class SyllablePronunciationFeedback {
       'SyllablePronunciationFeedback(syllable: $syllable, userPronunciationFilePath: [audio], correctPronunciationFilePath: [audio], detail: $detail)';
 }
 
-class WordPronuniationFeedback {
+class WordPronunciationFeedback {
   final String word;
   final String userPronunciationFilePath;
   final String correctPronunciationFilePath;
   final List<SyllablePronunciationFeedback> syllableFeedback;
   final bool isBad;
 
-  WordPronuniationFeedback({
+  WordPronunciationFeedback({
     required this.word,
     required this.userPronunciationFilePath,
     required this.correctPronunciationFilePath,
@@ -49,7 +49,7 @@ class WordPronuniationFeedback {
 
   @override
   String toString() =>
-      'WordPronuniationFeedback(word: $word, userPronunciationFilePath: [audio], correctPronunciationFilePath: [audio], isBad: $isBad, syllableFeedback: $syllableFeedback)';
+      'WordPronunciationFeedback(word: $word, userPronunciationFilePath: [audio], correctPronunciationFilePath: [audio], isBad: $isBad, syllableFeedback: $syllableFeedback)';
 }
 
 sealed class PronunciationItemResult {
@@ -70,16 +70,16 @@ class NativeLanguagePronunciationResult extends PronunciationItemResult {
   String toString() => 'NativeLanguagePronunciationResult(transcript: $transcript)';
 }
 
-class TargetLanguatePronunciationResult extends PronunciationItemResult {
-  final List<WordPronuniationFeedback> wordFeedback;
-  TargetLanguatePronunciationResult({
+class TargetLanguagePronunciationResult extends PronunciationItemResult {
+  final List<WordPronunciationFeedback> wordFeedback;
+  TargetLanguagePronunciationResult({
     required super.transcript,
     required this.wordFeedback,
   }) : super(isTargetLanguage: true);
 
   @override
   String toString() =>
-      'TargetLanguatePronunciationResult(transcript: $transcript, wordFeedback: $wordFeedback)';
+      'TargetLanguagePronunciationResult(transcript: $transcript, wordFeedback: $wordFeedback)';
 }
 
 class PronunciationAnalysisResult {

@@ -6,13 +6,13 @@ import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:signals/signals.dart';
 
-class AudioInputHandler {
+class AudioInputManager {
   final ChatMessagesManager _messagesManager;
   final IAudioRecorder _audioRecorder;
   final IAudioPlayerManager _audioPlayerManager;
   final IAudioUtils _audioUtils;
 
-  AudioInputHandler(
+  AudioInputManager(
       this._messagesManager,
       this._audioRecorder,
       this._audioPlayerManager,

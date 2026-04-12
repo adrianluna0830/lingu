@@ -1,18 +1,18 @@
 import 'package:lingu/features/chat/ui/chat_messages_list/models/feedback_result_enum.dart';
 
-sealed class MessageViewDTO {
+sealed class MessageViewDto {
   final int id;
-  MessageViewDTO({required this.id});
+  MessageViewDto({required this.id});
 }
 
-class UserTextMessageViewDTO extends MessageViewDTO {
+class UserTextMessageViewDto extends MessageViewDto {
   final String text;
   final String? correction;
   final String? translatedText;
   final FeedbackResultEnum? grammarErrorSeverity;
   final FeedbackResultEnum? fluencyCorrection;
 
-  UserTextMessageViewDTO({
+  UserTextMessageViewDto({
     required super.id,
     required this.text,
     required this.correction,
@@ -22,7 +22,7 @@ class UserTextMessageViewDTO extends MessageViewDTO {
   });
 }
 
-class UserAudioMessageViewDTO extends MessageViewDTO {
+class UserAudioMessageViewDto extends MessageViewDto {
   final String audioUrl;
   final Duration duration;
   final String? correction;
@@ -31,7 +31,7 @@ class UserAudioMessageViewDTO extends MessageViewDTO {
   final FeedbackResultEnum? fluencyCorrection;
   final FeedbackResultEnum? pronunciationErrorSeverity;
 
-  UserAudioMessageViewDTO({
+  UserAudioMessageViewDto({
     required super.id,
     required this.audioUrl,
     required this.duration,
@@ -43,24 +43,24 @@ class UserAudioMessageViewDTO extends MessageViewDTO {
   });
 }
 
-class AITextMessageViewDTO extends MessageViewDTO {
+class AITextMessageViewDto extends MessageViewDto {
   final String text;
   final String? translation;
 
-  AITextMessageViewDTO({
+  AITextMessageViewDto({
     required super.id,
     required this.text,
     required this.translation,
   });
 }
 
-class AIAudioMessageViewDTO extends MessageViewDTO {
+class AIAudioMessageViewDto extends MessageViewDto {
   final String audioUrl;
   final Duration duration;
   final String transcript;
   final String? translation;
 
-  AIAudioMessageViewDTO({
+  AIAudioMessageViewDto({
     required super.id,
     required this.audioUrl,
     required this.duration,

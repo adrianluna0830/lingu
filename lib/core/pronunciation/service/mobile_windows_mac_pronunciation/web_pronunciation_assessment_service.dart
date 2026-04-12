@@ -6,7 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
 
 import '../../models/pronunciation_assessment_errors.dart';
-import '../../models/raw_pronunciation_assessment_response.dart';
+import '../../models/pronunciation_assessment_dto.dart';
 
 
 class WebViewPronunciationAssessmentService implements IPronunciationAssessmentService {
@@ -251,7 +251,7 @@ class WebViewPronunciationAssessmentService implements IPronunciationAssessmentS
   }
 
   @override
-  Future<RawPronunciationAssessmentResponse> assessFromWavAsync(
+  Future<PronunciationAssessmentDto> assessFromWavAsync(
     {required Uint8List wavBytes,
     required String language,
     int sampleRate = 16000,
@@ -305,7 +305,7 @@ class WebViewPronunciationAssessmentService implements IPronunciationAssessmentS
         },
       );
 
-      return RawPronunciationAssessmentResponse.fromMap(raw);
+      return PronunciationAssessmentDto.fromMap(raw);
     } catch (e) {
       _isEvaluating = false;
       if (e is PronunciationAssessmentUsageError) rethrow;

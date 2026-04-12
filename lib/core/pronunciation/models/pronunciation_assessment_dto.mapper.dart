@@ -6,17 +6,17 @@
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
-part of 'raw_pronunciation_assessment_response.dart';
+part of 'pronunciation_assessment_dto.dart';
 
-class RawPronunciationAssessmentResponseMapper
-    extends ClassMapperBase<RawPronunciationAssessmentResponse> {
-  RawPronunciationAssessmentResponseMapper._();
+class PronunciationAssessmentDtoMapper
+    extends ClassMapperBase<PronunciationAssessmentDto> {
+  PronunciationAssessmentDtoMapper._();
 
-  static RawPronunciationAssessmentResponseMapper? _instance;
-  static RawPronunciationAssessmentResponseMapper ensureInitialized() {
+  static PronunciationAssessmentDtoMapper? _instance;
+  static PronunciationAssessmentDtoMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(
-        _instance = RawPronunciationAssessmentResponseMapper._(),
+        _instance = PronunciationAssessmentDtoMapper._(),
       );
       NBestMapper.ensureInitialized();
     }
@@ -24,51 +24,63 @@ class RawPronunciationAssessmentResponseMapper
   }
 
   @override
-  final String id = 'RawPronunciationAssessmentResponse';
+  final String id = 'PronunciationAssessmentDto';
 
-  static String _$id(RawPronunciationAssessmentResponse v) => v.id;
-  static const Field<RawPronunciationAssessmentResponse, String> _f$id = Field(
+  static String _$id(PronunciationAssessmentDto v) => v.id;
+  static const Field<PronunciationAssessmentDto, String> _f$id = Field(
     'id',
     _$id,
     key: r'Id',
   );
-  static String _$recognitionStatus(RawPronunciationAssessmentResponse v) =>
+  static String _$recognitionStatus(PronunciationAssessmentDto v) =>
       v.recognitionStatus;
-  static const Field<RawPronunciationAssessmentResponse, String>
-  _f$recognitionStatus = Field(
-    'recognitionStatus',
-    _$recognitionStatus,
-    key: r'RecognitionStatus',
-  );
-  static int _$offset(RawPronunciationAssessmentResponse v) => v.offset;
-  static const Field<RawPronunciationAssessmentResponse, int> _f$offset = Field(
+  static const Field<PronunciationAssessmentDto, String> _f$recognitionStatus =
+      Field(
+        'recognitionStatus',
+        _$recognitionStatus,
+        key: r'RecognitionStatus',
+      );
+  static int _$offset(PronunciationAssessmentDto v) => v.offset;
+  static const Field<PronunciationAssessmentDto, int> _f$offset = Field(
     'offset',
     _$offset,
     key: r'Offset',
   );
-  static int _$duration(RawPronunciationAssessmentResponse v) => v.duration;
-  static const Field<RawPronunciationAssessmentResponse, int> _f$duration =
-      Field('duration', _$duration, key: r'Duration');
-  static String _$displayText(RawPronunciationAssessmentResponse v) =>
-      v.displayText;
-  static const Field<RawPronunciationAssessmentResponse, String>
-  _f$displayText = Field('displayText', _$displayText, key: r'DisplayText');
-  static int? _$channel(RawPronunciationAssessmentResponse v) => v.channel;
-  static const Field<RawPronunciationAssessmentResponse, int> _f$channel =
-      Field('channel', _$channel, key: r'Channel', opt: true);
-  static double? _$snr(RawPronunciationAssessmentResponse v) => v.snr;
-  static const Field<RawPronunciationAssessmentResponse, double> _f$snr = Field(
+  static int _$duration(PronunciationAssessmentDto v) => v.duration;
+  static const Field<PronunciationAssessmentDto, int> _f$duration = Field(
+    'duration',
+    _$duration,
+    key: r'Duration',
+  );
+  static String _$displayText(PronunciationAssessmentDto v) => v.displayText;
+  static const Field<PronunciationAssessmentDto, String> _f$displayText = Field(
+    'displayText',
+    _$displayText,
+    key: r'DisplayText',
+  );
+  static int? _$channel(PronunciationAssessmentDto v) => v.channel;
+  static const Field<PronunciationAssessmentDto, int> _f$channel = Field(
+    'channel',
+    _$channel,
+    key: r'Channel',
+    opt: true,
+  );
+  static double? _$snr(PronunciationAssessmentDto v) => v.snr;
+  static const Field<PronunciationAssessmentDto, double> _f$snr = Field(
     'snr',
     _$snr,
     key: r'Snr',
     opt: true,
   );
-  static List<NBest> _$nBest(RawPronunciationAssessmentResponse v) => v.nBest;
-  static const Field<RawPronunciationAssessmentResponse, List<NBest>> _f$nBest =
-      Field('nBest', _$nBest, key: r'NBest');
+  static List<NBest> _$nBest(PronunciationAssessmentDto v) => v.nBest;
+  static const Field<PronunciationAssessmentDto, List<NBest>> _f$nBest = Field(
+    'nBest',
+    _$nBest,
+    key: r'NBest',
+  );
 
   @override
-  final MappableFields<RawPronunciationAssessmentResponse> fields = const {
+  final MappableFields<PronunciationAssessmentDto> fields = const {
     #id: _f$id,
     #recognitionStatus: _f$recognitionStatus,
     #offset: _f$offset,
@@ -79,8 +91,8 @@ class RawPronunciationAssessmentResponseMapper
     #nBest: _f$nBest,
   };
 
-  static RawPronunciationAssessmentResponse _instantiate(DecodingData data) {
-    return RawPronunciationAssessmentResponse(
+  static PronunciationAssessmentDto _instantiate(DecodingData data) {
+    return PronunciationAssessmentDto(
       id: data.dec(_f$id),
       recognitionStatus: data.dec(_f$recognitionStatus),
       offset: data.dec(_f$offset),
@@ -95,79 +107,74 @@ class RawPronunciationAssessmentResponseMapper
   @override
   final Function instantiate = _instantiate;
 
-  static RawPronunciationAssessmentResponse fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<RawPronunciationAssessmentResponse>(
-      map,
-    );
+  static PronunciationAssessmentDto fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<PronunciationAssessmentDto>(map);
   }
 
-  static RawPronunciationAssessmentResponse fromJson(String json) {
-    return ensureInitialized().decodeJson<RawPronunciationAssessmentResponse>(
-      json,
-    );
+  static PronunciationAssessmentDto fromJson(String json) {
+    return ensureInitialized().decodeJson<PronunciationAssessmentDto>(json);
   }
 }
 
-mixin RawPronunciationAssessmentResponseMappable {
+mixin PronunciationAssessmentDtoMappable {
   String toJson() {
-    return RawPronunciationAssessmentResponseMapper.ensureInitialized()
-        .encodeJson<RawPronunciationAssessmentResponse>(
-          this as RawPronunciationAssessmentResponse,
+    return PronunciationAssessmentDtoMapper.ensureInitialized()
+        .encodeJson<PronunciationAssessmentDto>(
+          this as PronunciationAssessmentDto,
         );
   }
 
   Map<String, dynamic> toMap() {
-    return RawPronunciationAssessmentResponseMapper.ensureInitialized()
-        .encodeMap<RawPronunciationAssessmentResponse>(
-          this as RawPronunciationAssessmentResponse,
+    return PronunciationAssessmentDtoMapper.ensureInitialized()
+        .encodeMap<PronunciationAssessmentDto>(
+          this as PronunciationAssessmentDto,
         );
   }
 
-  RawPronunciationAssessmentResponseCopyWith<
-    RawPronunciationAssessmentResponse,
-    RawPronunciationAssessmentResponse,
-    RawPronunciationAssessmentResponse
+  PronunciationAssessmentDtoCopyWith<
+    PronunciationAssessmentDto,
+    PronunciationAssessmentDto,
+    PronunciationAssessmentDto
   >
   get copyWith =>
-      _RawPronunciationAssessmentResponseCopyWithImpl<
-        RawPronunciationAssessmentResponse,
-        RawPronunciationAssessmentResponse
-      >(this as RawPronunciationAssessmentResponse, $identity, $identity);
+      _PronunciationAssessmentDtoCopyWithImpl<
+        PronunciationAssessmentDto,
+        PronunciationAssessmentDto
+      >(this as PronunciationAssessmentDto, $identity, $identity);
   @override
   String toString() {
-    return RawPronunciationAssessmentResponseMapper.ensureInitialized()
-        .stringifyValue(this as RawPronunciationAssessmentResponse);
+    return PronunciationAssessmentDtoMapper.ensureInitialized().stringifyValue(
+      this as PronunciationAssessmentDto,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return RawPronunciationAssessmentResponseMapper.ensureInitialized()
-        .equalsValue(this as RawPronunciationAssessmentResponse, other);
+    return PronunciationAssessmentDtoMapper.ensureInitialized().equalsValue(
+      this as PronunciationAssessmentDto,
+      other,
+    );
   }
 
   @override
   int get hashCode {
-    return RawPronunciationAssessmentResponseMapper.ensureInitialized()
-        .hashValue(this as RawPronunciationAssessmentResponse);
+    return PronunciationAssessmentDtoMapper.ensureInitialized().hashValue(
+      this as PronunciationAssessmentDto,
+    );
   }
 }
 
-extension RawPronunciationAssessmentResponseValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, RawPronunciationAssessmentResponse, $Out> {
-  RawPronunciationAssessmentResponseCopyWith<
-    $R,
-    RawPronunciationAssessmentResponse,
-    $Out
-  >
-  get $asRawPronunciationAssessmentResponse => $base.as(
-    (v, t, t2) =>
-        _RawPronunciationAssessmentResponseCopyWithImpl<$R, $Out>(v, t, t2),
+extension PronunciationAssessmentDtoValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, PronunciationAssessmentDto, $Out> {
+  PronunciationAssessmentDtoCopyWith<$R, PronunciationAssessmentDto, $Out>
+  get $asPronunciationAssessmentDto => $base.as(
+    (v, t, t2) => _PronunciationAssessmentDtoCopyWithImpl<$R, $Out>(v, t, t2),
   );
 }
 
-abstract class RawPronunciationAssessmentResponseCopyWith<
+abstract class PronunciationAssessmentDtoCopyWith<
   $R,
-  $In extends RawPronunciationAssessmentResponse,
+  $In extends PronunciationAssessmentDto,
   $Out
 >
     implements ClassCopyWith<$R, $In, $Out> {
@@ -182,27 +189,24 @@ abstract class RawPronunciationAssessmentResponseCopyWith<
     double? snr,
     List<NBest>? nBest,
   });
-  RawPronunciationAssessmentResponseCopyWith<$R2, $In, $Out2>
-  $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  PronunciationAssessmentDtoCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
 }
 
-class _RawPronunciationAssessmentResponseCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, RawPronunciationAssessmentResponse, $Out>
+class _PronunciationAssessmentDtoCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, PronunciationAssessmentDto, $Out>
     implements
-        RawPronunciationAssessmentResponseCopyWith<
+        PronunciationAssessmentDtoCopyWith<
           $R,
-          RawPronunciationAssessmentResponse,
+          PronunciationAssessmentDto,
           $Out
         > {
-  _RawPronunciationAssessmentResponseCopyWithImpl(
-    super.value,
-    super.then,
-    super.then2,
-  );
+  _PronunciationAssessmentDtoCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<RawPronunciationAssessmentResponse> $mapper =
-      RawPronunciationAssessmentResponseMapper.ensureInitialized();
+  late final ClassMapperBase<PronunciationAssessmentDto> $mapper =
+      PronunciationAssessmentDtoMapper.ensureInitialized();
   @override
   ListCopyWith<$R, NBest, NBestCopyWith<$R, NBest, NBest>> get nBest =>
       ListCopyWith(
@@ -233,8 +237,8 @@ class _RawPronunciationAssessmentResponseCopyWithImpl<$R, $Out>
     }),
   );
   @override
-  RawPronunciationAssessmentResponse $make(CopyWithData data) =>
-      RawPronunciationAssessmentResponse(
+  PronunciationAssessmentDto $make(CopyWithData data) =>
+      PronunciationAssessmentDto(
         id: data.get(#id, or: $value.id),
         recognitionStatus: data.get(
           #recognitionStatus,
@@ -249,17 +253,9 @@ class _RawPronunciationAssessmentResponseCopyWithImpl<$R, $Out>
       );
 
   @override
-  RawPronunciationAssessmentResponseCopyWith<
-    $R2,
-    RawPronunciationAssessmentResponse,
-    $Out2
-  >
+  PronunciationAssessmentDtoCopyWith<$R2, PronunciationAssessmentDto, $Out2>
   $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _RawPronunciationAssessmentResponseCopyWithImpl<$R2, $Out2>(
-        $value,
-        $cast,
-        t,
-      );
+      _PronunciationAssessmentDtoCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class NBestMapper extends ClassMapperBase<NBest> {

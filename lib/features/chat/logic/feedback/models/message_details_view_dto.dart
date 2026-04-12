@@ -1,28 +1,28 @@
 import 'package:lingu/features/chat/logic/feedback/models/pronunciation_analysis_result.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
-sealed class MessageDetailsData {}
+sealed class MessageDetailsViewDto {}
 
-class UserTextMessageData implements MessageDetailsData {
+class UserTextMessageDetailsViewDto implements MessageDetailsViewDto {
   final String? translatedText;
   final SentenceFeedback? grammarFeedback;
   final SentenceFeedback? fluencyFeedback;
 
-  UserTextMessageData({
+  UserTextMessageDetailsViewDto({
     required this.translatedText,
     required this.grammarFeedback,
     required this.fluencyFeedback,
   });
 }
 
-class UserAudioMessageData implements MessageDetailsData {
+class UserAudioMessageDetailsViewDto implements MessageDetailsViewDto {
     final String? translatedText;
 
   final SentenceFeedback? grammarFeedback;
   final SentenceFeedback? fluencyFeedback;
   final PronunciationAnalysisResult? pronunciationFeedback;
 
-  UserAudioMessageData({
+  UserAudioMessageDetailsViewDto({
     required this.translatedText,
     required this.grammarFeedback,
     required this.fluencyFeedback,
@@ -30,15 +30,15 @@ class UserAudioMessageData implements MessageDetailsData {
   });
 }
 
-class AITextMessageData implements MessageDetailsData {
+class AITextMessageDetailsViewDto implements MessageDetailsViewDto {
   final String? translation;
 
-  AITextMessageData({required this.translation});
+  AITextMessageDetailsViewDto({required this.translation});
 }
 
-class AIAudioMessageData implements MessageDetailsData {
+class AIAudioMessageDetailsViewDto implements MessageDetailsViewDto {
   final String transcript;
   final String? translation;
 
-  AIAudioMessageData({required this.transcript, required this.translation});
+  AIAudioMessageDetailsViewDto({required this.transcript, required this.translation});
 }

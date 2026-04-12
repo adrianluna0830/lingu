@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:lingu/core/pronunciation/models/pronunciation_assessment_errors.dart';
-import 'package:lingu/core/pronunciation/models/raw_pronunciation_assessment_response.dart';
+import 'package:lingu/core/pronunciation/models/pronunciation_assessment_dto.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
 
 
@@ -57,7 +57,7 @@ class LinuxPronunciationAssessmentService implements IPronunciationAssessmentSer
   }
 
   @override
-  Future<RawPronunciationAssessmentResponse> assessFromWavAsync(
+  Future<PronunciationAssessmentDto> assessFromWavAsync(
     {required Uint8List wavBytes,
     required String language,
     int sampleRate = 16000,
@@ -110,7 +110,7 @@ class LinuxPronunciationAssessmentService implements IPronunciationAssessmentSer
 
       final responseJson = jsonDecode(responseString);
       if (responseJson['success'] == true) {
-        return RawPronunciationAssessmentResponse.fromMap(responseJson['data']);
+        return PronunciationAssessmentDto.fromMap(responseJson['data']);
       } else {
         final errorCode = responseJson['error_code'] as String?;
         final message = (responseJson['message'] ?? responseJson['error']) as String? ?? 'unknown error in python script';

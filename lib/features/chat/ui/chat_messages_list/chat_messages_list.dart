@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
-import 'package:lingu/features/chat/ui/message_bubble.dart';
-import 'package:lingu/features/chat/ui/voice_note/voice_note.dart';
+import 'package:lingu/features/chat/ui/widgets/message_bubble.dart';
+import 'package:lingu/features/chat/ui/widgets/voice_note/voice_note.dart';
 
 class ChatMessagesList extends StatelessWidget {
-  final List<MessageViewDTO> messages;
+  final List<MessageViewDto> messages;
   final ChatMessagesListController? controller;
   final double maxMessageWidth;
   final double messageSpacing;
@@ -24,7 +24,7 @@ class ChatMessagesList extends StatelessWidget {
       itemCount: messages.length,
       itemBuilder: (context, index) {
         final message = messages[index];
-        final isUser = message is UserTextMessageViewDTO || message is UserAudioMessageViewDTO;
+        final isUser = message is UserTextMessageViewDto || message is UserAudioMessageViewDto;
 
         return Padding(
           padding: EdgeInsets.only(bottom: messageSpacing),
@@ -43,7 +43,7 @@ class ChatMessagesList extends StatelessWidget {
 }
 
 class _MessageItem extends StatelessWidget {
-  final MessageViewDTO message;
+  final MessageViewDto message;
   final double maxWidth;
   final VoidCallback onTap;
 
@@ -54,13 +54,13 @@ class _MessageItem extends StatelessWidget {
   });
 
   bool get _isClickable {
-    if (message is UserTextMessageViewDTO) {
-      final m = message as UserTextMessageViewDTO;
+    if (message is UserTextMessageViewDto) {
+      final m = message as UserTextMessageViewDto;
       if (m.translatedText != null) return true;
       return m.grammarErrorSeverity != null && m.fluencyCorrection != null;
     }
-    if (message is UserAudioMessageViewDTO) {
-      final m = message as UserAudioMessageViewDTO;
+    if (message is UserAudioMessageViewDto) {
+      final m = message as UserAudioMessageViewDto;
       if (m.translatedText != null) return true;
       return m.grammarErrorSeverity != null &&
           m.fluencyCorrection != null &&
@@ -71,7 +71,7 @@ class _MessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUser = message is UserTextMessageViewDTO || message is UserAudioMessageViewDTO;
+    final isUser = message is UserTextMessageViewDto || message is UserAudioMessageViewDto;
 
     return Column(
       crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -90,7 +90,7 @@ class _MessageItem extends StatelessWidget {
 
   Widget _buildContent() {
     final msg = message;
-    if (msg is UserTextMessageViewDTO) {
+    if (msg is UserTextMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: Column(
@@ -112,7 +112,7 @@ class _MessageItem extends StatelessWidget {
           ],
         ),
       );
-    } else if (msg is UserAudioMessageViewDTO) {
+    } else if (msg is UserAudioMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
         child: Column(
@@ -139,12 +139,12 @@ class _MessageItem extends StatelessWidget {
         ),
       );
     }
- else if (msg is AITextMessageViewDTO) {
+ else if (msg is AITextMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: Text(msg.text),
       );
-    } else if (msg is AIAudioMessageViewDTO) {
+    } else if (msg is AIAudioMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
         child: VoiceNote(
@@ -158,12 +158,12 @@ class _MessageItem extends StatelessWidget {
 
   Widget _buildFeedbackInfo() {
     List<String> info = [];
-    if (message is UserTextMessageViewDTO) {
-      final m = message as UserTextMessageViewDTO;
+    if (message is UserTextMessageViewDto) {
+      final m = message as UserTextMessageViewDto;
       if (m.grammarErrorSeverity != null) info.add("Grammar: ${m.grammarErrorSeverity!.name}");
       if (m.fluencyCorrection != null) info.add("Fluency: ${m.fluencyCorrection!.name}");
-    } else if (message is UserAudioMessageViewDTO) {
-      final m = message as UserAudioMessageViewDTO;
+    } else if (message is UserAudioMessageViewDto) {
+      final m = message as UserAudioMessageViewDto;
       if (m.pronunciationErrorSeverity != null) info.add("Pronunciation: ${m.pronunciationErrorSeverity!.name}");
       if (m.grammarErrorSeverity != null) info.add("Grammar: ${m.grammarErrorSeverity!.name}");
       if (m.fluencyCorrection != null) info.add("Fluency: ${m.fluencyCorrection!.name}");

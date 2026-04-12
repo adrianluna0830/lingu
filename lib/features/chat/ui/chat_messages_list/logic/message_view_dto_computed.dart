@@ -1,25 +1,25 @@
 import 'package:lingu/features/chat/ui/chat_messages_list/models/feedback_result_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
-import 'package:lingu/features/chat/logic/feedback/models/message_details_data.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
 import 'package:signals/signals_flutter.dart';
 
-class MessageViewDTOComputed extends Computed<List<MessageViewDTO>> {
-  MessageViewDTOComputed(
+class MessageViewDtoComputed extends Computed<List<MessageViewDto>> {
+  MessageViewDtoComputed(
       {required ChatMessagesManager chatMessagesManager,
       required MessageDetailsManager messageDetailsManager})
       : super(() {
           final messages = chatMessagesManager.messages.value;
           final messageDetails = messageDetailsManager.messageDetails.value;
-          List<MessageViewDTO> dtos = [];
+          List<MessageViewDto> dtos = [];
           for (var message in messages) {
             final details = messageDetails[message.id];
             if (message is UserTextMessage) {
               final userTextDetails =
-                  details is UserTextMessageData ? details : null;
-              dtos.add(UserTextMessageViewDTO(
+                  details is UserTextMessageDetailsViewDto ? details : null;
+              dtos.add(UserTextMessageViewDto(
                 id: message.id,
                 text: message.text,
                 correction: userTextDetails?.grammarFeedback?.correction,
@@ -33,8 +33,8 @@ class MessageViewDTOComputed extends Computed<List<MessageViewDTO>> {
               ));
             } else if (message is UserAudioMessage) {
               final userAudioDetails =
-                  details is UserAudioMessageData ? details : null;
-              dtos.add(UserAudioMessageViewDTO(
+                  details is UserAudioMessageDetailsViewDto ? details : null;
+              dtos.add(UserAudioMessageViewDto(
                 id: message.id,
                 audioUrl: message.fullMergedAudioFilePath,
                 duration: message.duration,
@@ -53,16 +53,16 @@ class MessageViewDTOComputed extends Computed<List<MessageViewDTO>> {
               ));
             } else if (message is AITextMessage) {
               final aiTextDetails =
-                  details is AITextMessageData ? details : null;
-              dtos.add(AITextMessageViewDTO(
+                  details is AITextMessageDetailsViewDto ? details : null;
+              dtos.add(AITextMessageViewDto(
                 id: message.id,
                 text: message.text,
                 translation: aiTextDetails?.translation,
               ));
             } else if (message is AIAudioMessage) {
               final aiAudioDetails =
-                  details is AIAudioMessageData ? details : null;
-              dtos.add(AIAudioMessageViewDTO(
+                  details is AIAudioMessageDetailsViewDto ? details : null;
+              dtos.add(AIAudioMessageViewDto(
                 id: message.id,
                 audioUrl: message.audioUrl,
                 duration: message.duration,

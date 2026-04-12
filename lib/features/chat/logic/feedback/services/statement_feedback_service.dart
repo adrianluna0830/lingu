@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:googleai_dart/googleai_dart.dart';
-import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
-class StatementFeedbackManager {
-  final IAIService _aiModel;
+class StatementFeedbackService {
+  final IAiService _aiModel;
   final ChatLanguages _languages;
 
-  StatementFeedbackManager(this._aiModel, this._languages);
+  StatementFeedbackService(this._aiModel, this._languages);
 
   Future<(SentenceFeedback? fluency, SentenceFeedback? grammar)> analyze(
       String statement) async {

@@ -2,12 +2,12 @@
 
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'raw_pronunciation_assessment_response.mapper.dart';
+part 'pronunciation_assessment_dto.mapper.dart';
 
 
 
 @MappableClass()
-class RawPronunciationAssessmentResponse with RawPronunciationAssessmentResponseMappable {
+class PronunciationAssessmentDto with PronunciationAssessmentDtoMappable {
   final String id;
   final String recognitionStatus; 
   final int offset;
@@ -17,7 +17,7 @@ class RawPronunciationAssessmentResponse with RawPronunciationAssessmentResponse
   final double? snr;
   final List<NBest> nBest;
 
-  const RawPronunciationAssessmentResponse({
+  const PronunciationAssessmentDto({
     required this.id,
     required this.recognitionStatus,
     required this.offset,
@@ -31,8 +31,8 @@ class RawPronunciationAssessmentResponse with RawPronunciationAssessmentResponse
   bool get isSuccess => recognitionStatus == 'Success' || recognitionStatus == '0';
 
 
-  static final fromMap = RawPronunciationAssessmentResponseMapper.fromMap;
-  static final fromJson = RawPronunciationAssessmentResponseMapper.fromJson;
+  static final fromMap = PronunciationAssessmentDtoMapper.fromMap;
+  static final fromJson = PronunciationAssessmentDtoMapper.fromJson;
 }
 
 @MappableClass()

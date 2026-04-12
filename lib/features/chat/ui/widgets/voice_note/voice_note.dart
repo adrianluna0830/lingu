@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/features/chat/ui/voice_note/voice_note_controller.dart';
+import 'package:lingu/features/chat/ui/widgets/voice_note/voice_note_controller.dart';
 import 'package:signals/signals_flutter.dart';
 
 class VoiceNote extends StatefulWidget {

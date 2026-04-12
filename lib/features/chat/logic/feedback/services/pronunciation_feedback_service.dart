@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/audio/misc/i_audio_utils.dart';
-import 'package:lingu/core/pronunciation/models/raw_pronunciation_assessment_response.dart';
+import 'package:lingu/core/pronunciation/models/pronunciation_assessment_dto.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
 import 'package:lingu/core/stt/audio_encoding_enum.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
@@ -73,18 +73,18 @@ class AIPronunciationResponse {
     "required": ["wordSSML", "syllableFeedback"]
   };
 }
-class PronunciationFeedbackManager {
+class PronunciationFeedbackService {
   
   final int wordContextSize = 5;
   final int goodPronunciationThreshold = 80;
 
   final IPronunciationAssessmentService _assessmentService;
-  final IAIService _aiModel;
+  final IAiService _aiModel;
   final ISpeechToTextService _sttService;
   final IAudioUtils _audioUtils;
   final ITextToSpeechService _ttsService;
   final ChatLanguages _languages;
-  PronunciationFeedbackManager(this._assessmentService, this._aiModel, this._sttService, this._audioUtils, this._languages, this._ttsService);
+  PronunciationFeedbackService(this._assessmentService, this._aiModel, this._sttService, this._audioUtils, this._languages, this._ttsService);
 
   String _generatePronunciationPrompt(String word, List<String> syllables, List<String> phonemes, double score) {
     return '''
@@ -104,7 +104,7 @@ For each syllable:
 ''';
   }
 
-  Future<WordPronuniationFeedback> _computeWordFeedback(Uint8List audioBytes, WordResult wordResult) async {
+  Future<WordPronunciationFeedback> _computeWordFeedback(Uint8List audioBytes, WordResult wordResult) async {
     final userWordPronunciationBytes = await _audioUtils.cut(audioBytes, Duration(milliseconds: wordResult.offset ~/ 10000), Duration(milliseconds: wordResult.duration ~/ 10000));
     final userWordPronunciationFilePath = await _audioUtils.saveToPath(userWordPronunciationBytes, true);
 
@@ -159,7 +159,7 @@ For each syllable:
 
     final bool isBad = wordResult.pronunciationAssessment.accuracyScore < goodPronunciationThreshold;
 
-    return WordPronuniationFeedback(
+    return WordPronunciationFeedback(
       word: wordResult.word,
       userPronunciationFilePath: userWordPronunciationFilePath,
       correctPronunciationFilePath: correctPronunciationFilePath,
@@ -168,15 +168,15 @@ For each syllable:
     );
   }
 
-  Future<TargetLanguatePronunciationResult> _computeTargetLanguageResult(Uint8List audioBytes) async {
+  Future<TargetLanguagePronunciationResult> _computeTargetLanguageResult(Uint8List audioBytes) async {
     final rawResponse = await _assessmentService.assessFromWavAsync(wavBytes: audioBytes, language: _languages.target.bcp47);
 
-    List<WordPronuniationFeedback> wordFeedback = [];
+    List<WordPronunciationFeedback> wordFeedback = [];
     for (var wordResult in rawResponse.nBest.first.words) {
       wordFeedback.add(await _computeWordFeedback(audioBytes, wordResult));
     }
 
-    return TargetLanguatePronunciationResult(transcript: rawResponse.displayText.trim(), wordFeedback: wordFeedback);
+    return TargetLanguagePronunciationResult(transcript: rawResponse.displayText.trim(), wordFeedback: wordFeedback);
   }
 
   Future<NativeLanguagePronunciationResult> _computeNativeLanguageResult(Uint8List audioBytes) async {

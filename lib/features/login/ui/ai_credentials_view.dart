@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
 import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/di/injection.dart';

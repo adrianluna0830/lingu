@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:lingu/core/ai/core/i_ai_model.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/ai/gemini/gemini_fabric.dart';
 import 'package:lingu/core/audio/misc/i_audio_utils.dart';
 import 'package:lingu/core/audio/pcm/pcm_audio_utils.dart';
@@ -27,9 +27,9 @@ import 'package:lingu/core/tts/google/google_tts_fabric.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/chatbot/chatbot_service.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
-import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_manager.dart';
-import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_manager.dart';
-import 'package:lingu/features/chat/logic/input/audio_input_handler.dart';
+import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_service.dart';
+import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart';
+import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/logic/message_view_dto_computed.dart';
@@ -191,7 +191,7 @@ class _ChatDependencies {
       return ChatLanguages(native: native, target: target);
     }());
 
-    di.registerSingletonAsync<IAIService>(
+    di.registerSingletonAsync<IAiService>(
       () async => await di<IAIFabric>().create(),
     );
     di.registerSingletonAsync<IPronunciationAssessmentService>(
@@ -206,25 +206,25 @@ class _ChatDependencies {
   }
 
   static void registerLogic() {
-    di.registerLazySingleton<PronunciationFeedbackManager>(
-      () => PronunciationFeedbackManager(
+    di.registerLazySingleton<PronunciationFeedbackService>(
+      () => PronunciationFeedbackService(
         di<IPronunciationAssessmentService>(),
-        di<IAIService>(),
+        di<IAiService>(),
         di<ISpeechToTextService>(),
         di<IAudioUtils>(),
         di<ChatLanguages>(),
         di<ITextToSpeechService>(),
       ),
     );
-    di.registerLazySingleton<StatementFeedbackManager>(
-      () => StatementFeedbackManager(di<IAIService>(), di<ChatLanguages>()),
+    di.registerLazySingleton<StatementFeedbackService>(
+      () => StatementFeedbackService(di<IAiService>(), di<ChatLanguages>()),
     );
     di.registerSingleton<MessageDetailsManager>(
       MessageDetailsManager(
-        di<IAIService>(),
+        di<IAiService>(),
         di<ChatMessagesManager>(),
-        di<PronunciationFeedbackManager>(),
-        di<StatementFeedbackManager>(),
+        di<PronunciationFeedbackService>(),
+        di<StatementFeedbackService>(),
         di<ChatLanguages>(),
       ),
     );
@@ -234,14 +234,14 @@ class _ChatDependencies {
   }
 
   static void registerUIAndInput() {
-    di.registerLazySingleton<MessageViewDTOComputed>(
-      () => MessageViewDTOComputed(
+    di.registerLazySingleton<MessageViewDtoComputed>(
+      () => MessageViewDtoComputed(
         chatMessagesManager: di<ChatMessagesManager>(),
         messageDetailsManager: di<MessageDetailsManager>(),
       ),
     );
-    di.registerFactory<AudioInputHandler>(
-      () => AudioInputHandler(
+    di.registerFactory<AudioInputManager>(
+      () => AudioInputManager(
         di<ChatMessagesManager>(),
         di<IAudioRecorder>(),
         di<IAudioPlayerManager>(),
