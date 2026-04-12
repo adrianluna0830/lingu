@@ -1,4 +1,4 @@
-import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_feedback_summary.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 
 sealed class MessageViewDto {
@@ -8,40 +8,36 @@ sealed class MessageViewDto {
 
 class UserTextMessageViewDto extends MessageViewDto {
   final UserTextMessage chatMessage;
-  final UserTextMessageDetailsViewDto? messageDetails;
+  final TextFeedbackSummary? feedbackSummary;
 
   UserTextMessageViewDto({
     required this.chatMessage,
-    required this.messageDetails,
+    required this.feedbackSummary,
   }) : super(id: chatMessage.id);
 }
 
 class UserAudioMessageViewDto extends MessageViewDto {
   final UserAudioMessage chatMessage;
-  final UserAudioMessageDetailsViewDto? messageDetails;
+  final AudioFeedbackSummary? feedbackSummary;
 
   UserAudioMessageViewDto({
     required this.chatMessage,
-    required this.messageDetails,
+    required this.feedbackSummary,
   }) : super(id: chatMessage.id);
 }
 
 class AITextMessageViewDto extends MessageViewDto {
   final AITextMessage chatMessage;
-  final AITextMessageDetailsViewDto? messageDetails;
 
   AITextMessageViewDto({
     required this.chatMessage,
-    required this.messageDetails,
   }) : super(id: chatMessage.id);
 }
 
 class AIAudioMessageViewDto extends MessageViewDto {
   final AIAudioMessage chatMessage;
-  final AIAudioMessageDetailsViewDto? messageDetails;
 
   AIAudioMessageViewDto({
     required this.chatMessage,
-    required this.messageDetails,
   }) : super(id: chatMessage.id);
 }

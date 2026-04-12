@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
+import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 
 class BadSyllableFeedback {
   final String feedbackMessage;
@@ -82,14 +85,41 @@ class TargetLanguagePronunciationResult extends PronunciationItemResult {
       'TargetLanguagePronunciationResult(transcript: $transcript, wordFeedback: $wordFeedback)';
 }
 
-class PronunciationAnalysisResult {
+class PronunciationFeedback {
   final List<PronunciationItemResult> itemResults;
 
-  PronunciationAnalysisResult({
+  PronunciationFeedback({
     required this.itemResults,
   });
 
   String get rawTranscript => itemResults.map((e) => e.transcript).join(' ');
+
+  FeedbackResultEnum get mostSevere {
+    var maxSeverity = FeedbackResultEnum.none;
+
+    for (var item in itemResults) {
+      if (item is TargetLanguagePronunciationResult) {
+        for (var word in item.wordFeedback) {
+          for (var syllable in word.syllableFeedback) {
+            if (syllable.detail != null) {
+              final currentSeverity = _mapErrorToFeedback(syllable.detail!.severity);
+              if (currentSeverity.index > maxSeverity.index) {
+                maxSeverity = currentSeverity;
+              }
+            }
+          }
+        }
+      }
+    }
+    return maxSeverity;
+  }
+
+  FeedbackResultEnum _mapErrorToFeedback(ErrorSeverityEnum error) {
+    return switch (error) {
+      ErrorSeverityEnum.bad => FeedbackResultEnum.major,
+      ErrorSeverityEnum.neutral => FeedbackResultEnum.minor,
+    };
+  }
 
   @override
   String toString() => 'PronunciationAnalysisResult(itemResults: $itemResults)';

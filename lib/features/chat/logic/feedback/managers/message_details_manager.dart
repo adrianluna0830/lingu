@@ -44,7 +44,7 @@ class MessageDetailsManager {
     final feedback = await _statementFeedbackService.analyze(fullText);
 
     _messageDetails[messageId] = UserTextMessageDetailsViewDto(
-      rephrasedText: feedback.$3,
+      translatedText: feedback.$3,
       grammarFeedback: feedback.$2,
       fluencyFeedback: feedback.$1,
     );
@@ -60,7 +60,7 @@ class MessageDetailsManager {
     final feedback = await _statementFeedbackService.analyze(result.rawTranscript);
 
     _messageDetails[messageId] = UserAudioMessageDetailsViewDto(
-      rephrasedText: feedback.$3,
+      translatedText: feedback.$3,
       grammarFeedback: feedback.$2,
       fluencyFeedback: feedback.$1,
       pronunciationFeedback: result,

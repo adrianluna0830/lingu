@@ -9,7 +9,7 @@ import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
-import 'package:lingu/features/chat/logic/feedback/models/pronunciation_analysis_result.dart';
+import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 
 
@@ -185,7 +185,7 @@ For each syllable:
     return NativeLanguagePronunciationResult(transcript: transcript.trim());
   }
 
-  Future<PronunciationAnalysisResult> analyze(List<UserSpeechAudio> audioFiles) async {
+  Future<PronunciationFeedback> analyze(List<UserSpeechAudio> audioFiles) async {
     List<PronunciationItemResult> itemResults = [];
     for (var audio in audioFiles) {
       final bytes = await _audioUtils.retrieve(audio.filePath);
@@ -199,6 +199,6 @@ For each syllable:
       final res = await _computeTargetLanguageResult(bytes);
       itemResults.add(res);
     }
-    return PronunciationAnalysisResult(itemResults: itemResults);
+    return PronunciationFeedback(itemResults: itemResults);
   }
 }

@@ -8,27 +8,37 @@ class UserAudioMessageDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      width: double.infinity,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (data.rephrasedText != null) ...[
-              const Text('Rephrased to Target:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(data.rephrasedText!.targetText,
-                  style: const TextStyle(fontStyle: FontStyle.italic)),
-              const Divider(),
-            ],
-            Text(
-              'Grammar: ${data.grammarFeedback?.correction ?? "Perfect"}\n'
-              'Fluency: ${data.fluencyFeedback?.correction ?? "Perfect"}',
-              style: const TextStyle(fontSize: 16),
-            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (data.translatedText != null) ...[
+            const Text('Translation to Target', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Target: ${data.translatedText!.targetText}'),
+            Text('Translation: ${data.translatedText!.translation}'),
+            const Divider(),
           ],
-        ),
+          if (data.grammarFeedback != null) ...[
+            const Text('Grammar', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Correction: ${data.grammarFeedback!.correction}'),
+            Text('Explanation: ${data.grammarFeedback!.explanation}'),
+            const Divider(),
+          ],
+          if (data.fluencyFeedback != null) ...[
+            const Text('Fluency', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Correction: ${data.fluencyFeedback!.correction}'),
+            Text('Explanation: ${data.fluencyFeedback!.explanation}'),
+            const Divider(),
+          ],
+          if (data.pronunciationFeedback != null) ...[
+            const Text('Pronunciation',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Transcript: ${data.pronunciationFeedback!.rawTranscript}'),
+            Text('Details: ${data.pronunciationFeedback!.toString()}'),
+            const Divider(),
+          ],
+        ],
       ),
     );
   }

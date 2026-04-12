@@ -1,8 +1,8 @@
-class RephrasedText {
+class TranslatedText {
   final String targetText;
   final String translation;
 
-  RephrasedText({
+  TranslatedText({
     required this.targetText,
     required this.translation,
   });

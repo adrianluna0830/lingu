@@ -1,42 +1,66 @@
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
+import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
+import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_feedback_summary.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
 import 'package:signals/signals_flutter.dart';
 
 class MessageViewDtoComputed extends Computed<List<MessageViewDto>> {
-  MessageViewDtoComputed(
-      {required ChatMessagesManager chatMessagesManager,
-      required MessageDetailsManager messageDetailsManager})
-      : super(() {
+  MessageViewDtoComputed({
+    required ChatMessagesManager chatMessagesManager,
+    required MessageDetailsManager messageDetailsManager,
+  }) : super(() {
           final messages = chatMessagesManager.messages.value;
-          final messageDetails = messageDetailsManager.messageDetails.value;
-          List<MessageViewDto> dtos = [];
-          for (var message in messages) {
-            final details = messageDetails[message.id];
-            if (message is UserTextMessage) {
-              dtos.add(UserTextMessageViewDto(
-                chatMessage: message,
-                messageDetails: details is UserTextMessageDetailsViewDto ? details : null,
-              ));
-            } else if (message is UserAudioMessage) {
-              dtos.add(UserAudioMessageViewDto(
-                chatMessage: message,
-                messageDetails: details is UserAudioMessageDetailsViewDto ? details : null,
-              ));
-            } else if (message is AITextMessage) {
-              dtos.add(AITextMessageViewDto(
-                chatMessage: message,
-                messageDetails: details is AITextMessageDetailsViewDto ? details : null,
-              ));
-            } else if (message is AIAudioMessage) {
-              dtos.add(AIAudioMessageViewDto(
-                chatMessage: message,
-                messageDetails: details is AIAudioMessageDetailsViewDto ? details : null,
-              ));
-            }
-          }
-          return dtos;
+          final detailsMap = messageDetailsManager.messageDetails.value;
+
+          return messages.map((message) {
+            final details = detailsMap[message.id];
+            return _mapToDto(message, details);
+          }).toList();
         });
+
+  static MessageViewDto _mapToDto(ChatMessage message, MessageDetailsViewDto? details) {
+    return switch (message) {
+      UserTextMessage m => UserTextMessageViewDto(
+          chatMessage: m,
+          feedbackSummary: _createTextSummary(details as UserTextMessageDetailsViewDto?),
+        ),
+      UserAudioMessage m => UserAudioMessageViewDto(
+          chatMessage: m,
+          feedbackSummary: _createAudioSummary(details as UserAudioMessageDetailsViewDto?),
+        ),
+      AITextMessage m => AITextMessageViewDto(chatMessage: m),
+      AIAudioMessage m => AIAudioMessageViewDto(chatMessage: m),
+    };
+  }
+
+  static TextFeedbackSummary? _createTextSummary(UserTextMessageDetailsViewDto? details) {
+    if (details == null) return null;
+    return TextFeedbackSummary(
+      grammar: _mapSeverity(details.grammarFeedback?.severity),
+      fluency: _mapSeverity(details.fluencyFeedback?.severity),
+      translation: details.translatedText?.targetText,
+    );
+  }
+
+  static AudioFeedbackSummary? _createAudioSummary(UserAudioMessageDetailsViewDto? details) {
+    if (details == null) return null;
+    return AudioFeedbackSummary(
+      grammar: _mapSeverity(details.grammarFeedback?.severity),
+      fluency: _mapSeverity(details.fluencyFeedback?.severity),
+      pronunciation: details.pronunciationFeedback?.mostSevere ?? FeedbackResultEnum.none,
+      translation: details.translatedText?.targetText,
+    );
+  }
+
+  static FeedbackResultEnum _mapSeverity(ErrorSeverityEnum? severity) {
+    if (severity == null) return FeedbackResultEnum.none;
+    return switch (severity) {
+      ErrorSeverityEnum.bad => FeedbackResultEnum.major,
+      ErrorSeverityEnum.neutral => FeedbackResultEnum.minor,
+    };
+  }
 }

@@ -43,7 +43,7 @@ class _ChatViewState extends State<ChatView> {
   @override
   void initState() {
     super.initState();
-    _inputBarController.onUserTextMessage = ({required text, required individualTextInputs}) {
+    _inputBarController.onUserTextMessage = (text, individualTextInputs) {
       _chatMessagesManager.addUserTextMessage(text: text, individualTextInputs: individualTextInputs);
     };
     _inputBarController.onStartRecording = () {

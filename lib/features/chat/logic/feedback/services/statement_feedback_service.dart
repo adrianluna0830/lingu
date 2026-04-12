@@ -3,7 +3,8 @@ import 'package:googleai_dart/googleai_dart.dart';
 import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
-import 'package:lingu/features/chat/logic/feedback/models/rephrased_text.dart';
+import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
+import 'package:lingu/features/chat/logic/feedback/models/translated_text.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
 class StatementFeedbackService {
@@ -12,7 +13,7 @@ class StatementFeedbackService {
 
   StatementFeedbackService(this._aiModel, this._languages);
 
-  Future<(SentenceFeedback? fluency, SentenceFeedback? grammar, RephrasedText? rephrasedText)> analyze(
+  Future<(SentenceFeedback? fluency, SentenceFeedback? grammar, TranslatedText? translatedText)> analyze(
       String statement) async {
     final schema = Schema(
       type: SchemaType.object,
@@ -22,6 +23,10 @@ class StatementFeedbackService {
           properties: {
             'correction': Schema(type: SchemaType.string),
             'explanation': Schema(type: SchemaType.string),
+            'severity': Schema(
+              type: SchemaType.string,
+              enumValues: ['bad', 'neutral'],
+            ),
           },
           nullable: true,
         ),
@@ -30,10 +35,14 @@ class StatementFeedbackService {
           properties: {
             'correction': Schema(type: SchemaType.string),
             'explanation': Schema(type: SchemaType.string),
+            'severity': Schema(
+              type: SchemaType.string,
+              enumValues: ['bad', 'neutral'],
+            ),
           },
           nullable: true,
         ),
-        'rephrasedText': Schema(
+        'translatedText': Schema(
           type: SchemaType.object,
           properties: {
             'targetText': Schema(type: SchemaType.string),
@@ -46,8 +55,9 @@ class StatementFeedbackService {
 
     final prompt =
         "Analyze the following text, focusing on the parts written in ${_getLanguageName(_languages.target)}. "
-        "1. If the input contains a mix of both ${_getLanguageName(_languages.target)} and ${_getLanguageName(_languages.native)}, provide a rephrased version fully in ${_getLanguageName(_languages.target)} (targetText) and its translation into ${_getLanguageName(_languages.native)} (translation) in the 'rephrasedText' field. Otherwise, set 'rephrasedText' to null.\n"
-        "2. Regardless of whether it's mixed or not, analyze the ${_getLanguageName(_languages.target)} portion for fluency and grammar issues. Provide corrections and explanations in ${_getLanguageName(_languages.native)}. "
+        "1. If the input contains a mix of both ${_getLanguageName(_languages.target)} and ${_getLanguageName(_languages.native)}, provide a version fully in ${_getLanguageName(_languages.target)} (targetText) and its translation into ${_getLanguageName(_languages.native)} (translation) in the 'translatedText' field. Otherwise, set 'translatedText' to null.\n"
+        "2. Regardless of whether it's mixed or not, analyze the ${_getLanguageName(_languages.target)} portion for fluency and grammar issues. Provide corrections, explanations, and severity in ${_getLanguageName(_languages.native)}. "
+        "Severity must be 'bad' for significant errors or 'neutral' for minor/stylistic improvements. "
         "If the target language part is perfect or no feedback is needed for a category, return null for that category.\n"
         "Text: \"$statement\"";
 
@@ -60,12 +70,12 @@ class StatementFeedbackService {
     final json = jsonDecode(jsonString) as Map<String, dynamic>;
     final fluencyJson = json['fluency'] as Map<String, dynamic>?;
     final grammarJson = json['grammar'] as Map<String, dynamic>?;
-    final rephrasedJson = json['rephrasedText'] as Map<String, dynamic>?;
+    final translatedJson = json['translatedText'] as Map<String, dynamic>?;
 
     return (
       fluencyJson != null ? _parseFeedback(fluencyJson) : null,
       grammarJson != null ? _parseFeedback(grammarJson) : null,
-      rephrasedJson != null ? _parseRephrasedText(rephrasedJson) : null,
+      translatedJson != null ? _parseTranslatedText(translatedJson) : null,
     );
   }
 
@@ -73,11 +83,12 @@ class StatementFeedbackService {
     return SentenceFeedback(
       correction: json['correction'],
       explanation: json['explanation'],
+      severity: ErrorSeverityEnum.values.byName(json['severity']),
     );
   }
 
-  RephrasedText _parseRephrasedText(Map<String, dynamic> json) {
-    return RephrasedText(
+  TranslatedText _parseTranslatedText(Map<String, dynamic> json) {
+    return TranslatedText(
       targetText: json['targetText'],
       translation: json['translation'],
     );

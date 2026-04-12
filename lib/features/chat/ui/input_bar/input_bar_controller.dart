@@ -6,7 +6,7 @@ class InputBarController {
   Function()? onStartRecording;
   Function()? onChat;
   Function(bool)? onFocusChange;
-  Function({required String text, required List<UserTextInput> individualTextInputs})? onUserTextMessage;
+  Function(String text,  List<UserTextInput> individualTextInputs)? onUserTextMessage;
 }
 
 class InputBarInternalController {
@@ -89,7 +89,7 @@ class InputBarInternalController {
     final fullText = chars.map((e) => e.$1).join('');
     
     controller?.onTextSubmit?.call(fullText);
-    controller?.onUserTextMessage?.call(text: fullText, individualTextInputs: inputs);
+    controller?.onUserTextMessage?.call(fullText, inputs);
     
     _textCharsSignal.value = [];
     _textSignal.value = "";

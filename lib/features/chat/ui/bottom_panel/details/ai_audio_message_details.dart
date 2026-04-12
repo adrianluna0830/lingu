@@ -11,15 +11,17 @@ class AIAudioMessageDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      width: double.infinity,
-      child: SingleChildScrollView(
-        child: Text(
-          'Transcript: ${data.transcript}\n'
-          'Translation: ${data.translation ?? "No translation available"}',
-          style: const TextStyle(fontSize: 16),
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Transcript', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(data.transcript),
+          const Divider(),
+          const Text('Translation', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(data.translation ?? 'No translation available'),
+        ],
       ),
     );
   }

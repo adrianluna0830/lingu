@@ -1,30 +1,30 @@
-import 'package:lingu/features/chat/logic/feedback/models/pronunciation_analysis_result.dart';
-import 'package:lingu/features/chat/logic/feedback/models/rephrased_text.dart';
+import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback.dart';
+import 'package:lingu/features/chat/logic/feedback/models/translated_text.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
 sealed class MessageDetailsViewDto {}
 
 class UserTextMessageDetailsViewDto implements MessageDetailsViewDto {
-  final RephrasedText? rephrasedText;
+  final TranslatedText? translatedText;
   final SentenceFeedback? grammarFeedback;
   final SentenceFeedback? fluencyFeedback;
 
   UserTextMessageDetailsViewDto({
-    required this.rephrasedText,
+    required this.translatedText,
     required this.grammarFeedback,
     required this.fluencyFeedback,
   });
 }
 
 class UserAudioMessageDetailsViewDto implements MessageDetailsViewDto {
-  final RephrasedText? rephrasedText;
+  final TranslatedText? translatedText;
 
   final SentenceFeedback? grammarFeedback;
   final SentenceFeedback? fluencyFeedback;
-  final PronunciationAnalysisResult? pronunciationFeedback;
+  final PronunciationFeedback? pronunciationFeedback;
 
   UserAudioMessageDetailsViewDto({
-    required this.rephrasedText,
+    required this.translatedText,
     required this.grammarFeedback,
     required this.fluencyFeedback,
     required this.pronunciationFeedback,
