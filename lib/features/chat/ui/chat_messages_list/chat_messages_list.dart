@@ -103,6 +103,7 @@ class UserMessageItem extends StatelessWidget {
         _ => null,
       };
 
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -111,11 +112,11 @@ class UserMessageItem extends StatelessWidget {
         alignment: Alignment.centerRight,
         onLongPress: onTap,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6.0),
+          borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
               color: getShadowColor(_feedbackSeverity),
-              offset: const Offset(2.95, 2.65),
+              offset: const Offset(2.4, 2.4),
               blurRadius: 0,
             ),
           ],

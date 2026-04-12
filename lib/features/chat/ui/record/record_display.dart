@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lingu/core/models/language_locale.dart';
+import 'package:lingu/core/utils/ui_utils.dart';
 import 'package:lingu/features/chat/ui/record/record_controller.dart';
-import 'package:lingu/features/chat/ui/widgets/locale_indicator.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:waveform_flutter/waveform_flutter.dart' as waveform;
 
@@ -70,61 +71,96 @@ class _RecordDisplayState extends State<RecordDisplay> {
         _internalController.speakingTargetLanguage.watch(context);
     final isPaused = _internalController.isPaused.watch(context);
 
-    final currentLocale = isTargetLanguage ? widget.targetLocale : widget.nativeLocale;
-
-    return Column(
-      children: [
-        Expanded(
-          child: waveform.AnimatedWaveList(
-            stream: _waveformStream,
-            barBuilder: (animation, amplitude) {
-              final isTarget = (amplitude is LanguageAmplitude)
-                  ? amplitude.isTarget
-                  : true;
-              return waveform.WaveFormBar(
-                animation: animation,
-                amplitude: amplitude,
-                color: isTarget ? Colors.red : Colors.blue,
-              );
-            },
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.tab) {
+            _internalController.toggleLanguage();
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.enter) {
+            _internalController.stopRecording();
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+            _internalController.cancelRecording();
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.space) {
+            _internalController.toggleRecording();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Column(
+        children: [
+          Expanded(
+            child: waveform.AnimatedWaveList(
+              stream: _waveformStream,
+              barBuilder: (animation, amplitude) {
+                final isTarget = (amplitude is LanguageAmplitude)
+                    ? amplitude.isTarget
+                    : true;
+                return waveform.WaveFormBar(
+                  animation: animation,
+                  amplitude: amplitude,
+                  color: isTarget ? Colors.red : Colors.blue,
+                );
+              },
+            ),
           ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              onPressed: _internalController.cancelRecording,
-              icon: const Icon(Icons.cancel),
-            ),
-            IconButton(
-              onPressed: _internalController.toggleRecording,
-              icon: Icon(isPaused ? Icons.play_arrow : Icons.pause),
-            ),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                IconButton(
-                  onPressed: _internalController.toggleLanguage,
-                  icon: Icon(
-                    isTargetLanguage ? Icons.language : Icons.translate,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                onPressed: _internalController.cancelRecording,
+                icon: const Icon(Icons.cancel),
+              ),
+              IconButton(
+                onPressed: _internalController.toggleRecording,
+                icon: Icon(isPaused ? Icons.play_arrow : Icons.pause),
+              ),
+              Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ExcludeFocus(
+                  child: ToggleButtons(
+                    isSelected: [!isTargetLanguage, isTargetLanguage],
+                    onPressed: (index) {
+                      if ((index == 0 && isTargetLanguage) ||
+                          (index == 1 && !isTargetLanguage)) {
+                        _internalController.toggleLanguage();
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    selectedColor: Colors.white,
+                    fillColor: isTargetLanguage
+                        ? getLanguageColor(widget.targetLocale)
+                        : getLanguageColor(widget.nativeLocale),
+                    color: Colors.blue.shade700,
+                    constraints: const BoxConstraints(minHeight: 40, minWidth: 80),
+                    renderBorder: false,
+                    children: [
+                      Text(getLanguageDisplayName(widget.nativeLocale, context),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 12)),
+                      Text(getLanguageDisplayName(widget.targetLocale, context),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
                   ),
                 ),
-                Positioned(
-                  top: -4,
-                  right: -2,
-                  child: IgnorePointer(
-                    child: LocaleIndicator(locale: currentLocale),
-                  ),
-                ),
-              ],
-            ),
-            IconButton(
-              onPressed: _internalController.stopRecording,
-              icon: const Icon(Icons.send),
-            ),
-          ],
-        ),
-      ],
+              ),
+              IconButton(
+                onPressed: _internalController.stopRecording,
+                icon: const Icon(Icons.send),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

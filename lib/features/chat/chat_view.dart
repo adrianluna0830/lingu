@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
+import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/ai_audio_message_details.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/ai_text_message_details.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
@@ -8,7 +9,6 @@ import 'package:lingu/features/chat/logic/feedback/models/message_details_view_d
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_state.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/logic/message_view_dto_computed.dart';
-import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel_controller.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar.dart';
@@ -16,7 +16,6 @@ import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
 import 'package:lingu/features/chat/ui/record/record_controller.dart';
 import 'package:lingu/features/chat/ui/record/record_display.dart';
-import 'package:lingu/features/chat/ui/bottom_panel/bottom_panel.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_audio_message_details.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_text_message_details.dart';
 import 'package:signals/signals_flutter.dart';
@@ -119,35 +118,41 @@ class _ChatViewState extends State<ChatView> {
                 ),
               ),
             if (panelState is ChatPanelState)
-              BottomPanel(
-                  controller: _bottomPanelController,
-                  child: const SizedBox(height: 200)),
+              SizedBox(
+                height: 200,
+                child: BottomPanel(
+                    controller: _bottomPanelController,
+                    child: const SizedBox.shrink()),
+              ),
             if (panelState is MessageDetailsPanelState)
-              Builder(builder: (context) {
-                final data = panelState.data;
-                if (data is UserTextMessageDetailsViewDto) {
-                  return BottomPanel(
-                    controller: _bottomPanelController,
-                    child: UserTextMessageDetails(data: data),
-                  );
-                } else if (data is UserAudioMessageDetailsViewDto) {
-                  return BottomPanel(
-                    controller: _bottomPanelController,
-                    child: UserAudioMessageDetails(data: data),
-                  );
-                } else if (data is AITextMessageDetailsViewDto) {
-                  return BottomPanel(
-                    controller: _bottomPanelController,
-                    child: AITextMessageDetails(data: data),
-                  );
-                } else if (data is AIAudioMessageDetailsViewDto) {
-                  return BottomPanel(
-                    controller: _bottomPanelController,
-                    child: AIAudioMessageDetails(data: data),
-                  );
-                }
-                return const SizedBox.shrink();
-              }),
+              SizedBox(
+                height: 300,
+                child: Builder(builder: (context) {
+                  final data = panelState.data;
+                  if (data is UserTextMessageDetailsViewDto) {
+                    return BottomPanel(
+                      controller: _bottomPanelController,
+                      child: UserTextMessageDetails(data: data),
+                    );
+                  } else if (data is UserAudioMessageDetailsViewDto) {
+                    return BottomPanel(
+                      controller: _bottomPanelController,
+                      child: UserAudioMessageDetails(data: data),
+                    );
+                  } else if (data is AITextMessageDetailsViewDto) {
+                    return BottomPanel(
+                      controller: _bottomPanelController,
+                      child: AITextMessageDetails(data: data),
+                    );
+                  } else if (data is AIAudioMessageDetailsViewDto) {
+                    return BottomPanel(
+                      controller: _bottomPanelController,
+                      child: AIAudioMessageDetails(data: data),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+              ),
             if (panelState is! MicPanelState)
               Padding(
                 padding: const EdgeInsets.all(8.0),

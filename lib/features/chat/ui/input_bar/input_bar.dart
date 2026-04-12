@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lingu/core/models/language_locale.dart';
+import 'package:lingu/core/utils/ui_utils.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
 import 'package:signals/signals_flutter.dart' show FlutterReadonlySignalUtils;
 
@@ -91,98 +93,122 @@ class _InputBarState extends State<InputBar> {
   Widget build(BuildContext context) {
     final isTargetLang =
         _internalController.isTypingInTargetLanguage.watch(context);
-    final currentLocale =
-        isTargetLang ? widget.targetLocale : widget.nativeLocale;
 
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: _textController,
-            focusNode: _focusNode,
-            decoration: const InputDecoration(
-              hintText: 'Type a message',
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-                borderSide: BorderSide(width: 1.5, color: Colors.blueGrey),
+    return Focus(
+      descendantsAreFocusable: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
+          _internalController.toggleTypingLanguage();
+          return KeyEventResult.handled; // Evita que el Tab salte al AppBar
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _textController,
+              focusNode: _focusNode,
+              decoration: const InputDecoration(
+                hintText: 'Type a message',
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  borderSide: BorderSide(width: 1.5, color: Colors.blueGrey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  borderSide: BorderSide(width: 1.5, color: Colors.blue),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  borderSide: BorderSide(width: 1.5),
+                ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-                borderSide: BorderSide(width: 1.5, color: Colors.blue),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-                borderSide: BorderSide(width: 1.5),
-              ),
-            ),
-            onChanged: (value) {
-              _internalController.updateText(value);
-            },
-          ),
-        ),
-        const SizedBox(width: 8.0),
-        if (_internalController.showTextIcon.watch(context)) ...[
-          Container(
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.blue.shade100,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ToggleButtons(
-              isSelected: [!isTargetLang, isTargetLang],
-              onPressed: (index) {
-                if ((index == 0 && isTargetLang) ||
-                    (index == 1 && !isTargetLang)) {
-                  _internalController.toggleTypingLanguage();
+              onChanged: (value) {
+                _internalController.updateText(value);
+              },
+              onSubmitted: (value) {
+                if (_internalController.showTextIcon.value) {
+                  _internalController.submitText();
+                  _textController.clear();
+                  _focusNode.requestFocus();
                 }
               },
-              borderRadius: BorderRadius.circular(20),
-              selectedColor: Colors.white,
-              fillColor: Colors.blue.shade400,
-              color: Colors.blue.shade700,
-              constraints: const BoxConstraints(minHeight: 40, minWidth: 45),
-              renderBorder: false,
-              children: [
-                Text(widget.nativeLocale.display,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12)),
-                Text(widget.targetLocale.display,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12)),
-              ],
+            ),
+          ),
+          if (_internalController.showTextIcon.watch(context)) ...[
+            const SizedBox(width: 8.0),
+            Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.blue.shade100,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: ExcludeFocus(
+                child: ToggleButtons(
+                  isSelected: [!isTargetLang, isTargetLang],
+                  onPressed: (index) {
+                    if ((index == 0 && isTargetLang) ||
+                        (index == 1 && !isTargetLang)) {
+                      _internalController.toggleTypingLanguage();
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  selectedColor: Colors.white,
+                  fillColor: isTargetLang
+                      ? getLanguageColor(widget.targetLocale)
+                      : getLanguageColor(widget.nativeLocale),
+                  color: Colors.blue.shade700,
+                  constraints: const BoxConstraints(minHeight: 40, minWidth: 80),
+                  renderBorder: false,
+                  children: [
+                    Text(getLanguageDisplayName(widget.nativeLocale, context),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12)),
+                    Text(getLanguageDisplayName(widget.targetLocale, context),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(width: 8.0),
+          ExcludeFocus(
+            child: IconButton(
+              onPressed: () {
+                if (_internalController.showTextIcon.watch(context)) {
+                  _internalController.submitText();
+                  _textController.clear();
+                } else {
+                  _internalController.startRecording();
+                }
+              },
+              icon: Icon(_internalController.showTextIcon.watch(context)
+                  ? Icons.send
+                  : Icons.mic),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.blue.shade200,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8.0),
+          ExcludeFocus(
+            child: IconButton(
+              onPressed: _internalController.chat,
+              icon: const Icon(Icons.message),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.blue.shade200,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50)),
+              ),
             ),
           ),
           const SizedBox(width: 8.0),
         ],
-        IconButton(
-          onPressed: () {
-            if (_internalController.showTextIcon.watch(context)) {
-              _internalController.submitText();
-              _textController.clear();
-            } else {
-              _internalController.startRecording();
-            }
-          },
-          icon: Icon(_internalController.showTextIcon.watch(context)
-              ? Icons.send
-              : Icons.mic),
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.blue.shade200,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          ),
-        ),
-        const SizedBox(width: 8.0),
-        IconButton(
-          onPressed: _internalController.chat,
-          icon: const Icon(Icons.message),
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.blue.shade200,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
