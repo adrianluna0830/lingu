@@ -9,7 +9,7 @@ Color getShadowColor(FeedbackResultEnum? severity) {
   return switch (severity) {
     FeedbackResultEnum.minor => Colors.orange,
     FeedbackResultEnum.major => Colors.red,
-    FeedbackResultEnum.none => Colors.blue,
+    FeedbackResultEnum.none => Colors.green,
   };
 }
 
@@ -111,11 +111,11 @@ class UserMessageItem extends StatelessWidget {
         alignment: Alignment.centerRight,
         onLongPress: onTap,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(6.0),
           boxShadow: [
             BoxShadow(
               color: getShadowColor(_feedbackSeverity),
-              offset: const Offset(2.25, 2.25),
+              offset: const Offset(2.95, 2.65),
               blurRadius: 0,
             ),
           ],
@@ -161,16 +161,53 @@ class MessageContent extends StatelessWidget {
     if (msg is UserTextMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-        child: Text(msg.chatMessage.text),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(msg.chatMessage.text),
+            if (msg.feedbackSummary?.translation != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                '"${msg.feedbackSummary!.translation}"',
+                style: const TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: Colors.black54,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ],
+        ),
       );
     }
 
     if (msg is UserAudioMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.all(4.0),
-        child: VoiceNote(
-          audioUrl: msg.chatMessage.fullMergedAudioFilePath,
-          duration: msg.chatMessage.duration,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            VoiceNote(
+              audioUrl: msg.chatMessage.fullMergedAudioFilePath,
+              duration: msg.chatMessage.duration,
+            ),
+            if (msg.feedbackSummary?.translation != null) ...[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: Text(
+                  '"${msg.feedbackSummary!.translation}"',
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: Colors.black54,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       );
     }
