@@ -5,6 +5,8 @@ enum LanguageLocale {
 
   final String bcp47;
   const LanguageLocale(this.bcp47);
+
+  String get display => name.toUpperCase();
 }
 
 class NativeLocale {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/ui/record/record_controller.dart';
+import 'package:lingu/features/chat/ui/widgets/locale_indicator.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:waveform_flutter/waveform_flutter.dart' as waveform;
 
@@ -61,16 +62,7 @@ class _RecordDisplayState extends State<RecordDisplay> {
     }
   }
 
-  String _getLocaleDisplay(LanguageLocale locale) {
-    switch (locale) {
-      case LanguageLocale.en:
-        return 'En';
-      case LanguageLocale.es:
-        return 'Es';
-      case LanguageLocale.de:
-        return 'De';
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -79,50 +71,22 @@ class _RecordDisplayState extends State<RecordDisplay> {
     final isPaused = _internalController.isPaused.watch(context);
 
     final currentLocale = isTargetLanguage ? widget.targetLocale : widget.nativeLocale;
-    final localeName = _getLocaleDisplay(currentLocale);
 
     return Column(
       children: [
         Expanded(
-          child: Stack(
-            children: [
-              waveform.AnimatedWaveList(
-                stream: _waveformStream,
-                barBuilder: (animation, amplitude) {
-                  final isTarget = (amplitude is LanguageAmplitude)
-                      ? amplitude.isTarget
-                      : true;
-                  return waveform.WaveFormBar(
-                    animation: animation,
-                    amplitude: amplitude,
-                    color: isTarget ? Colors.red : Colors.blue,
-                  );
-                },
-              ),
-              Positioned(
-                top: 16,
-                right: 16,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      width: 2.5,
-                    ),
-                  ),
-                  child: Text(
-                    localeName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          child: waveform.AnimatedWaveList(
+            stream: _waveformStream,
+            barBuilder: (animation, amplitude) {
+              final isTarget = (amplitude is LanguageAmplitude)
+                  ? amplitude.isTarget
+                  : true;
+              return waveform.WaveFormBar(
+                animation: animation,
+                amplitude: amplitude,
+                color: isTarget ? Colors.red : Colors.blue,
+              );
+            },
           ),
         ),
         Row(
@@ -136,11 +100,23 @@ class _RecordDisplayState extends State<RecordDisplay> {
               onPressed: _internalController.toggleRecording,
               icon: Icon(isPaused ? Icons.play_arrow : Icons.pause),
             ),
-            IconButton(
-              onPressed: _internalController.toggleLanguage,
-              icon: Icon(
-                isTargetLanguage ? Icons.language : Icons.translate,
-              ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  onPressed: _internalController.toggleLanguage,
+                  icon: Icon(
+                    isTargetLanguage ? Icons.language : Icons.translate,
+                  ),
+                ),
+                Positioned(
+                  top: -4,
+                  right: -2,
+                  child: IgnorePointer(
+                    child: LocaleIndicator(locale: currentLocale),
+                  ),
+                ),
+              ],
             ),
             IconButton(
               onPressed: _internalController.stopRecording,

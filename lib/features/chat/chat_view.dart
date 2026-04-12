@@ -149,7 +149,11 @@ class _ChatViewState extends State<ChatView> {
           if (panelState is! MicPanelState)
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: InputBar(_inputBarController),
+              child: InputBar(
+                _inputBarController,
+                nativeLocale: chatLanguages.native,
+                targetLocale: chatLanguages.target,
+              ),
             ),
         ],
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
+import 'package:lingu/features/chat/ui/widgets/locale_indicator.dart';
 import 'package:signals/signals_flutter.dart' show FlutterReadonlySignalUtils;
 
 class _RichTextEditingController extends TextEditingController {
@@ -50,7 +52,15 @@ class _RichTextEditingController extends TextEditingController {
 
 class InputBar extends StatefulWidget {
   final InputBarController? controller;
-  const InputBar(this.controller, {super.key});
+  final LanguageLocale nativeLocale;
+  final LanguageLocale targetLocale;
+
+  const InputBar(
+    this.controller, {
+    super.key,
+    required this.nativeLocale,
+    required this.targetLocale,
+  });
 
   @override
   State<InputBar> createState() => _InputBarState();
@@ -82,6 +92,8 @@ class _InputBarState extends State<InputBar> {
   Widget build(BuildContext context) {
     final isTargetLang =
         _internalController.isTypingInTargetLanguage.watch(context);
+    final currentLocale =
+        isTargetLang ? widget.targetLocale : widget.nativeLocale;
 
     return Row(
       children: [
@@ -111,16 +123,28 @@ class _InputBarState extends State<InputBar> {
         ),
         const SizedBox(width: 8.0),
         if (_internalController.showTextIcon.watch(context)) ...[
-          IconButton(
-            onPressed: () {
-              _internalController.toggleTypingLanguage();
-            },
-            icon: Icon(isTargetLang ? Icons.toggle_on : Icons.toggle_off),
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.blue.shade200,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50)),
-            ),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: () {
+                  _internalController.toggleTypingLanguage();
+                },
+                icon: Icon(isTargetLang ? Icons.toggle_on : Icons.toggle_off),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.blue.shade200,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50)),
+                ),
+              ),
+              Positioned(
+                top: -4,
+                right: -2,
+                child: IgnorePointer(
+                  child: LocaleIndicator(locale: currentLocale),
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 8.0),
         ],
