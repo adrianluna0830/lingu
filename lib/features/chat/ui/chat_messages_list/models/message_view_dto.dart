@@ -1,4 +1,5 @@
-import 'package:lingu/features/chat/ui/chat_messages_list/models/feedback_result_enum.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
+import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 
 sealed class MessageViewDto {
   final int id;
@@ -6,65 +7,41 @@ sealed class MessageViewDto {
 }
 
 class UserTextMessageViewDto extends MessageViewDto {
-  final String text;
-  final String? correction;
-  final String? translatedText;
-  final FeedbackResultEnum? grammarErrorSeverity;
-  final FeedbackResultEnum? fluencyCorrection;
+  final UserTextMessage chatMessage;
+  final UserTextMessageDetailsViewDto? messageDetails;
 
   UserTextMessageViewDto({
-    required super.id,
-    required this.text,
-    required this.correction,
-    required this.translatedText,
-    required this.grammarErrorSeverity,
-    required this.fluencyCorrection,
-  });
+    required this.chatMessage,
+    required this.messageDetails,
+  }) : super(id: chatMessage.id);
 }
 
 class UserAudioMessageViewDto extends MessageViewDto {
-  final String audioUrl;
-  final Duration duration;
-  final String? correction;
-  final String? translatedText;
-  final FeedbackResultEnum? grammarErrorSeverity;
-  final FeedbackResultEnum? fluencyCorrection;
-  final FeedbackResultEnum? pronunciationErrorSeverity;
+  final UserAudioMessage chatMessage;
+  final UserAudioMessageDetailsViewDto? messageDetails;
 
   UserAudioMessageViewDto({
-    required super.id,
-    required this.audioUrl,
-    required this.duration,
-    required this.correction,
-    required this.translatedText,
-    required this.grammarErrorSeverity,
-    required this.fluencyCorrection,
-    required this.pronunciationErrorSeverity,
-  });
+    required this.chatMessage,
+    required this.messageDetails,
+  }) : super(id: chatMessage.id);
 }
 
 class AITextMessageViewDto extends MessageViewDto {
-  final String text;
-  final String? translation;
+  final AITextMessage chatMessage;
+  final AITextMessageDetailsViewDto? messageDetails;
 
   AITextMessageViewDto({
-    required super.id,
-    required this.text,
-    required this.translation,
-  });
+    required this.chatMessage,
+    required this.messageDetails,
+  }) : super(id: chatMessage.id);
 }
 
 class AIAudioMessageViewDto extends MessageViewDto {
-  final String audioUrl;
-  final Duration duration;
-  final String transcript;
-  final String? translation;
+  final AIAudioMessage chatMessage;
+  final AIAudioMessageDetailsViewDto? messageDetails;
 
   AIAudioMessageViewDto({
-    required super.id,
-    required this.audioUrl,
-    required this.duration,
-    required this.transcript,
-    required this.translation,
-  });
+    required this.chatMessage,
+    required this.messageDetails,
+  }) : super(id: chatMessage.id);
 }

@@ -3,6 +3,7 @@ import 'package:googleai_dart/googleai_dart.dart';
 import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
+import 'package:lingu/features/chat/logic/feedback/models/rephrased_text.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
 
 class StatementFeedbackService {
@@ -11,7 +12,7 @@ class StatementFeedbackService {
 
   StatementFeedbackService(this._aiModel, this._languages);
 
-  Future<(SentenceFeedback? fluency, SentenceFeedback? grammar)> analyze(
+  Future<(SentenceFeedback? fluency, SentenceFeedback? grammar, RephrasedText? rephrasedText)> analyze(
       String statement) async {
     final schema = Schema(
       type: SchemaType.object,
@@ -32,13 +33,22 @@ class StatementFeedbackService {
           },
           nullable: true,
         ),
+        'rephrasedText': Schema(
+          type: SchemaType.object,
+          properties: {
+            'targetText': Schema(type: SchemaType.string),
+            'translation': Schema(type: SchemaType.string),
+          },
+          nullable: true,
+        ),
       },
     );
 
     final prompt =
-        "Analyze the following text in ${_getLanguageName(_languages.target)} and provide feedback in ${_getLanguageName(_languages.native)}. "
-        "If there are issues with fluency or grammar, provide a correction and explanation. "
-        "If the text is perfect or no feedback is needed for a category, return null for that category. "
+        "Analyze the following text, focusing on the parts written in ${_getLanguageName(_languages.target)}. "
+        "1. If the input contains a mix of both ${_getLanguageName(_languages.target)} and ${_getLanguageName(_languages.native)}, provide a rephrased version fully in ${_getLanguageName(_languages.target)} (targetText) and its translation into ${_getLanguageName(_languages.native)} (translation) in the 'rephrasedText' field. Otherwise, set 'rephrasedText' to null.\n"
+        "2. Regardless of whether it's mixed or not, analyze the ${_getLanguageName(_languages.target)} portion for fluency and grammar issues. Provide corrections and explanations in ${_getLanguageName(_languages.native)}. "
+        "If the target language part is perfect or no feedback is needed for a category, return null for that category.\n"
         "Text: \"$statement\"";
 
     final response = await _aiModel.generateContent(
@@ -50,10 +60,12 @@ class StatementFeedbackService {
     final json = jsonDecode(jsonString) as Map<String, dynamic>;
     final fluencyJson = json['fluency'] as Map<String, dynamic>?;
     final grammarJson = json['grammar'] as Map<String, dynamic>?;
+    final rephrasedJson = json['rephrasedText'] as Map<String, dynamic>?;
 
     return (
       fluencyJson != null ? _parseFeedback(fluencyJson) : null,
       grammarJson != null ? _parseFeedback(grammarJson) : null,
+      rephrasedJson != null ? _parseRephrasedText(rephrasedJson) : null,
     );
   }
 
@@ -61,6 +73,13 @@ class StatementFeedbackService {
     return SentenceFeedback(
       correction: json['correction'],
       explanation: json['explanation'],
+    );
+  }
+
+  RephrasedText _parseRephrasedText(Map<String, dynamic> json) {
+    return RephrasedText(
+      targetText: json['targetText'],
+      translation: json['translation'],
     );
   }
 

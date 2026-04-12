@@ -55,18 +55,18 @@ class _MessageItem extends StatelessWidget {
 
   bool get _isClickable {
     if (message is UserTextMessageViewDto) {
-      final m = message as UserTextMessageViewDto;
-      if (m.translatedText != null) return true;
-      return m.grammarErrorSeverity != null && m.fluencyCorrection != null;
+      return (message as UserTextMessageViewDto).messageDetails != null;
     }
     if (message is UserAudioMessageViewDto) {
-      final m = message as UserAudioMessageViewDto;
-      if (m.translatedText != null) return true;
-      return m.grammarErrorSeverity != null &&
-          m.fluencyCorrection != null &&
-          m.pronunciationErrorSeverity != null;
+      return (message as UserAudioMessageViewDto).messageDetails != null;
     }
-    return true; // AI messages are clickable by default or as per logic
+    if (message is AITextMessageViewDto) {
+      return (message as AITextMessageViewDto).messageDetails != null;
+    }
+    if (message is AIAudioMessageViewDto) {
+      return (message as AIAudioMessageViewDto).messageDetails != null;
+    }
+    return false;
   }
 
   @override
@@ -91,17 +91,18 @@ class _MessageItem extends StatelessWidget {
   Widget _buildContent() {
     final msg = message;
     if (msg is UserTextMessageViewDto) {
+      final details = msg.messageDetails;
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(msg.text),
-            if (msg.translatedText != null) ...[
+            Text(msg.chatMessage.text),
+            if (details?.rephrasedText != null) ...[
               const SizedBox(height: 4),
               Text(
-                '"${msg.translatedText!}"',
+                '"${details!.rephrasedText!.targetText}"',
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.black.withOpacity(0.7),
@@ -113,6 +114,7 @@ class _MessageItem extends StatelessWidget {
         ),
       );
     } else if (msg is UserAudioMessageViewDto) {
+      final details = msg.messageDetails;
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
         child: Column(
@@ -120,14 +122,15 @@ class _MessageItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             VoiceNote(
-              audioUrl: msg.audioUrl,
-              duration: msg.duration,
+              audioUrl: msg.chatMessage.fullMergedAudioFilePath,
+              duration: msg.chatMessage.duration,
             ),
-            if (msg.translatedText != null)
+            if (details?.rephrasedText != null)
               Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 4.0),
+                padding:
+                    const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 4.0),
                 child: Text(
-                  '"${msg.translatedText!}"',
+                  '"${details!.rephrasedText!.targetText}"',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.black.withOpacity(0.7),
@@ -138,18 +141,17 @@ class _MessageItem extends StatelessWidget {
           ],
         ),
       );
-    }
- else if (msg is AITextMessageViewDto) {
+    } else if (msg is AITextMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        child: Text(msg.text),
+        child: Text(msg.chatMessage.text),
       );
     } else if (msg is AIAudioMessageViewDto) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
         child: VoiceNote(
-          audioUrl: msg.audioUrl,
-          duration: msg.duration,
+          audioUrl: msg.chatMessage.audioUrl,
+          duration: msg.chatMessage.duration,
         ),
       );
     }
@@ -160,13 +162,23 @@ class _MessageItem extends StatelessWidget {
     List<String> info = [];
     if (message is UserTextMessageViewDto) {
       final m = message as UserTextMessageViewDto;
-      if (m.grammarErrorSeverity != null) info.add("Grammar: ${m.grammarErrorSeverity!.name}");
-      if (m.fluencyCorrection != null) info.add("Fluency: ${m.fluencyCorrection!.name}");
+      final details = m.messageDetails;
+      if (details != null) {
+        if (details.grammarFeedback != null) info.add("Grammar: feedback available");
+        if (details.fluencyFeedback != null) info.add("Fluency: feedback available");
+      } else {
+        info.add("Loading feedback...");
+      }
     } else if (message is UserAudioMessageViewDto) {
       final m = message as UserAudioMessageViewDto;
-      if (m.pronunciationErrorSeverity != null) info.add("Pronunciation: ${m.pronunciationErrorSeverity!.name}");
-      if (m.grammarErrorSeverity != null) info.add("Grammar: ${m.grammarErrorSeverity!.name}");
-      if (m.fluencyCorrection != null) info.add("Fluency: ${m.fluencyCorrection!.name}");
+      final details = m.messageDetails;
+      if (details != null) {
+        if (details.pronunciationFeedback != null) info.add("Pronunciation: feedback available");
+        if (details.grammarFeedback != null) info.add("Grammar: feedback available");
+        if (details.fluencyFeedback != null) info.add("Fluency: feedback available");
+      } else {
+        info.add("Loading feedback...");
+      }
     }
 
     if (info.isEmpty) return const SizedBox.shrink();

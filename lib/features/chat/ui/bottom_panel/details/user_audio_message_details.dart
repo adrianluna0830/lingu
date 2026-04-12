@@ -12,7 +12,23 @@ class UserAudioMessageDetails extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       width: double.infinity,
       child: SingleChildScrollView(
-        child: Container()
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (data.rephrasedText != null) ...[
+              const Text('Rephrased to Target:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(data.rephrasedText!.targetText,
+                  style: const TextStyle(fontStyle: FontStyle.italic)),
+              const Divider(),
+            ],
+            Text(
+              'Grammar: ${data.grammarFeedback?.correction ?? "Perfect"}\n'
+              'Fluency: ${data.fluencyFeedback?.correction ?? "Perfect"}',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
       ),
     );
   }
