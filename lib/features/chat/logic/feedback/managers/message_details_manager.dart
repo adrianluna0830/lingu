@@ -41,12 +41,15 @@ class MessageDetailsManager {
   ) async {
     final fullText = textInputs.map((e) => e.text).join(' ');
 
-    final feedback = await _statementFeedbackService.analyze(fullText);
+    final response = await _statementFeedbackService.analyze(
+      statement: fullText,
+      segments: textInputs,
+    );
 
     _messageDetails[messageId] = UserTextMessageDetailsViewDto(
-      translatedText: feedback.$3,
-      grammarFeedback: feedback.$2,
-      fluencyFeedback: feedback.$1,
+      translatedText: response.translatedText,
+      grammarFeedback: response.grammar,
+      fluencyFeedback: response.fluency,
     );
   }
 
@@ -57,26 +60,16 @@ class MessageDetailsManager {
     final result =
         await _pronunciationFeedbackService.analyze(individualAudioUrls);
 
-    final feedback = await _statementFeedbackService.analyze(result.rawTranscript);
+    final response = await _statementFeedbackService.analyze(
+      statement: result.rawTranscript,
+      segments: individualAudioUrls,
+    );
 
     _messageDetails[messageId] = UserAudioMessageDetailsViewDto(
-      translatedText: feedback.$3,
-      grammarFeedback: feedback.$2,
-      fluencyFeedback: feedback.$1,
+      translatedText: response.translatedText,
+      grammarFeedback: response.grammar,
+      fluencyFeedback: response.fluency,
       pronunciationFeedback: result,
     );
-  }
-
-  String _cleanJson(String text) {
-    text = text.trim();
-    if (text.startsWith('```json')) {
-      text = text.substring(7);
-    } else if (text.startsWith('```')) {
-      text = text.substring(3);
-    }
-    if (text.endsWith('```')) {
-      text = text.substring(0, text.length - 3);
-    }
-    return text.trim();
   }
 }

@@ -30,16 +30,21 @@ class UserTextMessage extends ChatMessage {
   }
 }
 
-class UserTextInput
-{
+abstract interface class UserLanguageSegment {
+  bool get isTargetLanguage;
+}
+
+class UserTextInput implements UserLanguageSegment {
   final String text;
+  @override
   final bool isTargetLanguage;
 
   UserTextInput(this.text, this.isTargetLanguage);
 }
 
-class UserSpeechAudio {
+class UserSpeechAudio implements UserLanguageSegment {
   final String filePath;
+  @override
   final bool isTargetLanguage;
 
   const UserSpeechAudio({

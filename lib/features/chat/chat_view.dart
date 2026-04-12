@@ -94,68 +94,71 @@ class _ChatViewState extends State<ChatView> {
     final panelState = _panelManager.currentPanel.watch(context);
     final chatLanguages = di<ChatLanguages>();
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Chat View')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(
-            child: ChatMessagesList(
-              messages: _messageViewDtoComputed.watch(context),
-              controller: _controller,
-            ),
-          ),
-          if (panelState is MicPanelState)
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Chat View')),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
             Expanded(
-              child: RecordDisplay(
-                controller: _recordController,
-                amplitudeStream: _recordInputHandler.amplitudeStream
-                    .map((a) => (a.value, a.maxValue)),
-                nativeLocale: chatLanguages.native,
-                targetLocale: chatLanguages.target,
+              child: ChatMessagesList(
+                messages: _messageViewDtoComputed.watch(context),
+                controller: _controller,
               ),
             ),
-          if (panelState is ChatPanelState)
-            BottomPanel(
-                controller: _bottomPanelController,
-                child: const SizedBox(height: 200)),
-          if (panelState is MessageDetailsPanelState)
-            Builder(builder: (context) {
-              final data = panelState.data;
-              if (data is UserTextMessageDetailsViewDto) {
-                return BottomPanel(
-                  controller: _bottomPanelController,
-                  child: UserTextMessageDetails(data: data),
-                );
-              } else if (data is UserAudioMessageDetailsViewDto) {
-                return BottomPanel(
-                  controller: _bottomPanelController,
-                  child: UserAudioMessageDetails(data: data),
-                );
-              } else if (data is AITextMessageDetailsViewDto) {
-                return BottomPanel(
-                  controller: _bottomPanelController,
-                  child: AITextMessageDetails(data: data),
-                );
-              } else if (data is AIAudioMessageDetailsViewDto) {
-                return BottomPanel(
-                  controller: _bottomPanelController,
-                  child: AIAudioMessageDetails(data: data),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
-          if (panelState is! MicPanelState)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InputBar(
-                _inputBarController,
-                nativeLocale: chatLanguages.native,
-                targetLocale: chatLanguages.target,
+            if (panelState is MicPanelState)
+              Expanded(
+                child: RecordDisplay(
+                  controller: _recordController,
+                  amplitudeStream: _recordInputHandler.amplitudeStream
+                      .map((a) => (a.value, a.maxValue)),
+                  nativeLocale: chatLanguages.native,
+                  targetLocale: chatLanguages.target,
+                ),
               ),
-            ),
-        ],
+            if (panelState is ChatPanelState)
+              BottomPanel(
+                  controller: _bottomPanelController,
+                  child: const SizedBox(height: 200)),
+            if (panelState is MessageDetailsPanelState)
+              Builder(builder: (context) {
+                final data = panelState.data;
+                if (data is UserTextMessageDetailsViewDto) {
+                  return BottomPanel(
+                    controller: _bottomPanelController,
+                    child: UserTextMessageDetails(data: data),
+                  );
+                } else if (data is UserAudioMessageDetailsViewDto) {
+                  return BottomPanel(
+                    controller: _bottomPanelController,
+                    child: UserAudioMessageDetails(data: data),
+                  );
+                } else if (data is AITextMessageDetailsViewDto) {
+                  return BottomPanel(
+                    controller: _bottomPanelController,
+                    child: AITextMessageDetails(data: data),
+                  );
+                } else if (data is AIAudioMessageDetailsViewDto) {
+                  return BottomPanel(
+                    controller: _bottomPanelController,
+                    child: AIAudioMessageDetails(data: data),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+            if (panelState is! MicPanelState)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InputBar(
+                  _inputBarController,
+                  nativeLocale: chatLanguages.native,
+                  targetLocale: chatLanguages.target,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

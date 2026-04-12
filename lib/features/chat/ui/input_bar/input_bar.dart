@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar_controller.dart';
-import 'package:lingu/features/chat/ui/widgets/locale_indicator.dart';
 import 'package:signals/signals_flutter.dart' show FlutterReadonlySignalUtils;
 
 class _RichTextEditingController extends TextEditingController {
@@ -123,28 +122,35 @@ class _InputBarState extends State<InputBar> {
         ),
         const SizedBox(width: 8.0),
         if (_internalController.showTextIcon.watch(context)) ...[
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                onPressed: () {
+          Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.blue.shade100,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: ToggleButtons(
+              isSelected: [!isTargetLang, isTargetLang],
+              onPressed: (index) {
+                if ((index == 0 && isTargetLang) ||
+                    (index == 1 && !isTargetLang)) {
                   _internalController.toggleTypingLanguage();
-                },
-                icon: Icon(isTargetLang ? Icons.toggle_on : Icons.toggle_off),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.blue.shade200,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
-                ),
-              ),
-              Positioned(
-                top: -4,
-                right: -2,
-                child: IgnorePointer(
-                  child: LocaleIndicator(locale: currentLocale),
-                ),
-              ),
-            ],
+                }
+              },
+              borderRadius: BorderRadius.circular(20),
+              selectedColor: Colors.white,
+              fillColor: Colors.blue.shade400,
+              color: Colors.blue.shade700,
+              constraints: const BoxConstraints(minHeight: 40, minWidth: 45),
+              renderBorder: false,
+              children: [
+                Text(widget.nativeLocale.display,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 12)),
+                Text(widget.targetLocale.display,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 12)),
+              ],
+            ),
           ),
           const SizedBox(width: 8.0),
         ],
