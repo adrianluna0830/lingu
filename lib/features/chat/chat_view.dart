@@ -19,6 +19,8 @@ import 'package:lingu/features/chat/ui/record/record_display.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_audio_message_details.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_text_message_details.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
 import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
 
 @RoutePage()
@@ -103,7 +105,25 @@ class _ChatViewState extends State<ChatView> {
           children: [
             Expanded(
               child: ChatMessagesList(
-                messages: _messageViewDtoComputed.watch(context),
+                messages: [
+                  AIAudioMessageViewDto(
+                    chatMessage: const AIAudioMessage(
+                      id: -2,
+                      transcription: 'This is a test AI transcription for audio messages.',
+                      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                      duration: Duration(seconds: 5),
+                    ),
+                    translation: null, // Test "Cargando..."
+                  ),
+                  AITextMessageViewDto(
+                    chatMessage: const AITextMessage(
+                      id: -1,
+                      text: 'This is a dummy AI message to test the UI design.',
+                    ),
+                    translation: 'Este es un mensaje de IA ficticio para probar el diseño de la interfaz.',
+                  ),
+                  ..._messageViewDtoComputed.watch(context),
+                ],
                 controller: _controller,
               ),
             ),

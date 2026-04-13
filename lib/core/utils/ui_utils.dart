@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/core/models/language_locale.dart';
+import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 
 String getLanguageDisplayName(LanguageLocale locale, BuildContext context) {
-  // Hardcoded por ahora, preparado para localization después
   return switch (locale) {
     LanguageLocale.en => 'English',
     LanguageLocale.es => 'Spanish',
@@ -17,3 +17,15 @@ Color getLanguageColor(LanguageLocale locale) {
     LanguageLocale.de => Colors.red.shade400,
   };
 }
+
+
+
+Color getShadowColor(FeedbackResultEnum? severity) {
+  if (severity == null) return Colors.grey[400]!;
+  return switch (severity) {
+    FeedbackResultEnum.minor => Colors.orange,
+    FeedbackResultEnum.major => Colors.red,
+    FeedbackResultEnum.none => Colors.green,
+  };
+}
+

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:lingu/core/pronunciation/models/pronunciation_assessment_dto.dart';
 import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 
@@ -87,9 +88,13 @@ class TargetLanguagePronunciationResult extends PronunciationItemResult {
 
 class PronunciationFeedback {
   final List<PronunciationItemResult> itemResults;
+  final String? fluencyFeedback;
+  final String? observations;
 
   PronunciationFeedback({
     required this.itemResults,
+    this.fluencyFeedback,
+    this.observations,
   });
 
   String get rawTranscript => itemResults.map((e) => e.transcript).join(' ');

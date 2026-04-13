@@ -90,11 +90,13 @@ class AITextMessage extends ChatMessage {
 }
 
 class AIAudioMessage extends ChatMessage {
+  final String transcription;
   final String audioUrl;
   final Duration duration;
 
   const AIAudioMessage({
     required super.id,
+    required this.transcription,
     required this.audioUrl,
     required this.duration,
   });

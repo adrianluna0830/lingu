@@ -1,19 +1,13 @@
-// voice_note_controller.dart
 import 'dart:async';
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:signals/signals_flutter.dart';
 
-class VoiceNoteController {
-  // Optional public controller for future callbacks
-}
 
 class VoiceNoteInternalController {
-  final VoiceNoteController? controller;
   final IAudioPlayerManager _audioPlayerManager;
 
   VoiceNoteInternalController({
-    this.controller,
     IAudioPlayerManager? audioPlayerManager,
   }) : _audioPlayerManager = audioPlayerManager ?? di<IAudioPlayerManager>();
 

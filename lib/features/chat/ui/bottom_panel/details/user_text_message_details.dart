@@ -24,7 +24,6 @@ class _UserTextMessageDetailsState extends State<UserTextMessageDetails> with Si
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Original Message Anchor
         if (widget.data.translatedText != null)
           Container(
             margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),

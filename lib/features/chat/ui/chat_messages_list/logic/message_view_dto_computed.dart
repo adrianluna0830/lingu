@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
@@ -32,26 +34,36 @@ class MessageViewDtoComputed extends Computed<List<MessageViewDto>> {
           chatMessage: m,
           feedbackSummary: _createAudioSummary(details as UserAudioMessageDetailsViewDto?),
         ),
-      AITextMessage m => AITextMessageViewDto(chatMessage: m),
-      AIAudioMessage m => AIAudioMessageViewDto(chatMessage: m),
+      AITextMessage m => AITextMessageViewDto(chatMessage: m, translation: null),
+      AIAudioMessage m => AIAudioMessageViewDto(chatMessage: m, translation: null),
     };
   }
 
   static TextFeedbackSummary? _createTextSummary(UserTextMessageDetailsViewDto? details) {
     if (details == null) return null;
+
+    final grammar = _mapSeverity(details.grammarFeedback?.severity);
+    final fluency = _mapSeverity(details.fluencyFeedback?.severity);
+    final maxIndex = max(grammar.index, fluency.index);
+
     return TextFeedbackSummary(
-      grammar: _mapSeverity(details.grammarFeedback?.severity),
-      fluency: _mapSeverity(details.fluencyFeedback?.severity),
+      result: FeedbackResultEnum.values[maxIndex],
       translation: details.translatedText?.targetText,
     );
   }
 
   static AudioFeedbackSummary? _createAudioSummary(UserAudioMessageDetailsViewDto? details) {
     if (details == null) return null;
+
+    final grammar = _mapSeverity(details.grammarFeedback?.severity);
+    final fluency = _mapSeverity(details.fluencyFeedback?.severity);
+    final pronunciation = details.pronunciationFeedback?.mostSevere ?? FeedbackResultEnum.none;
+
+    final maxIndex = [grammar.index, fluency.index, pronunciation.index].reduce(max);
+
     return AudioFeedbackSummary(
-      grammar: _mapSeverity(details.grammarFeedback?.severity),
-      fluency: _mapSeverity(details.fluencyFeedback?.severity),
-      pronunciation: details.pronunciationFeedback?.mostSevere ?? FeedbackResultEnum.none,
+      result: FeedbackResultEnum.values[maxIndex],
+      transcription: details.pronunciationFeedback?.rawTranscript ?? '',
       translation: details.translatedText?.targetText,
     );
   }

@@ -28,16 +28,20 @@ class UserAudioMessageViewDto extends MessageViewDto {
 
 class AITextMessageViewDto extends MessageViewDto {
   final AITextMessage chatMessage;
+  final String? translation;
 
   AITextMessageViewDto({
+    required this.translation,
     required this.chatMessage,
   }) : super(id: chatMessage.id);
 }
 
 class AIAudioMessageViewDto extends MessageViewDto {
   final AIAudioMessage chatMessage;
+  final String? translation;
 
   AIAudioMessageViewDto({
     required this.chatMessage,
+    required this.translation,
   }) : super(id: chatMessage.id);
 }

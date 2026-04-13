@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:lingu/features/chat/ui/widgets/voice_note/voice_note_controller.dart';
 import 'package:signals/signals_flutter.dart';
 
-class VoiceNote extends StatefulWidget {
-  final VoiceNoteController? controller;
+class VoiceNoteControls extends StatefulWidget {
   final String audioUrl;
   final Duration duration;
-  const VoiceNote({super.key, this.controller, required this.audioUrl, required this.duration});
+  const VoiceNoteControls({super.key  , required this.audioUrl, required this.duration});
 
   @override
-  State<VoiceNote> createState() => _VoiceNoteState();
+  State<VoiceNoteControls> createState() => _VoiceNoteControlsState();
 }
 
-class _VoiceNoteState extends State<VoiceNote> {
-  late final VoiceNoteInternalController _internalController = VoiceNoteInternalController(controller: widget.controller);
+class _VoiceNoteControlsState extends State<VoiceNoteControls> {
+  late final VoiceNoteInternalController _internalController = VoiceNoteInternalController();
 
   @override
   void initState() {
@@ -40,38 +39,41 @@ class _VoiceNoteState extends State<VoiceNote> {
     final canToggle = _internalController.canTogglePlay.watch(context);
 
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-          onPressed: canToggle ? () => _internalController.togglePlayStatus() : null,
-        ),
-        Flexible(
-          child: SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 4.0,
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 12.0),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
-            ),
-            child: Slider(
-              value: currentMs,
-              max: maxMs,
-              onChangeStart: (v) {
-                _internalController.onSeekStart();
-              },
-              onChanged: (v) => _internalController.onSeekChanged(
-                Duration(milliseconds: v.toInt()),
+    return GestureDetector(
+      onLongPress: () {},
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+            onPressed: canToggle ? () => _internalController.togglePlayStatus() : null,
+          ),
+          Flexible(
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 4.0,
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 12.0),
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
               ),
-              onChangeEnd: (v) {
-                _internalController.onSeekEnd(Duration(milliseconds: v.toInt()));
-              },
+              child: Slider(
+                value: currentMs,
+                max: maxMs,
+                onChangeStart: (v) {
+                  _internalController.onSeekStart();
+                },
+                onChanged: (v) => _internalController.onSeekChanged(
+                  Duration(milliseconds: v.toInt()),
+                ),
+                onChangeEnd: (v) {
+                  _internalController.onSeekEnd(Duration(milliseconds: v.toInt()));
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
