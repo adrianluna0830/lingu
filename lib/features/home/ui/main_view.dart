@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/router/app_router.dart';
+import 'package:lingu/features/home/ui/widgets/interactable_text.dart';
 
 @RoutePage()
 class MainView extends StatelessWidget {

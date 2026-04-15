@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+
 class BottomPanelController {
-  Function()? onClose;
+  VoidCallback? onClose;
+  BottomPanelController({this.onClose});
 }

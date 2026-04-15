@@ -4,7 +4,11 @@ sealed class PanelState {}
 
 class NonePanelState implements PanelState {}
 
-class ChatPanelState implements PanelState {}
+class ChatPanelState implements PanelState {
+  final String? initialQuestion;
+
+  ChatPanelState({this.initialQuestion});
+}
 
 class MicPanelState implements PanelState {}
 

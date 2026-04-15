@@ -8,6 +8,8 @@ class UserTextMessage extends StatelessWidget {
   final FeedbackResultEnum? feedbackResult;
   final String? translation;
   final VoidCallback? onTap;
+  final VoidCallback? onWordInfo;
+  final VoidCallback? onChat;
 
   const UserTextMessage({
     super.key,
@@ -15,44 +17,32 @@ class UserTextMessage extends StatelessWidget {
     this.feedbackResult,
     this.translation,
     this.onTap,
+    this.onWordInfo,
+    this.onChat,
   });
 
   @override
   Widget build(BuildContext context) {
     return MessageLayout(
-      alignment: Alignment.centerRight,
+      isUser: true,
       onLongPress: feedbackResult != null ? onTap : null,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: getShadowColor(feedbackResult),
-            offset: const Offset(2.4, 2.4),
-            blurRadius: 0,
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(text),
-            if (translation != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                '"$translation"',
-                style: const TextStyle(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.black87,
-                  fontSize: 12,
+        boxShadow: feedbackResult != null
+            ? [
+                BoxShadow(
+                  color: getShadowColor(feedbackResult),
+                  offset: const Offset(2.4, 2.4),
+                  blurRadius: 0,
                 ),
-              ),
-            ],
-          ],
-        ),
+              ]
+            : null,
       ),
+      children: [
+        Text(text),
+        if (translation != null)
+          MessageSubText('"$translation"'),
+      ],
     );
   }
 }

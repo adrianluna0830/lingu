@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 
+class Option<T extends Enum> {
+  final T value;
+  final bool isEnabled;
+  final VoidCallback? onPressed;
+
+  const Option({
+    required this.value,
+    this.isEnabled = true,
+    this.onPressed,
+  });
+}
+
 class BaseMessageDetailsOptions<T extends Enum> extends StatefulWidget {
-  final List<(T, VoidCallback?)> segments;
+  final List<Option<T>> options;
   final String Function(T value, BuildContext context) labelBuilder;
 
   const BaseMessageDetailsOptions({
     super.key,
-    required this.segments,
+    required this.options,
     required this.labelBuilder,
   });
 
@@ -22,17 +34,17 @@ class _BaseMessageDetailsOptionsState<T extends Enum>
   @override
   void initState() {
     super.initState();
-    final enabledSegments = widget.segments.where((e) => e.$2 != null).toList();
-    if (enabledSegments.length == 1) {
-      selected = enabledSegments.first.$1;
+    final enabledOptions = widget.options.where((e) => e.isEnabled && e.onPressed != null).toList();
+    if (enabledOptions.length == 1) {
+      selected = enabledOptions.first.value;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        enabledSegments.first.$2?.call();
+        enabledOptions.first.onPressed?.call();
       });
     }
   }
 
   bool _isDisabled(T value) {
-    return widget.segments.firstWhere((e) => e.$1 == value).$2 == null;
+    return !widget.options.firstWhere((e) => e.value == value).isEnabled;
   }
 
   @override
@@ -43,15 +55,15 @@ class _BaseMessageDetailsOptionsState<T extends Enum>
         borderRadius: BorderRadius.circular(20),
       ),
       child: ToggleButtons(
-        isSelected: widget.segments.map((e) => e.$1 == selected).toList(),
+        isSelected: widget.options.map((e) => e.value == selected).toList(),
         onPressed: (index) {
-          final option = widget.segments[index];
-          if (option.$2 == null) return;
+          final option = widget.options[index];
+          if (!option.isEnabled || option.onPressed == null) return;
 
           setState(() {
-            selected = option.$1;
+            selected = option.value;
           });
-          option.$2?.call();
+          option.onPressed?.call();
         },
         borderRadius: BorderRadius.circular(20),
         selectedColor: Colors.white,
@@ -60,11 +72,11 @@ class _BaseMessageDetailsOptionsState<T extends Enum>
         disabledColor: Colors.blueGrey.shade200,
         constraints: const BoxConstraints(minHeight: 40, minWidth: 100),
         renderBorder: false,
-        children: widget.segments.map((e) {
+        children: widget.options.map((e) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              widget.labelBuilder(e.$1, context),
+              widget.labelBuilder(e.value, context),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
           );

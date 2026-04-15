@@ -78,12 +78,11 @@ class AIPronunciationResponse {
 
 class AIOverallPronunciationResponse {
   final String? fluencyFeedback;
-  final String? observations;
 
-  AIOverallPronunciationResponse({this.fluencyFeedback, this.observations});
+  AIOverallPronunciationResponse({this.fluencyFeedback});
 
   factory AIOverallPronunciationResponse.fromJson(Map<String, dynamic> json) {
-    return AIOverallPronunciationResponse(fluencyFeedback: json['fluencyFeedback'] as String?, observations: json['observations'] as String?);
+    return AIOverallPronunciationResponse(fluencyFeedback: json['fluencyFeedback'] as String?);
   }
 
   static Map<String, dynamic> schema(String nativeLanguageName) => {
@@ -93,13 +92,7 @@ class AIOverallPronunciationResponse {
         "type": "string",
         "nullable": true,
         "description":
-            "Tips on how to sound more native, overall rhythm or fluency advice. Written in $nativeLanguageName. Null if the pronunciation was very native-like and no major tips are needed.",
-      },
-      "observations": {
-        "type": "string",
-        "nullable": true,
-        "description":
-            "Observations of recurring mistakes across the whole phrase, like struggling with certain syllables, phonemes, diphthongs, etc. Written in $nativeLanguageName. Null if there were no significant recurring mistakes.",
+            "Tips on how to sound more native, overall rhythm or fluency advice. Focus on connections between words, diphthongs, and native-like intonation. Written in $nativeLanguageName. Null if no major tips are needed.",
       },
     },
   };
@@ -145,10 +138,11 @@ Here is the detailed phoneme and syllable breakdown of their pronunciation:
 $wordDetails
 
 Based on the ENTIRE phrase, provide:
-1. `fluencyFeedback`: Tips on how to sound more native for this phrase (e.g., linking words, rhythm, overall intonation). Only provide this if there is room for noticeable improvement, otherwise leave it null.
-2. `observations`: General observations about recurring mispronunciations, difficult combinations, or specific phonemes/syllables the user struggles with across the whole phrase. Leave null if there are no major recurring issues.
+1. `fluencyFeedback`: Provide tips on how to sound more native for this phrase. Focus ONLY on things that help with native-like fluency, such as word linking (how words flow together), rhythm, intonation, or specific diphthongs/combinations that change in natural speech. 
+DO NOT give general pronunciation tips for individual words (as those are already covered). Only provide this if there's a specific "pro-tip" that would make the user sound significantly more like a native speaker. 
+If the user's flow is already good or there are no specific native-like tips to give for this phrase, leave it null. (This should be null approximately 70% of the time).
 
-Both feedbacks MUST be written in the user's native language (${_languages.native.name}).
+The feedback MUST be written in the user's native language (${_languages.native.name}).
 ''';
   }
 
@@ -201,12 +195,18 @@ Both feedbacks MUST be written in the user's native language (${_languages.nativ
 
     final bool isBad = wordResult.pronunciationAssessment.accuracyScore < goodPronunciationThreshold;
 
+    BadWordFeedback? detail;
+    if (isBad || finalSyllableFeedbacks.isNotEmpty) {
+      detail = BadWordFeedback(
+        userPronunciationFilePath: userWordPronunciationFilePath,
+        correctPronunciationFilePath: correctPronunciationFilePath,
+        syllableFeedback: finalSyllableFeedbacks,
+      );
+    }
+
     return WordPronunciationFeedback(
       word: wordResult.word,
-      userPronunciationFilePath: userWordPronunciationFilePath,
-      correctPronunciationFilePath: correctPronunciationFilePath,
-      syllableFeedback: finalSyllableFeedbacks,
-      isBad: isBad,
+      detail: detail,
     );
   }
 
@@ -227,8 +227,8 @@ Both feedbacks MUST be written in the user's native language (${_languages.nativ
     return NativeLanguagePronunciationResult(transcript: transcript.trim());
   }
 
-  Future<(String?, String?)> _computeOverallFeedback(List<WordResult> allWords, String fullTranscript) async {
-    if (allWords.isEmpty) return (null, null);
+  Future<String?> _computeOverallFeedback(List<WordResult> allWords, String fullTranscript) async {
+    if (allWords.isEmpty) return null;
 
     final wordDetails = allWords
         .map((w) {
@@ -245,7 +245,7 @@ Both feedbacks MUST be written in the user's native language (${_languages.nativ
     final jsonResponse = jsonDecode(aiResponseText) as Map<String, dynamic>;
     final aiResult = AIOverallPronunciationResponse.fromJson(jsonResponse);
 
-    return (aiResult.fluencyFeedback, aiResult.observations);
+    return aiResult.fluencyFeedback;
   }
 
   Future<PronunciationFeedback> analyze(List<UserSpeechAudio> audioFiles) async {
@@ -269,14 +269,11 @@ Both feedbacks MUST be written in the user's native language (${_languages.nativ
     }
 
     String? fluencyFeedback;
-    String? observations;
 
     if (allTargetWords.isNotEmpty && fullTargetTranscript.isNotEmpty) {
-      final overallFeedback = await _computeOverallFeedback(allTargetWords, fullTargetTranscript);
-      fluencyFeedback = overallFeedback.$1;
-      observations = overallFeedback.$2;
+      fluencyFeedback = await _computeOverallFeedback(allTargetWords, fullTargetTranscript);
     }
 
-    return PronunciationFeedback(itemResults: itemResults, fluencyFeedback: fluencyFeedback, observations: observations);
+    return PronunciationFeedback(itemResults: itemResults, fluencyFeedback: fluencyFeedback);
   }
 }

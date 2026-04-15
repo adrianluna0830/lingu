@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:lingu/core/pronunciation/models/pronunciation_assessment_dto.dart';
 import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 
@@ -36,24 +33,48 @@ class SyllablePronunciationFeedback {
       'SyllablePronunciationFeedback(syllable: $syllable, userPronunciationFilePath: [audio], correctPronunciationFilePath: [audio], detail: $detail)';
 }
 
-class WordPronunciationFeedback {
-  final String word;
+class BadWordFeedback {
   final String userPronunciationFilePath;
   final String correctPronunciationFilePath;
   final List<SyllablePronunciationFeedback> syllableFeedback;
-  final bool isBad;
 
-  WordPronunciationFeedback({
-    required this.word,
+  BadWordFeedback({
     required this.userPronunciationFilePath,
     required this.correctPronunciationFilePath,
     required this.syllableFeedback,
-    required this.isBad,
+  });
+
+  ErrorSeverityEnum? get mostSevere {
+    ErrorSeverityEnum? maxSeverity;
+
+    for (var syllable in syllableFeedback) {
+      if (syllable.detail != null) {
+        final currentSeverity = syllable.detail!.severity;
+        if (maxSeverity == null || currentSeverity.index < maxSeverity.index) {
+          maxSeverity = currentSeverity;
+        }
+      }
+    }
+    return maxSeverity;
+  }
+
+  @override
+  String toString() =>
+      'BadWordFeedback(userPronunciationFilePath: [audio], correctPronunciationFilePath: [audio], syllableFeedback: $syllableFeedback)';
+}
+
+class WordPronunciationFeedback {
+  final String word;
+  final BadWordFeedback? detail;
+
+  WordPronunciationFeedback({
+    required this.word,
+    this.detail,
   });
 
   @override
   String toString() =>
-      'WordPronunciationFeedback(word: $word, userPronunciationFilePath: [audio], correctPronunciationFilePath: [audio], isBad: $isBad, syllableFeedback: $syllableFeedback)';
+      'WordPronunciationFeedback(word: $word, detail: $detail)';
 }
 
 sealed class PronunciationItemResult {
@@ -89,12 +110,10 @@ class TargetLanguagePronunciationResult extends PronunciationItemResult {
 class PronunciationFeedback {
   final List<PronunciationItemResult> itemResults;
   final String? fluencyFeedback;
-  final String? observations;
 
   PronunciationFeedback({
     required this.itemResults,
     this.fluencyFeedback,
-    this.observations,
   });
 
   String get rawTranscript => itemResults.map((e) => e.transcript).join(' ');
@@ -105,11 +124,13 @@ class PronunciationFeedback {
     for (var item in itemResults) {
       if (item is TargetLanguagePronunciationResult) {
         for (var word in item.wordFeedback) {
-          for (var syllable in word.syllableFeedback) {
-            if (syllable.detail != null) {
-              final currentSeverity = _mapErrorToFeedback(syllable.detail!.severity);
-              if (currentSeverity.index > maxSeverity.index) {
-                maxSeverity = currentSeverity;
+          if (word.detail != null) {
+            for (var syllable in word.detail!.syllableFeedback) {
+              if (syllable.detail != null) {
+                final currentSeverity = _mapErrorToFeedback(syllable.detail!.severity);
+                if (currentSeverity.index > maxSeverity.index) {
+                  maxSeverity = currentSeverity;
+                }
               }
             }
           }

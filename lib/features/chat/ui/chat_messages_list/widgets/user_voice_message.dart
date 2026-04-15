@@ -11,6 +11,8 @@ class UserVoiceMessage extends StatelessWidget {
   final String? translation;
   final String? transcription;
   final VoidCallback? onTap;
+  final VoidCallback? onWordInfo;
+  final VoidCallback? onChat;
 
   const UserVoiceMessage({
     super.key,
@@ -20,59 +22,34 @@ class UserVoiceMessage extends StatelessWidget {
     this.translation,
     this.transcription,
     this.onTap,
+    this.onWordInfo,
+    this.onChat,
   });
 
   @override
   Widget build(BuildContext context) {
     return MessageLayout(
-      alignment: Alignment.centerRight,
+      isUser: true,
       onLongPress: feedbackResult != null ? onTap : null,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: getShadowColor(feedbackResult),
-            offset: const Offset(2.4, 2.4),
-            blurRadius: 0,
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            VoiceNoteControls(audioUrl: audioUrl, duration: duration),
-            if (translation != null) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                child: Text(
-                  '"$translation"',
-                  style: const TextStyle(
-                    fontStyle: FontStyle.italic,
-                    color: Colors.black87,
-                    fontSize: 12,
-                  ),
+        boxShadow: feedbackResult != null
+            ? [
+                BoxShadow(
+                  color: getShadowColor(feedbackResult),
+                  offset: const Offset(2.4, 2.4),
+                  blurRadius: 0,
                 ),
-              ),
-            ],
-            if (transcription != null) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                child: Text(
-                  '($transcription)',
-                  style: const TextStyle(
-                    fontStyle: FontStyle.italic,
-                    color: Colors.black87,
-                    fontSize: 11,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
+              ]
+            : null,
       ),
+      children: [
+        VoiceNoteControls(audioUrl: audioUrl, duration: duration),
+        if (translation != null)
+          MessageSubText('"$translation"'),
+        if (transcription != null)
+          MessageSubText('($transcription)'),
+      ],
     );
   }
 }

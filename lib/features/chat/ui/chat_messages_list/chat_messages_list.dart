@@ -25,6 +25,8 @@ class ChatMessagesList extends StatelessWidget {
             feedbackResult: message.feedbackSummary?.result,
             translation: message.feedbackSummary?.translation,
             onTap: () => controller?.onMessageTap?.call(message),
+            onWordInfo: () => controller?.onWordInfoTap?.call(message),
+            onChat: () => controller?.onChatMessageTap?.call(message),
           ),
           UserAudioMessageViewDto message => UserVoiceMessage(
             audioUrl: message.chatMessage.fullMergedAudioFilePath,
@@ -33,12 +35,16 @@ class ChatMessagesList extends StatelessWidget {
             translation: message.feedbackSummary?.translation,
             transcription: message.feedbackSummary?.transcription,
             onTap: () => controller?.onMessageTap?.call(message),
+            onWordInfo: () => controller?.onWordInfoTap?.call(message),
+            onChat: () => controller?.onChatMessageTap?.call(message),
           ),
           AITextMessageViewDto message => AITextMessage(
             text: message.chatMessage.text,
             translation: message.translation,
             onTap: () => controller?.onMessageTap?.call(message),
             onTranslation: () => controller?.onAITranslationTap?.call(message),
+            onWordInfo: () => controller?.onWordInfoTap?.call(message),
+            onChat: () => controller?.onChatMessageTap?.call(message),
           ),
           AIAudioMessageViewDto message => AIVoiceMessage(
             audioUrl: message.chatMessage.audioUrl,
@@ -47,6 +53,8 @@ class ChatMessagesList extends StatelessWidget {
             translation: message.translation,
             onTap: () => controller?.onMessageTap?.call(message),
             onTranslation: () => controller?.onAITranslationTap?.call(message),
+            onWordInfo: () => controller?.onWordInfoTap?.call(message),
+            onChat: () => controller?.onChatMessageTap?.call(message),
           ),
         };
 

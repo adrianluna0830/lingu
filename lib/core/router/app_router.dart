@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lingu/core/router/guards/chat_guard.dart';
 import 'package:lingu/core/router/guards/home_guard.dart';
 import 'package:lingu/core/router/guards/login_guards.dart';
-import 'package:lingu/features/chat/chat_view.dart';
+import 'package:lingu/features/chat/ui/chat_view.dart';
 import 'package:lingu/features/home/ui/home_view.dart';
 import 'package:lingu/features/home/ui/main_view.dart';
 import 'package:lingu/features/settings/ui/settings_view.dart';

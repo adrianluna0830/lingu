@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/core/models/language_locale.dart';
+import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 
 String getLanguageDisplayName(LanguageLocale locale, BuildContext context) {
@@ -18,14 +19,20 @@ Color getLanguageColor(LanguageLocale locale) {
   };
 }
 
-
-
 Color getShadowColor(FeedbackResultEnum? severity) {
   if (severity == null) return Colors.grey[400]!;
   return switch (severity) {
     FeedbackResultEnum.minor => Colors.orange,
     FeedbackResultEnum.major => Colors.red,
     FeedbackResultEnum.none => Colors.green,
+  };
+}
+
+Color? getErrorSeverityColor(ErrorSeverityEnum? severity) {
+  if (severity == null) return null;
+  return switch (severity) {
+    ErrorSeverityEnum.bad => Colors.red,
+    ErrorSeverityEnum.neutral => Colors.orange,
   };
 }
 
