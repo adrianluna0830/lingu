@@ -1,3 +1,4 @@
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:lingu/features/chat/logic/feedback/models/message_feedback_summary.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 

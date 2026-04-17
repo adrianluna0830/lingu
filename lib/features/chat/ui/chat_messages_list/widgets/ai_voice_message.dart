@@ -3,6 +3,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/widgets/message_layout.dart';
 import 'package:lingu/features/chat/ui/widgets/voice_note/voice_note.dart';
 import 'package:lingu/features/home/ui/widgets/interactable_text.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 class AIVoiceMessage extends StatefulWidget {
   final String audioUrl;
@@ -64,10 +65,24 @@ class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
       children: [
         VoiceNoteControls(audioUrl: widget.audioUrl, duration: widget.duration),
         if (isShowingTranslation)
-          MessageSubText(
-            widget.translation != null ? '"${widget.translation}"' : '"Cargando..."',
-            onTap: () => _showTranslation.value = false,
-          ),
+          widget.translation != null
+              ? MessageSubText(
+                  '"${widget.translation}"',
+                  onTap: () => _showTranslation.value = false,
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Shimmer(
+                    child: Container(
+                      height: 12,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
         if (isShowingTranscription)
           InteractableText(
             text: '(${widget.transcription})',

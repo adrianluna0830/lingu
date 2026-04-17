@@ -17,6 +17,7 @@ class UserTextMessageDetailsViewDto implements MessageDetailsViewDto {
 }
 
 class UserAudioMessageDetailsViewDto implements MessageDetailsViewDto {
+  final String transcription;
   final TranslatedText? translatedText;
 
   final SentenceFeedback? grammarFeedback;
@@ -24,6 +25,7 @@ class UserAudioMessageDetailsViewDto implements MessageDetailsViewDto {
   final PronunciationFeedback? pronunciationFeedback;
 
   UserAudioMessageDetailsViewDto({
+    required this.transcription,
     required this.translatedText,
     required this.grammarFeedback,
     required this.fluencyFeedback,

@@ -103,7 +103,7 @@ class PronunciationFeedbackService {
   final int goodPronunciationThreshold = 80;
 
   final IPronunciationAssessmentService _assessmentService;
-  final IAiService _aiModel;
+  final IAIService _aiModel;
   final ISpeechToTextService _sttService;
   final IAudioUtils _audioUtils;
   final ITextToSpeechService _ttsService;

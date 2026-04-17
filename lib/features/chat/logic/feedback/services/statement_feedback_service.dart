@@ -43,7 +43,7 @@ class StatementFeedbackResponse {
 }
 
 class StatementFeedbackService {
-  final IAiService _aiModel;
+  final IAIService _aiModel;
   final ChatLanguages _languages;
 
   StatementFeedbackService(this._aiModel, this._languages);

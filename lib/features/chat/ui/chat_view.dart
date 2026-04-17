@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
+import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/ui/widgets/chat_panel.dart';
 import 'package:lingu/features/chat/logic/panel/chat_panel_controller.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_panel_message.dart';
@@ -11,7 +12,7 @@ import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_state.dart';
-import 'package:lingu/features/chat/ui/chat_messages_list/logic/message_view_dto_computed.dart';
+import 'package:lingu/features/chat/logic/chatbot/chat_orchestrator.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/chat_messages_list_controller.dart';
 import 'package:lingu/features/chat/ui/input_bar/input_bar.dart';
@@ -36,6 +37,7 @@ class ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<ChatView> {
   final ChatMessagesManager _chatMessagesManager = di<ChatMessagesManager>();
+  final MessageDetailsManager _messageDetailsManager = di<MessageDetailsManager>();
   final InputBarController _inputBarController = InputBarController();
   final ChatMessagesListController _controller = ChatMessagesListController();
   final RecordController _recordController = RecordController();
@@ -43,13 +45,13 @@ class _ChatViewState extends State<ChatView> {
   final ChatPanelController _chatPanelController = ChatPanelController();
   final AudioInputManager _recordInputHandler = di<AudioInputManager>();
   final PanelManager _panelManager = di<PanelManager>();
-  late final MessageViewDtoComputed _messageViewDtoComputed = di<MessageViewDtoComputed>();
+  late final ChatOrchestrator _orchestrator = di<ChatOrchestrator>();
 
   @override
   void initState() {
     super.initState();
     _inputBarController.onUserTextMessage = (text, individualTextInputs) {
-      _chatMessagesManager.addUserTextMessage(text: text, individualTextInputs: individualTextInputs);
+      _orchestrator.handleUserTextMessage(text: text, individualTextInputs: individualTextInputs);
     };
     _inputBarController.onStartRecording = () {
       _panelManager.openMicPanel();
@@ -85,6 +87,13 @@ class _ChatViewState extends State<ChatView> {
     };
     _controller.onMessageTap = (message) {
       _panelManager.selectMessage(message.id);
+    };
+    _controller.onAITranslationTap = (message) {
+      if (message is AITextMessageViewDto) {
+        _orchestrator.handleFetchTranslation(message.id, message.chatMessage.text);
+      } else if (message is AIAudioMessageViewDto) {
+        _orchestrator.handleFetchTranslation(message.id, message.chatMessage.transcription);
+      }
     };
     _controller.onWordInfoTap = (message) {
       final content = switch (message) {
@@ -133,22 +142,7 @@ class _ChatViewState extends State<ChatView> {
               children: [
                 Expanded(
                   child: ChatMessagesList(
-                    messages: [
-                      AIAudioMessageViewDto(
-                        chatMessage: const AIAudioMessage(
-                          id: -2,
-                          transcription: 'This is a test AI transcription for audio messages.',
-                          audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-                          duration: Duration(seconds: 5),
-                        ),
-                        translation: null,
-                      ),
-                      AITextMessageViewDto(
-                        chatMessage: const AITextMessage(id: -1, text: 'This is a dummy AI message to test the UI design.'),
-                        translation: 'Este es un mensaje de IA ficticio para probar el diseño de la interfaz.',
-                      ),
-                      ..._messageViewDtoComputed.watch(context),
-                    ],
+                    messages:_orchestrator.messages.watch(context),
                     controller: _controller,
                   ),
                 ),

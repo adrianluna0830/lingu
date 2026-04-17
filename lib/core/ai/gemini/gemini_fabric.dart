@@ -10,7 +10,7 @@ class GeminiFabric implements IAIFabric {
   GeminiFabric(this._credentialsService);
 
   @override
-  Future<IAiService> create() async {
+  Future<IAIService> create() async {
     final apiKey = _credentialsService.apiKey.value;
     assert(apiKey != null, 'API key must be configured');
     assert(apiKey!.isNotEmpty, 'API key cannot be empty');
@@ -32,7 +32,7 @@ class GeminiFabric implements IAIFabric {
 
     return GeminiService(
       client: googleClient,
-modelType: GeminiModelType.gemini25Flash,
+modelType: GeminiModelType.gemini25FlashLite,
     );
   }
 

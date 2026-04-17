@@ -2,18 +2,18 @@ import 'dart:typed_data';
 import 'package:lingu/core/audio/misc/i_audio_utils.dart';
 import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
-import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
+import 'package:lingu/features/chat/logic/chatbot/chat_orchestrator.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:signals/signals.dart';
 
 class AudioInputManager {
-  final ChatMessagesManager _messagesManager;
+  final ChatOrchestrator _orchestrator;
   final IAudioRecorder _audioRecorder;
   final IAudioPlayerManager _audioPlayerManager;
   final IAudioUtils _audioUtils;
 
   AudioInputManager(
-      this._messagesManager,
+      this._orchestrator,
       this._audioRecorder,
       this._audioPlayerManager,
       this._audioUtils);
@@ -53,7 +53,7 @@ class AudioInputManager {
 
     Duration duration = await _audioPlayerManager.getDuration(filepath);
 
-    _messagesManager.addUserAudioMessage(
+    _orchestrator.handleUserAudioMessage(
       audioUrl: filepath,
       duration: duration,
       individualAudioUrls: List.from(_audioChunks),

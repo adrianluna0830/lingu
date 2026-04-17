@@ -11,7 +11,7 @@ class MessageDetailsManager {
   final ChatMessagesManager _chatMessagesManager;
   final PronunciationFeedbackService _pronunciationFeedbackService;
   final StatementFeedbackService _statementFeedbackService;
-  final IAiService _aiModel;
+  final IAIService _aiModel;
   final ChatLanguages _languages;
 
   MessageDetailsManager(
@@ -20,22 +20,33 @@ class MessageDetailsManager {
     this._pronunciationFeedbackService,
     this._statementFeedbackService,
     this._languages,
-  ) {
-    _chatMessagesManager.onNewMessage.listen((message) {
-      if (!message.isUser) return;
-      if (message is UserTextMessage) {
-        fetchTextFeedback(message.id, message.individualTextInputs);
-      } else if (message is UserAudioMessage) {
-        fetchAudioFeedback(message.id, message.individualAudioFilePaths);
-      }
-    });
-  }
+  );
+
+  
 
   final _messageDetails = mapSignal<int, MessageDetailsViewDto>({});
   ReadonlySignal<Map<int, MessageDetailsViewDto>> get messageDetails =>
       _messageDetails;
 
-  Future<void> fetchTextFeedback(
+  Future<MessageDetailsViewDto?> fetchTranslation(int messageId, String content) async {
+    if (_messageDetails.containsKey(messageId)) return _messageDetails[messageId]; 
+    final String prompt = "Translate the following text to ${_languages.native.bcp47}, the output should be only a translation: $content ";
+    final response = await _aiModel.generateContent(prompt: prompt);
+
+    final message = _chatMessagesManager.messages.value.firstWhere((e) => e.id == messageId);
+    final MessageDetailsViewDto details;
+    if (message is AIAudioMessage) {
+      details = AIAudioMessageDetailsViewDto(
+        transcript: message.transcription,
+        translation: response,
+      );
+    } else {
+      details = AITextMessageDetailsViewDto(translation: response);
+    }
+    _messageDetails[messageId] = details;
+    return details;
+  }
+  Future<UserTextMessageDetailsViewDto> fetchTextFeedback(
     int messageId,
     List<UserTextInput> textInputs,
   ) async {
@@ -46,14 +57,16 @@ class MessageDetailsManager {
       segments: textInputs,
     );
 
-    _messageDetails[messageId] = UserTextMessageDetailsViewDto(
+    final dto = UserTextMessageDetailsViewDto(
       translatedText: response.translatedText,
       grammarFeedback: response.grammar,
       fluencyFeedback: response.fluency,
     );
+    _messageDetails[messageId] = dto;
+    return dto;
   }
 
-  Future<void> fetchAudioFeedback(
+  Future<UserAudioMessageDetailsViewDto> fetchAudioFeedback(
     int messageId,
     List<UserSpeechAudio> individualAudioUrls,
   ) async {
@@ -65,11 +78,14 @@ class MessageDetailsManager {
       segments: individualAudioUrls,
     );
 
-    _messageDetails[messageId] = UserAudioMessageDetailsViewDto(
+    final dto = UserAudioMessageDetailsViewDto(
+      transcription: result.rawTranscript,
       translatedText: response.translatedText,
       grammarFeedback: response.grammar,
       fluencyFeedback: response.fluency,
       pronunciationFeedback: result,
     );
+    _messageDetails[messageId] = dto;
+    return dto;
   }
 }

@@ -15,7 +15,33 @@ class ChatMessagesManager {
   int _generateId() => _nextId++;
 
 
-  Future<void> addUserTextMessage({required String text, required List<UserTextInput> individualTextInputs}) async {
+
+  Future<AITextMessage> addAITextMessage({required String text}) async {
+    final id = _generateId();
+    final message = AITextMessage(id: id, text: text);
+    _messages.value = [..._messages.value, message];
+    _newMessageController.add(message);
+    return message;
+  }
+
+  Future<AIAudioMessage> addAIAudioMessage({
+    required String audioUrl, 
+    required Duration duration, 
+    required String transcription,
+  }) async {
+    final id = _generateId();
+    final message = AIAudioMessage(
+      id: id,
+      duration: duration, 
+      transcription: transcription, audioUrl: audioUrl,
+    );
+    _messages.value = [..._messages.value, message];
+    _newMessageController.add(message);
+    return message;
+  }
+
+
+  Future<UserTextMessage> addUserTextMessage({required String text, required List<UserTextInput> individualTextInputs}) async {
     final id = _generateId();
     final message = UserTextMessage(
       id: id,
@@ -23,9 +49,10 @@ class ChatMessagesManager {
     );
     _messages.value = [..._messages.value, message];
     _newMessageController.add(message);
+    return message;
   }
 
-  Future<void> addUserAudioMessage({
+  Future<UserAudioMessage> addUserAudioMessage({
     required String audioUrl, 
     required Duration duration, 
     required List<UserSpeechAudio> individualAudioUrls,
@@ -39,6 +66,7 @@ class ChatMessagesManager {
     );
     _messages.value = [..._messages.value, message];
     _newMessageController.add(message);
+    return message;
   }
 
   void dispose() {

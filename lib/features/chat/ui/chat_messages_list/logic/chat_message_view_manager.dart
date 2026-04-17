@@ -1,28 +1,29 @@
 import 'dart:math';
 
-import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
 import 'package:lingu/features/chat/logic/feedback/models/error_severity_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:lingu/features/chat/logic/feedback/models/message_feedback_summary.dart';
-import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:signals/signals.dart';
 
-class MessageViewDtoComputed extends Computed<List<MessageViewDto>> {
-  MessageViewDtoComputed({
-    required ChatMessagesManager chatMessagesManager,
-    required MessageDetailsManager messageDetailsManager,
-  }) : super(() {
-          final messages = chatMessagesManager.messages.value;
-          final detailsMap = messageDetailsManager.messageDetails.value;
+class ChatMessageViewManager {
+  final _messages = signal<List<MessageViewDto>>([]);
+  ReadonlySignal<List<MessageViewDto>> get messages => _messages;
 
-          return messages.map((message) {
-            final details = detailsMap[message.id];
-            return _mapToDto(message, details);
-          }).toList();
-        });
+  void addMessage(ChatMessage message) {
+    _messages.value = [..._messages.value, _mapToDto(message, null)];
+  }
+
+  void updateMessage(ChatMessage message, MessageDetailsViewDto details) {
+    _messages.value = _messages.value.map((dto) {
+      if (dto.id == message.id) {
+        return _mapToDto(message, details);
+      }
+      return dto;
+    }).toList();
+  }
 
   static MessageViewDto _mapToDto(ChatMessage message, MessageDetailsViewDto? details) {
     return switch (message) {
@@ -34,13 +35,19 @@ class MessageViewDtoComputed extends Computed<List<MessageViewDto>> {
           chatMessage: m,
           feedbackSummary: _createAudioSummary(details as UserAudioMessageDetailsViewDto?),
         ),
-      AITextMessage m => AITextMessageViewDto(chatMessage: m, translation: null),
-      AIAudioMessage m => AIAudioMessageViewDto(chatMessage: m, translation: null),
+      AITextMessage m => AITextMessageViewDto(
+          chatMessage: m,
+          translation: (details as AITextMessageDetailsViewDto?)?.translation,
+        ),
+      AIAudioMessage m => AIAudioMessageViewDto(
+          chatMessage: m,
+          translation: (details as AIAudioMessageDetailsViewDto?)?.translation,
+        ),
     };
   }
 
   static TextFeedbackSummary? _createTextSummary(UserTextMessageDetailsViewDto? details) {
-    if (details == null) return null;
+    if (details == null) return const TextFeedbackSummary(result: FeedbackResultEnum.processing);
 
     final grammar = _mapSeverity(details.grammarFeedback?.severity);
     final fluency = _mapSeverity(details.fluencyFeedback?.severity);
@@ -53,7 +60,12 @@ class MessageViewDtoComputed extends Computed<List<MessageViewDto>> {
   }
 
   static AudioFeedbackSummary? _createAudioSummary(UserAudioMessageDetailsViewDto? details) {
-    if (details == null) return null;
+    if (details == null) {
+      return const AudioFeedbackSummary(
+        result: FeedbackResultEnum.processing,
+        transcription: '',
+      );
+    }
 
     final grammar = _mapSeverity(details.grammarFeedback?.severity);
     final fluency = _mapSeverity(details.fluencyFeedback?.severity);

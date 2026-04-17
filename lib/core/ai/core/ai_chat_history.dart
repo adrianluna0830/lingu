@@ -1,24 +1,18 @@
-
 import 'package:lingu/core/ai/core/ai_chat_message.dart';
 
-
-class AIChatHistory  {
+class AIChatHistory {
   final List<AIChatMessage> messages;
 
   const AIChatHistory([this.messages = const []]);
 
-  AIChatHistory addUser(String text) => AIChatHistory([
+  AIChatHistory _add(AIChatMessage message) => AIChatHistory([
         ...messages,
-        UserMessage(text: text, createdAt: DateTime.now()),
+        message,
       ]);
 
-  AIChatHistory addModel(String text) => AIChatHistory([
-        ...messages,
-        ModelMessage(text: text, createdAt: DateTime.now()),
-      ]);
+  AIChatHistory addUser(String text) => _add(UserMessage(text: text));
 
-
-
+  AIChatHistory addModel(String text) => _add(ModelMessage(text: text));
 
   bool get isEmpty => messages.isEmpty;
   int get length => messages.length;

@@ -57,6 +57,7 @@ dependencies:
   dart_mappable: ^4.7.0
   flutter_inappwebview: ^6.1.5
   http: ^1.6.0
+  shimmer_animation: ^2.2.2+1
 
 dev_dependencies:
   flutter_test:

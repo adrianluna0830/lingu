@@ -15,7 +15,7 @@ enum GeminiModelType {
   final String value;
 }
 
-class GeminiService extends IAiService {
+class GeminiService extends IAIService {
   final GoogleAIClient _client;
   final GeminiModelType modelType;
 

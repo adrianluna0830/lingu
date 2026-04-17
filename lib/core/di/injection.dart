@@ -32,7 +32,9 @@ import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_s
 import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
-import 'package:lingu/features/chat/ui/chat_messages_list/logic/message_view_dto_computed.dart';
+import 'package:lingu/features/chat/logic/chatbot/chatbot_manager.dart';
+import 'package:lingu/features/chat/logic/chatbot/chat_orchestrator.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/logic/chat_message_view_manager.dart';
 import 'package:lingu/features/topics/repository/topics_repository.dart';
 import 'package:lingu/features/topics/topics_manager.dart';
 
@@ -191,7 +193,7 @@ class _ChatDependencies {
       return ChatLanguages(native: native, target: target);
     }());
 
-    di.registerSingletonAsync<IAiService>(
+    di.registerSingletonAsync<IAIService>(
       () async => await di<IAIFabric>().create(),
     );
     di.registerSingletonAsync<IPronunciationAssessmentService>(
@@ -209,7 +211,7 @@ class _ChatDependencies {
     di.registerLazySingleton<PronunciationFeedbackService>(
       () => PronunciationFeedbackService(
         di<IPronunciationAssessmentService>(),
-        di<IAiService>(),
+        di<IAIService>(),
         di<ISpeechToTextService>(),
         di<IAudioUtils>(),
         di<ChatLanguages>(),
@@ -217,15 +219,27 @@ class _ChatDependencies {
       ),
     );
     di.registerLazySingleton<StatementFeedbackService>(
-      () => StatementFeedbackService(di<IAiService>(), di<ChatLanguages>()),
+      () => StatementFeedbackService(di<IAIService>(), di<ChatLanguages>()),
     );
     di.registerSingleton<MessageDetailsManager>(
       MessageDetailsManager(
-        di<IAiService>(),
+        di<IAIService>(),
         di<ChatMessagesManager>(),
         di<PronunciationFeedbackService>(),
         di<StatementFeedbackService>(),
         di<ChatLanguages>(),
+      ),
+    );
+    di.registerSingleton<ChatbotManager>(
+      ChatbotManager(di<IAIService>(), di<ChatMessagesManager>()),
+    );
+    di.registerSingleton<ChatMessageViewManager>(ChatMessageViewManager());
+    di.registerSingleton<ChatOrchestrator>(
+      ChatOrchestrator(
+        di<ChatMessagesManager>(),
+        di<MessageDetailsManager>(),
+        di<ChatbotManager>(),
+        di<ChatMessageViewManager>(),
       ),
     );
     di.registerSingleton<PanelManager>(
@@ -234,15 +248,9 @@ class _ChatDependencies {
   }
 
   static void registerUIAndInput() {
-    di.registerLazySingleton<MessageViewDtoComputed>(
-      () => MessageViewDtoComputed(
-        chatMessagesManager: di<ChatMessagesManager>(),
-        messageDetailsManager: di<MessageDetailsManager>(),
-      ),
-    );
     di.registerFactory<AudioInputManager>(
       () => AudioInputManager(
-        di<ChatMessagesManager>(),
+        di<ChatOrchestrator>(),
         di<IAudioRecorder>(),
         di<IAudioPlayerManager>(),
         di<IAudioUtils>(),

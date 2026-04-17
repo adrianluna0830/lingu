@@ -10,7 +10,7 @@ abstract class IAPIFabric<T> {
   Future<T> create();
 }
 
-abstract class IAIFabric implements IAPIFabric<IAiService> {}
+abstract class IAIFabric implements IAPIFabric<IAIService> {}
 abstract class ITTSFabric implements IAPIFabric<ITextToSpeechService> {}
 abstract class IPronunciationAssessmentFabric implements IAPIFabric<IPronunciationAssessmentService> {}
 abstract class ISTTFabric implements IAPIFabric<ISpeechToTextService> {}
