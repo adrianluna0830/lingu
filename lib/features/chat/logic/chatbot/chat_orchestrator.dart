@@ -1,6 +1,11 @@
 import 'dart:async';
+import 'package:lingu/core/ai/core/ai_chat_history.dart';
+import 'package:lingu/core/ai/core/i_ai_service.dart';
+import 'package:lingu/core/audio/misc/i_audio_utils.dart';
+import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/chatbot/chatbot_manager.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/logic/chat_message_view_manager.dart';
@@ -12,6 +17,11 @@ class ChatOrchestrator {
   final MessageDetailsManager _messageDetailsManager;
   final ChatbotManager _chatbotManager;
   final ChatMessageViewManager _viewManager;
+  final IAIService _aiModel;
+  final ChatLanguages _languages;
+  final IAudioUtils _audioUtils;
+
+  AIChatHistory _chatHistory = const AIChatHistory();
 
   ReadonlySignal<List<MessageViewDto>> get messages => _viewManager.messages;
 
@@ -20,6 +30,9 @@ class ChatOrchestrator {
     this._messageDetailsManager,
     this._chatbotManager,
     this._viewManager,
+    this._aiModel,
+    this._languages,
+    this._audioUtils,
   );
 
   Future<void> handleUserTextMessage({
@@ -30,18 +43,17 @@ class ChatOrchestrator {
       text: text,
       individualTextInputs: individualTextInputs,
     );
-    
+
     _viewManager.addMessage(message);
-    
+
     final details = await _messageDetailsManager.fetchTextFeedback(
       message.id,
       individualTextInputs,
     );
-    
+
     _viewManager.updateMessage(message, details);
-    
-    final aiMessage = await _chatbotManager.generateResponse(text);
-    _viewManager.addMessage(aiMessage);
+
+    await _generateAndHandleAIResponse(text);
   }
 
   Future<void> handleUserAudioMessage({
@@ -64,16 +76,78 @@ class ChatOrchestrator {
 
     _viewManager.updateMessage(message, details);
 
-    final transcription = details.translatedText?.targetText ?? details.transcription;
-    final aiMessage = await _chatbotManager.generateResponse(transcription);
-    _viewManager.addMessage(aiMessage);
+    final transcription =
+        details.translatedText?.targetText ?? details.transcription;
+    await _generateAndHandleAIResponse(transcription);
+  }
+
+  Future<void> _generateAndHandleAIResponse(String prompt) async {
+    final chatbotResponse = await _chatbotManager.generateNextResponse(
+      _chatHistory,
+      prompt,
+    );
+    _chatHistory = chatbotResponse.history;
+
+    switch (chatbotResponse) {
+      case TextChatbotResponse():
+        final aiMessage = await _chatMessagesManager.addAITextMessage(
+          text: chatbotResponse.text,
+        );
+        _viewManager.addMessage(aiMessage);
+        _messageDetailsManager.setDetails(
+          aiMessage.id,
+          AITextMessageDetailsViewDto(),
+        );
+      case AudioChatbotResponse():
+        final ttsResponse = chatbotResponse.audioResponse;
+        final audioUrl = await _audioUtils.saveToPath(
+          ttsResponse.audioContent,
+          true,
+        );
+        final duration = ttsResponse.duration;
+
+        final aiMessage = await _chatMessagesManager.addAIAudioMessage(
+          audioUrl: audioUrl,
+          duration: duration,
+          transcript: chatbotResponse.text,
+        );
+        _viewManager.addMessage(aiMessage);
+
+        _messageDetailsManager.setAiAudioDetails(
+          aiMessage.id,
+          ttsResponse.timepoints,
+          duration,
+          audioUrl,
+        );
+    }
   }
 
   Future<void> handleFetchTranslation(int messageId, String content) async {
-    final details = await _messageDetailsManager.fetchTranslation(messageId, content);
-    if (details != null) {
-      final message = _chatMessagesManager.messages.value.firstWhere((m) => m.id == messageId);
-      _viewManager.updateMessage(message, details);
+    final message = _chatMessagesManager.messages.value.firstWhere(
+      (m) => m.id == messageId,
+    );
+
+    if (message is AITextMessage && message.translation != null) return;
+    if (message is AIAudioMessage && message.translation != null) return;
+
+    final String prompt =
+        "Translate the following text to ${_languages.native.bcp47}, the output should be only a translation: $content ";
+    final response = await _aiModel.generateContent(prompt: prompt);
+
+    if (message is AITextMessage) {
+      final updatedMessage = message.copyWith(translation: response);
+      _chatMessagesManager.updateMessage(updatedMessage);
+      final details = _messageDetailsManager.messageDetails.value[messageId];
+      if (details != null) {
+        _viewManager.updateMessage(updatedMessage, details);
+      }
+    } else if (message is AIAudioMessage) {
+      final updatedMessage = message.copyWith(translation: response);
+      _chatMessagesManager.updateMessage(updatedMessage);
+      final details = _messageDetailsManager.messageDetails.value[messageId];
+      if (details != null) {
+        _viewManager.updateMessage(updatedMessage, details);
+      }
     }
   }
 }

@@ -23,17 +23,20 @@ import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 import 'package:lingu/core/stt/google_speech_to_text_fabric.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
+import 'package:lingu/core/tts/core/synthesis_with_timepoints_response.dart';
 import 'package:lingu/core/tts/google/google_tts_fabric.dart';
+import 'package:lingu/features/chat/di/chat_cefr.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
-import 'package:lingu/features/chat/logic/chatbot/chatbot_service.dart';
+import 'package:lingu/features/chat/logic/chatbot/chatbot_manager.dart';
+import 'package:lingu/features/chat/logic/chatbot/chat_orchestrator.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
+import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_service.dart';
 import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart';
 import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
-import 'package:lingu/features/chat/logic/chatbot/chatbot_manager.dart';
-import 'package:lingu/features/chat/logic/chatbot/chat_orchestrator.dart';
+import 'package:lingu/features/chat/ui/bottom_panel/details/ai_audio_message_details.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/logic/chat_message_view_manager.dart';
 import 'package:lingu/features/topics/repository/topics_repository.dart';
 import 'package:lingu/features/topics/topics_manager.dart';
@@ -61,6 +64,8 @@ class DependencyInjection {
 
           _ChatDependencies.registerLogic();
           _ChatDependencies.registerUIAndInput();
+
+          await di.allReady();
         },
       );
     }
@@ -103,7 +108,9 @@ class _StartupDependencies {
 
   static void registerAudioAndFabrics() {
     di.registerSingleton<IAudioUtils>(PCMAudioUtils());
-    di.registerSingleton<IAudioRecorder>(UniversalPCMRecorder(di<IAudioUtils>()));
+    di.registerSingleton<IAudioRecorder>(
+      UniversalPCMRecorder(di<IAudioUtils>()),
+    );
     di.registerSingleton<IAudioPlayerManager>(JustAudioPlayerManager());
 
     di.registerFactory<IPronunciationAssessmentFabric>(
@@ -114,9 +121,7 @@ class _StartupDependencies {
     di.registerLazySingleton<ISTTFabric>(
       () => GoogleSpeechToTextFabric(di<STTCredentialsService>()),
     );
-    di.registerSingleton<IAIFabric>(
-      GeminiFabric(di<AICredentialsService>()),
-    );
+    di.registerSingleton<IAIFabric>(GeminiFabric(di<AICredentialsService>()));
     di.registerFactory<ITTSFabric>(
       () => GoogleTTSFabric(di<TextToSpeechSettingsService>()),
     );
@@ -169,12 +174,9 @@ class _StartupDependencies {
       ),
     );
 
-    di.registerFactory<ChatbotService>(() => ChatbotService());
     di.registerFactory<TopicsManager>(
-      () => TopicsManager(
-        di<TopicDataRepository>(),
-        di<LocaleSettingsService>(),
-      ),
+      () =>
+          TopicsManager(di<TopicDataRepository>(), di<LocaleSettingsService>()),
     );
   }
 }
@@ -182,7 +184,7 @@ class _StartupDependencies {
 class _ChatDependencies {
   static void registerCore() {
     di.registerSingleton<ChatMessagesManager>(ChatMessagesManager());
-    
+
     di.registerSingleton<ChatLanguages>(() {
       final service = di<LocaleSettingsService>();
       final native = service.nativeLocale.value;
@@ -191,6 +193,15 @@ class _ChatDependencies {
         throw Exception("Chat languages not configured");
       }
       return ChatLanguages(native: native, target: target);
+    }());
+
+    di.registerSingleton<ChatCEFR>(() {
+      final service = di<LocaleSettingsService>();
+      final level = service.currentTargetLanguageCEFR.value;
+      if (level == null) {
+        throw Exception("CEFR level not configured");
+      }
+      return ChatCEFR(level);
     }());
 
     di.registerSingletonAsync<IAIService>(
@@ -223,31 +234,46 @@ class _ChatDependencies {
     );
     di.registerSingleton<MessageDetailsManager>(
       MessageDetailsManager(
-        di<IAIService>(),
-        di<ChatMessagesManager>(),
         di<PronunciationFeedbackService>(),
         di<StatementFeedbackService>(),
-        di<ChatLanguages>(),
       ),
     );
-    di.registerSingleton<ChatbotManager>(
-      ChatbotManager(di<IAIService>(), di<ChatMessagesManager>()),
+    di.registerSingletonAsync<ChatbotManager>(
+      () async => ChatbotManager(
+        di<IAIService>(),
+        di<ITextToSpeechService>(),
+        di<ChatLanguages>(),
+        di<ChatCEFR>(),
+      ),
     );
     di.registerSingleton<ChatMessageViewManager>(ChatMessageViewManager());
-    di.registerSingleton<ChatOrchestrator>(
-      ChatOrchestrator(
+    di.registerSingletonAsync<ChatOrchestrator>(() async {
+      await di.isReady<ChatbotManager>();
+      await di.isReady<IAIService>();
+      return ChatOrchestrator(
         di<ChatMessagesManager>(),
         di<MessageDetailsManager>(),
         di<ChatbotManager>(),
         di<ChatMessageViewManager>(),
-      ),
-    );
+        di<IAIService>(),
+        di<ChatLanguages>(),
+        di<IAudioUtils>(),
+      );
+    });
     di.registerSingleton<PanelManager>(
       PanelManager(di<MessageDetailsManager>()),
     );
   }
 
   static void registerUIAndInput() {
+    di.registerFactoryParam<AIAudioMessageDetailsInternalController,
+        AIAudioMessageDetailsViewDto, void>(
+      (data, _) => AIAudioMessageDetailsInternalController(
+        data,
+        di<IAudioPlayerManager>(),
+      ),
+    );
+
     di.registerFactory<AudioInputManager>(
       () => AudioInputManager(
         di<ChatOrchestrator>(),

@@ -9,6 +9,20 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
   final Signal<String?> _currentSource = signal(null);
   final Signal<AudioPlaybackState> _playbackState = signal(AudioPlaybackState.stopped);
   final Signal<Duration> _duration = signal(Duration.zero);
+  final Signal<double> _playbackSpeed = signal(1.0);
+
+  late final _playbackStateContainer =
+      readonlySignalContainer<AudioPlaybackState, String>(
+    (source) => computed(() => _currentSource.value == source
+        ? _playbackState.value
+        : AudioPlaybackState.stopped),
+    cache: true,
+  );
+
+  late final _playbackSpeedContainer = readonlySignalContainer<double, String>(
+    (source) => _playbackSpeed,
+    cache: true,
+  );
 
   bool _completed = false;
 
@@ -21,14 +35,6 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
   late final StreamSubscription _playerStateSubscription;
   late final StreamSubscription _positionSubscription;
   late final StreamSubscription _durationSubscription;
-
-  late final _playbackStateContainer =
-      readonlySignalContainer<AudioPlaybackState, String>(
-    (source) => computed(() => _currentSource.value == source
-        ? _playbackState.value
-        : AudioPlaybackState.stopped),
-    cache: true,
-  );
 
   JustAudioPlayerManager() {
     _playerStateSubscription = _player.playerStateStream.listen(_onPlayerState);
@@ -71,7 +77,10 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
     String source,
     Duration start, {
     bool autoPlay = true,
+    double? speed,
   }) async {
+    final effectiveSpeed = speed ?? _playbackSpeed.value;
+
     if (_currentSource.value != source) {
       _currentSource.value = source;
       await _player.setFilePath(source);
@@ -81,10 +90,21 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
     }
 
     _completed = false;
+    if (speed != null) {
+      _playbackSpeed.value = speed;
+    }
+    await _player.setSpeed(effectiveSpeed);
     await _player.seek(start);
 
     if (autoPlay) {
       _playbackState.value = AudioPlaybackState.playing;
+      await _player.play();
+    }
+  }
+
+  @override
+  Future<void> play(String source) async {
+    if (_currentSource.value == source) {
       await _player.play();
     }
   }
@@ -102,8 +122,8 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
       return;
     }
     await _player.stop();
-    _currentSource.value = null;
     _positionController.add(Duration.zero);
+    _currentSource.value = null;
     _playbackState.value = AudioPlaybackState.stopped;
   }
 
@@ -136,6 +156,11 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
   }
 
   @override
+  ReadonlySignal<double> getPlaybackSpeedSignal(String source) {
+    return _playbackSpeedContainer(source);
+  }
+
+  @override
   Stream<String> getOnCompletion(String source) {
     return _onCompletionController.stream.where((s) => s == source);
   }
@@ -143,9 +168,16 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
   @override
   Stream<Duration> getPositionStream(String source) {
     return _positionController.stream.where((pos) {
-      return _currentSource.value == source &&
-          _playbackState.value == AudioPlaybackState.playing;
+      return _currentSource.value == source;
     });
+  }
+
+  @override
+  Future<void> setSpeed(String source, double speed) async {
+    _playbackSpeed.value = speed;
+    if (_currentSource.value == source) {
+      await _player.setSpeed(speed);
+    }
   }
 
   @override
@@ -156,6 +188,7 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
     await _positionController.close();
     await _onCompletionController.close();
     _playbackStateContainer.dispose();
+    _playbackSpeedContainer.dispose();
     await _player.dispose();
   }
 }

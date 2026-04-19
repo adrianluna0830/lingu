@@ -92,7 +92,7 @@ class _ChatViewState extends State<ChatView> {
       if (message is AITextMessageViewDto) {
         _orchestrator.handleFetchTranslation(message.id, message.chatMessage.text);
       } else if (message is AIAudioMessageViewDto) {
-        _orchestrator.handleFetchTranslation(message.id, message.chatMessage.transcription);
+        _orchestrator.handleFetchTranslation(message.id, message.chatMessage.transcript);
       }
     };
     _controller.onWordInfoTap = (message) {
@@ -100,7 +100,7 @@ class _ChatViewState extends State<ChatView> {
         UserTextMessageViewDto m => m.chatMessage.text,
         UserAudioMessageViewDto m => m.feedbackSummary?.transcription ?? 'No transcription',
         AITextMessageViewDto m => m.chatMessage.text,
-        AIAudioMessageViewDto m => m.chatMessage.transcription,
+        AIAudioMessageViewDto m => m.chatMessage.transcript,
       };
       debugPrint('Word info tap on content: $content');
     };
@@ -109,7 +109,7 @@ class _ChatViewState extends State<ChatView> {
         UserTextMessageViewDto m => m.chatMessage.text,
         UserAudioMessageViewDto m => m.feedbackSummary?.transcription ?? 'No transcription',
         AITextMessageViewDto m => m.chatMessage.text,
-        AIAudioMessageViewDto m => m.chatMessage.transcription,
+        AIAudioMessageViewDto m => m.chatMessage.transcript,
       };
       debugPrint('Chat message tap on content: $content');
       

@@ -1,4 +1,3 @@
-
 sealed class ChatMessage {
   final int id;
   const ChatMessage({required this.id});
@@ -14,7 +13,8 @@ class UserTextMessage extends ChatMessage {
 
   const UserTextMessage({
     required super.id,
-    required this.text, required this.individualTextInputs,
+    required this.text,
+    required this.individualTextInputs,
   });
 
   UserTextMessage copyWith({
@@ -73,8 +73,10 @@ class UserAudioMessage extends ChatMessage {
   }) {
     return UserAudioMessage(
       id: id ?? this.id,
-      fullMergedAudioFilePath: fullMergedAudioUrl ?? this.fullMergedAudioFilePath,
-      individualAudioFilePaths: individualAudioUrls ?? this.individualAudioFilePaths,
+      fullMergedAudioFilePath:
+          fullMergedAudioUrl ?? this.fullMergedAudioFilePath,
+      individualAudioFilePaths:
+          individualAudioUrls ?? this.individualAudioFilePaths,
       duration: duration ?? this.duration,
     );
   }
@@ -82,22 +84,50 @@ class UserAudioMessage extends ChatMessage {
 
 class AITextMessage extends ChatMessage {
   final String text;
+  final String? translation;
 
   const AITextMessage({
     required super.id,
     required this.text,
+    this.translation,
   });
+
+  AITextMessage copyWith({int? id, String? text, String? translation}) {
+    return AITextMessage(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      translation: translation ?? this.translation,
+    );
+  }
 }
 
 class AIAudioMessage extends ChatMessage {
-  final String transcription;
+  final String transcript;
   final String audioUrl;
   final Duration duration;
+  final String? translation;
 
   const AIAudioMessage({
     required super.id,
-    required this.transcription,
+    required this.transcript,
     required this.audioUrl,
     required this.duration,
+    this.translation,
   });
+
+  AIAudioMessage copyWith({
+    int? id,
+    String? transcript,
+    String? audioUrl,
+    Duration? duration,
+    String? translation,
+  }) {
+    return AIAudioMessage(
+      id: id ?? this.id,
+      transcript: transcript ?? this.transcript,
+      audioUrl: audioUrl ?? this.audioUrl,
+      duration: duration ?? this.duration,
+      translation: translation ?? this.translation,
+    );
+  }
 }

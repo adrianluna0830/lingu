@@ -25,29 +25,39 @@ class ChatMessageViewManager {
     }).toList();
   }
 
-  static MessageViewDto _mapToDto(ChatMessage message, MessageDetailsViewDto? details) {
+  static MessageViewDto _mapToDto(
+    ChatMessage message,
+    MessageDetailsViewDto? details,
+  ) {
     return switch (message) {
       UserTextMessage m => UserTextMessageViewDto(
-          chatMessage: m,
-          feedbackSummary: _createTextSummary(details as UserTextMessageDetailsViewDto?),
+        chatMessage: m,
+        feedbackSummary: _createTextSummary(
+          details as UserTextMessageDetailsViewDto?,
         ),
+      ),
       UserAudioMessage m => UserAudioMessageViewDto(
-          chatMessage: m,
-          feedbackSummary: _createAudioSummary(details as UserAudioMessageDetailsViewDto?),
+        chatMessage: m,
+        feedbackSummary: _createAudioSummary(
+          details as UserAudioMessageDetailsViewDto?,
         ),
+      ),
       AITextMessage m => AITextMessageViewDto(
-          chatMessage: m,
-          translation: (details as AITextMessageDetailsViewDto?)?.translation,
-        ),
+        chatMessage: m,
+        translation: m.translation,
+      ),
       AIAudioMessage m => AIAudioMessageViewDto(
-          chatMessage: m,
-          translation: (details as AIAudioMessageDetailsViewDto?)?.translation,
-        ),
+        chatMessage: m,
+        translation: m.translation,
+      ),
     };
   }
 
-  static TextFeedbackSummary? _createTextSummary(UserTextMessageDetailsViewDto? details) {
-    if (details == null) return const TextFeedbackSummary(result: FeedbackResultEnum.processing);
+  static TextFeedbackSummary? _createTextSummary(
+    UserTextMessageDetailsViewDto? details,
+  ) {
+    if (details == null)
+      return const TextFeedbackSummary(result: FeedbackResultEnum.processing);
 
     final grammar = _mapSeverity(details.grammarFeedback?.severity);
     final fluency = _mapSeverity(details.fluencyFeedback?.severity);
@@ -59,7 +69,9 @@ class ChatMessageViewManager {
     );
   }
 
-  static AudioFeedbackSummary? _createAudioSummary(UserAudioMessageDetailsViewDto? details) {
+  static AudioFeedbackSummary? _createAudioSummary(
+    UserAudioMessageDetailsViewDto? details,
+  ) {
     if (details == null) {
       return const AudioFeedbackSummary(
         result: FeedbackResultEnum.processing,
@@ -69,9 +81,14 @@ class ChatMessageViewManager {
 
     final grammar = _mapSeverity(details.grammarFeedback?.severity);
     final fluency = _mapSeverity(details.fluencyFeedback?.severity);
-    final pronunciation = details.pronunciationFeedback?.mostSevere ?? FeedbackResultEnum.none;
+    final pronunciation =
+        details.pronunciationFeedback?.mostSevere ?? FeedbackResultEnum.none;
 
-    final maxIndex = [grammar.index, fluency.index, pronunciation.index].reduce(max);
+    final maxIndex = [
+      grammar.index,
+      fluency.index,
+      pronunciation.index,
+    ].reduce(max);
 
     return AudioFeedbackSummary(
       result: FeedbackResultEnum.values[maxIndex],

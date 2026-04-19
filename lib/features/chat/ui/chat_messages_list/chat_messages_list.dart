@@ -49,7 +49,7 @@ class ChatMessagesList extends StatelessWidget {
           AIAudioMessageViewDto message => AIVoiceMessage(
             audioUrl: message.chatMessage.audioUrl,
             duration: message.chatMessage.duration,
-            transcription: message.chatMessage.transcription,
+            transcription: message.chatMessage.transcript,
             translation: message.translation,
             onTap: () => controller?.onMessageTap?.call(message),
             onTranslation: () => controller?.onAITranslationTap?.call(message),

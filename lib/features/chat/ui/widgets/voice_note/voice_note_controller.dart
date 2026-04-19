@@ -39,6 +39,11 @@ class VoiceNoteInternalController {
         .getPositionStream(_audioUrl)
         .listen((pos) {
           if (_isSeeking) return;
+          
+          if (_hasCompleted && pos < _duration - const Duration(milliseconds: 500)) {
+            _hasCompleted = false;
+          }
+
           _currentPosition.value = pos;
 
           // just_audio/media_kit may not always emit ProcessingState.completed

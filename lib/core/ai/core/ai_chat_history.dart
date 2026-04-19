@@ -14,6 +14,17 @@ class AIChatHistory {
 
   AIChatHistory addModel(String text) => _add(ModelMessage(text: text));
 
+  AIChatHistory addModelAudio({
+    required String text,
+    required String audioUrl,
+    required Duration duration,
+  }) =>
+      _add(ModelMessage(
+        text: text,
+        audioUrl: audioUrl,
+        duration: duration,
+      ));
+
   bool get isEmpty => messages.isEmpty;
   int get length => messages.length;
 }

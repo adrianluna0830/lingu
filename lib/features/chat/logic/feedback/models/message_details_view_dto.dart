@@ -1,3 +1,4 @@
+import 'package:lingu/core/tts/core/synthesis_with_timepoints_response.dart';
 import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback.dart';
 import 'package:lingu/features/chat/logic/feedback/models/translated_text.dart';
 import 'package:lingu/features/chat/logic/feedback/models/sentence_feedback.dart';
@@ -34,14 +35,15 @@ class UserAudioMessageDetailsViewDto implements MessageDetailsViewDto {
 }
 
 class AITextMessageDetailsViewDto implements MessageDetailsViewDto {
-  final String? translation;
-
-  AITextMessageDetailsViewDto({required this.translation});
+  AITextMessageDetailsViewDto();
 }
 
 class AIAudioMessageDetailsViewDto implements MessageDetailsViewDto {
-  final String transcript;
-  final String? translation;
+  final List<SynthesisTimepoint> timepoints;
+  final Duration duration;
+  final String audioUrl;
+  String get sentence => timepoints.map((t) => t.word).join(' ');
 
-  AIAudioMessageDetailsViewDto({required this.transcript, required this.translation});
+  AIAudioMessageDetailsViewDto({required this.timepoints, required this.duration, required this.audioUrl});
+
 }

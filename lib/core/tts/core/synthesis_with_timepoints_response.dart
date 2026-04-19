@@ -1,23 +1,17 @@
 import 'dart:typed_data';
 
 
-class SynthesisTimepointAudioUrl {
-  final List<SynthesisTimepoint> timepoints;
-  final String audioUrl;
-
-  SynthesisTimepointAudioUrl(this.timepoints, this.audioUrl);
-}
-
-
-class SynthesisWithTimepointsResponse {
+class SynthesisWithTimepoints {
   final Uint8List audioContent;
   final List<SynthesisTimepoint> timepoints;
+  final Duration duration;
+  String get sentence => timepoints.map((t) => t.word).join(' ');
 
-  const SynthesisWithTimepointsResponse({
+  const SynthesisWithTimepoints({
     required this.audioContent,
     required this.timepoints,
+    required this.duration,
   });
-
 }
 
 class SynthesisTimepoint {
@@ -30,6 +24,4 @@ class SynthesisTimepoint {
     required this.offset,
     required this.duration,
   });
-
-
 }
