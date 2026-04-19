@@ -45,9 +45,9 @@ class UserVoiceMessage extends StatelessWidget {
       ),
       children: [
         VoiceNoteControls(audioUrl: audioUrl, duration: duration),
-        if (translation != null)
+        if (translation != null && translation!.trim().isNotEmpty)
           MessageSubText('"$translation"'),
-        if (transcription != null)
+        if (transcription != null && transcription!.trim().isNotEmpty)
           MessageSubText('($transcription)'),
       ],
     );

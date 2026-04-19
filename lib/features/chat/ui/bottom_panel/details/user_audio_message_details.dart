@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/features/chat/logic/feedback/models/feedback_result_enum.dart';
 import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
-import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/audio_pronunciation_content.dart';
+import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/pronunciation/audio_pronunciation_content.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/base_message_details_options.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/base_message_details_panel.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/message_feedback_content.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback.dart' as model;
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_audio_message_details.dart';
-import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/word_pronunciation_feedback.dart';
+import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/pronunciation/word_pronunciation_feedback.dart';
 
 class AudioPronunciationContent extends StatelessWidget {
   final List<model.PronunciationItemResult> results;

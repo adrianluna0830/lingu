@@ -9,7 +9,9 @@ enum GeminiModelType {
   gemini25Flash('gemini-2.5-flash'),
   gemini25Pro('gemini-2.5-pro'),
   gemini20Flash('gemini-2.0-flash'),
-  gemini20FlashLite('gemini-2.0-flash-lite');
+  gemini20FlashLite('gemini-2.0-flash-lite'),
+  gemini3FlashPreview('gemini-3-flash-preview'),
+  gemini31FlashLitePreview('gemini-3.1-flash-lite-preview');
 
   const GeminiModelType(this.value);
   final String value;

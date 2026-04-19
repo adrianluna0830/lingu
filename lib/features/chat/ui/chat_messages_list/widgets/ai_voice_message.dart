@@ -65,25 +65,27 @@ class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
       children: [
         VoiceNoteControls(audioUrl: widget.audioUrl, duration: widget.duration),
         if (isShowingTranslation)
-          widget.translation != null
+          widget.translation != null && widget.translation!.trim().isNotEmpty
               ? MessageSubText(
                   '"${widget.translation}"',
                   onTap: () => _showTranslation.value = false,
                 )
-              : Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Shimmer(
-                    child: Container(
-                      height: 12,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(4),
+              : widget.translation == null || widget.translation!.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Shimmer(
+                        child: Container(
+                          height: 12,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-        if (isShowingTranscription)
+                    )
+                  : const SizedBox.shrink(),
+        if (isShowingTranscription && widget.transcription.trim().isNotEmpty)
           InteractableText(
             text: '(${widget.transcription})',
             onChat: widget.onChat ?? () {},

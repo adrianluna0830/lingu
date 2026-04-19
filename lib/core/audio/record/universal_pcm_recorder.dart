@@ -19,8 +19,7 @@ class UniversalPCMRecorder extends IAudioRecorder {
   final rec.RecordConfig _recordConfig = rec.RecordConfig(
     encoder: rec.AudioEncoder.wav,
     numChannels: 1,
-      sampleRate: 16000,
-      bitRate: 128000
+    sampleRate: 16000,
   );
 
   UniversalPCMRecorder(this._audioUtils) : super(pollingRate: const Duration(milliseconds: 100));

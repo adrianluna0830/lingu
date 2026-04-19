@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lingu/core/utils/ui_utils.dart';
 import 'package:lingu/features/chat/logic/feedback/models/pronunciation_feedback.dart' as model;
-import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/tooltip_word.dart';
+import 'package:lingu/features/chat/ui/bottom_panel/details/widgets/pronunciation/tooltip_word.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_audio_message_details.dart';
 
 class WordPronunciationFeedback extends StatelessWidget {

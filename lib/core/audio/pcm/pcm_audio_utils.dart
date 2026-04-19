@@ -26,8 +26,8 @@ class PCMAudioUtils implements IAudioUtils {
     final int bytesPerSecond = sampleRate * channels * bytesPerSample;
     final int blockAlign = channels * bytesPerSample;
     
-    int startByte = (offset.inMilliseconds * bytesPerSecond) ~/ 1000;
-    int lengthInBytes = (duration.inMilliseconds * bytesPerSecond) ~/ 1000;
+    int startByte = (offset.inMicroseconds * bytesPerSecond) ~/ 1000000;
+    int lengthInBytes = (duration.inMicroseconds * bytesPerSecond) ~/ 1000000;
     
     startByte = startByte - (startByte % blockAlign);
     lengthInBytes = lengthInBytes - (lengthInBytes % blockAlign);
@@ -35,10 +35,20 @@ class PCMAudioUtils implements IAudioUtils {
     if (startByte < 0 || startByte >= audioData.length) {
       throw Exception('Invalid offset: The calculated start position ($startByte) is out of bounds for audio length (${audioData.length}).');
     }
-
-    if (startByte + lengthInBytes > audioData.length) {
-      lengthInBytes = audioData.length - startByte;
-      lengthInBytes = lengthInBytes - (lengthInBytes % blockAlign);
+    
+    if (audioData.length >= 44 && 
+        audioData[0] == 0x52 && audioData[1] == 0x49 && 
+        audioData[2] == 0x46 && audioData[3] == 0x46) {
+      startByte += 44;
+      if (startByte + lengthInBytes > audioData.length) {
+        lengthInBytes = audioData.length - startByte;
+        lengthInBytes = lengthInBytes - (lengthInBytes % blockAlign);
+      }
+    } else {
+      if (startByte + lengthInBytes > audioData.length) {
+        lengthInBytes = audioData.length - startByte;
+        lengthInBytes = lengthInBytes - (lengthInBytes % blockAlign);
+      }
     }
     
     if (lengthInBytes <= 0) {
@@ -68,7 +78,7 @@ class PCMAudioUtils implements IAudioUtils {
         ? await getTemporaryDirectory()
         : await getApplicationDocumentsDirectory();
 
-    final fileName = 'audio_${DateTime.now().millisecondsSinceEpoch}.wav';
+    final fileName = 'audio_${DateTime.now().microsecondsSinceEpoch}_${audioData.hashCode}.wav';
     final path = '${dir.path}/$fileName';
 
     final wavData = await _pcmToWav(audioData, 16000, 1);

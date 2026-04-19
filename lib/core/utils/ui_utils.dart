@@ -20,12 +20,12 @@ Color getLanguageColor(LanguageLocale locale) {
 }
 
 Color getShadowColor(FeedbackResultEnum? severity) {
-  if (severity == null || severity == FeedbackResultEnum.processing) return Colors.grey[400]!;
+  if (severity == null || severity == FeedbackResultEnum.processing) return Colors.grey[700]!;
   return switch (severity) {
     FeedbackResultEnum.minor => Colors.orange,
     FeedbackResultEnum.major => Colors.red,
     FeedbackResultEnum.none => Colors.green,
-    FeedbackResultEnum.processing => Colors.grey[400]!,
+    FeedbackResultEnum.processing => Colors.grey[700]!,
   };
 }
 

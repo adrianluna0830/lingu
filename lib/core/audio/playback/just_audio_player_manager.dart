@@ -60,7 +60,7 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
     }
 
     if (_completed) {
-      return;
+      _completed = false;
     }
 
     final newState = state.playing
@@ -86,10 +86,8 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
       await _player.setFilePath(source);
     } else if (_completed) {
       await _player.pause();
-      await _player.setFilePath(source);
     }
 
-    _completed = false;
     if (speed != null) {
       _playbackSpeed.value = speed;
     }
@@ -104,9 +102,14 @@ class JustAudioPlayerManager extends IAudioPlayerManager {
 
   @override
   Future<void> play(String source) async {
-    if (_currentSource.value == source) {
-      await _player.play();
+    if (_currentSource.value != source) {
+      _currentSource.value = source;
+      await _player.setFilePath(source);
+    } else if (_completed) {
+      await _player.pause();
+      await _player.seek(Duration.zero);
     }
+    await _player.play();
   }
 
   @override

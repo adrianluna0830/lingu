@@ -40,7 +40,7 @@ class UserTextMessage extends StatelessWidget {
       ),
       children: [
         Text(text),
-        if (translation != null)
+        if (translation != null && translation!.trim().isNotEmpty)
           MessageSubText('"$translation"'),
       ],
     );
