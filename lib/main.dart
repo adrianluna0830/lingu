@@ -3,14 +3,13 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/core/router/app_router.dart';
-import 'package:lingu/core/settings/ai_credentials_service.dart';
-import 'package:lingu/core/settings/locale_settings_service.dart';
-import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
-import 'package:lingu/core/settings/stt_credentials_service.dart';
-import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
+import 'package:lingu/gen/assets.gen.dart';
 import 'package:lingu/hive/hive_registrar.g.dart';
+import 'package:lingu/model_loader.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:signals/signals.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa_onnx;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +17,7 @@ void main() async {
   Hive.registerAdapters();
   JustAudioMediaKit.ensureInitialized();
   await DependencyInjection.init();
-
+  // sherpa_onnx.initBindings();
   // di<AICredentialsService>().apiKey.value = null;
   // di<STTCredentialsService>().apiKey.value = null;
   // di<TextToSpeechSettingsService>().apiKey.value = null;

@@ -58,12 +58,14 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   http: ^1.6.0
   shimmer_animation: ^2.2.2+1
+  sherpa_onnx: ^1.12.39
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^2.13.0
   hive_ce_generator: ^1.11.1
+  flutter_gen_runner: ^5.14.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -77,13 +79,24 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+flutter_gen:
+  output: lib/gen/  
+  assets:
+    outputs:
+      directory_path_enabled: true
+
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
-
+  assets:
+    - assets/models/stt/
+    - assets/models/tts/english/
+    - assets/models/tts/english/espeak-ng-data/
+    - assets/models/tts/english/espeak-ng-data/lang/
+    - assets/models/tts/english/espeak-ng-data/voices/
+    - assets/models/tts/spanish/
+    - assets/models/tts/spanish/espeak-ng-data/
+    - assets/models/tts/english/espeak-ng-data/lang/
+    - assets/models/tts/english/espeak-ng-data/voices/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
