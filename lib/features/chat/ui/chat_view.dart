@@ -26,6 +26,8 @@ import 'package:signals/signals_flutter.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
 import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
 import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
+import 'package:lingu/core/router/app_router.dart';
+import 'package:lingu/features/word/word_selection_dialog.dart';
 
 @RoutePage()
 class ChatView extends StatefulWidget {
@@ -95,15 +97,29 @@ class _ChatViewState extends State<ChatView> {
         _orchestrator.handleFetchTranslation(message.id, message.chatMessage.transcript);
       }
     };
-    _controller.onWordInfoTap = (message) {
-      final content = switch (message) {
-        UserTextMessageViewDto m => m.chatMessage.text,
-        UserAudioMessageViewDto m => m.feedbackSummary?.transcription ?? 'No transcription',
-        AITextMessageViewDto m => m.chatMessage.text,
-        AIAudioMessageViewDto m => m.chatMessage.transcript,
-      };
-      debugPrint('Word info tap on content: $content');
-    };
+_controller.onWordInfoTap = (message) async {
+  final content = switch (message) {
+    UserTextMessageViewDto m => m.feedbackSummary!.translation!,
+    UserAudioMessageViewDto m => m.feedbackSummary!.translation!,
+    AITextMessageViewDto m => m.chatMessage.text,
+    AIAudioMessageViewDto m => m.chatMessage.transcript,
+  };
+
+  final result = await showWordSelectionDialog(context, content);
+
+  if (result != null) {
+    final languages = di<ChatLanguages>();
+    if (mounted) {
+      context.router.push(WordFetchRoute(
+        word: result.word,
+        wordInContext: result.context,
+        learningLocale: languages.target,
+        nativeLocale: languages.native,
+      ));
+    }
+  }
+};
+
     _controller.onChatMessageTap = (message) {
       final content = switch (message) {
         UserTextMessageViewDto m => m.chatMessage.text,
@@ -112,7 +128,7 @@ class _ChatViewState extends State<ChatView> {
         AIAudioMessageViewDto m => m.chatMessage.transcript,
       };
       debugPrint('Chat message tap on content: $content');
-      
+
       if (_panelManager.currentPanel.value is ChatPanelState) {
         _chatPanelController.tryStartNewChatWithQuestion(content);
       } else {

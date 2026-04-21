@@ -17,7 +17,15 @@ class AIAudioMessageDetailsInternalController {
 
   AIAudioMessageDetailsInternalController(this.data, this._audioPlayerManager) {
     _audioPlayerManager.getPositionStream(data.audioUrl).listen((position) {
+      final state =
+          _audioPlayerManager.getPlaybackStateSignal(data.audioUrl).value;
+      if (state != AudioPlaybackState.playing) {
+        return;
+      }
+
       final timepoints = data.timepoints;
+      if (timepoints.isEmpty) return;
+
       for (int i = 0; i < timepoints.length; i++) {
         if (position < timepoints[i].offset) {
           _currentWordIndex.value = i == 0 ? 0 : i - 1;
@@ -115,8 +123,8 @@ class _AIAudioMessageDetailsState extends State<AIAudioMessageDetails> {
                       onTap: () => _controller.changeWord(index),
                       borderRadius: BorderRadius.circular(4),
                       child: Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 2, vertical: 2),
                         child: Stack(
                           alignment: Alignment.center,
                           children: [

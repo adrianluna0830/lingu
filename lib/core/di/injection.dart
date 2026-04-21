@@ -8,6 +8,7 @@ import 'package:lingu/core/audio/playback/just_audio_player_manager.dart';
 import 'package:lingu/core/audio/record/i_audio_recorder.dart';
 import 'package:lingu/core/audio/record/universal_pcm_recorder.dart';
 import 'package:lingu/core/interfaces/i_fabric.dart';
+import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/core/pronunciation/pronunciation_assessment_fabric.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
 import 'package:lingu/core/router/app_router.dart';
@@ -25,6 +26,8 @@ import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/tts/core/synthesis_with_timepoints_response.dart';
 import 'package:lingu/core/tts/google/google_tts_fabric.dart';
+import 'package:lingu/core/word/word_manager.dart';
+import 'package:lingu/core/word/word_repository.dart';
 import 'package:lingu/features/chat/di/chat_cefr.dart';
 import 'package:lingu/features/chat/di/chat_languages.dart';
 import 'package:lingu/features/chat/logic/chatbot/chatbot_manager.dart';
@@ -40,6 +43,7 @@ import 'package:lingu/features/chat/ui/bottom_panel/details/ai_audio_message_det
 import 'package:lingu/features/chat/ui/chat_messages_list/logic/chat_message_view_manager.dart';
 import 'package:lingu/features/topics/repository/topics_repository.dart';
 import 'package:lingu/features/topics/topics_manager.dart';
+import 'package:lingu/core/word/word.dart';
 
 final di = GetIt.instance;
 
@@ -51,6 +55,8 @@ class DependencyInjection {
 
     _StartupDependencies.registerAudioAndFabrics();
     _StartupDependencies.registerNavigationAndManagers();
+
+    await di.allReady();
   }
 
   static Future<void> initChatScope() async {

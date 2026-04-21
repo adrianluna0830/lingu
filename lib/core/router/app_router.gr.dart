@@ -538,3 +538,130 @@ class TopicsRoute extends PageRouteInfo<void> {
     },
   );
 }
+
+/// generated route for
+/// [WordFetchView]
+class WordFetchRoute extends PageRouteInfo<WordFetchRouteArgs> {
+  WordFetchRoute({
+    Key? key,
+    required String word,
+    required String wordInContext,
+    required LanguageLocale learningLocale,
+    required LanguageLocale nativeLocale,
+    List<PageRouteInfo>? children,
+  }) : super(
+         WordFetchRoute.name,
+         args: WordFetchRouteArgs(
+           key: key,
+           word: word,
+           wordInContext: wordInContext,
+           learningLocale: learningLocale,
+           nativeLocale: nativeLocale,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'WordFetchRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<WordFetchRouteArgs>();
+      return WordFetchView(
+        key: args.key,
+        word: args.word,
+        wordInContext: args.wordInContext,
+        learningLocale: args.learningLocale,
+        nativeLocale: args.nativeLocale,
+      );
+    },
+  );
+}
+
+class WordFetchRouteArgs {
+  const WordFetchRouteArgs({
+    this.key,
+    required this.word,
+    required this.wordInContext,
+    required this.learningLocale,
+    required this.nativeLocale,
+  });
+
+  final Key? key;
+
+  final String word;
+
+  final String wordInContext;
+
+  final LanguageLocale learningLocale;
+
+  final LanguageLocale nativeLocale;
+
+  @override
+  String toString() {
+    return 'WordFetchRouteArgs{key: $key, word: $word, wordInContext: $wordInContext, learningLocale: $learningLocale, nativeLocale: $nativeLocale}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WordFetchRouteArgs) return false;
+    return key == other.key &&
+        word == other.word &&
+        wordInContext == other.wordInContext &&
+        learningLocale == other.learningLocale &&
+        nativeLocale == other.nativeLocale;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      word.hashCode ^
+      wordInContext.hashCode ^
+      learningLocale.hashCode ^
+      nativeLocale.hashCode;
+}
+
+/// generated route for
+/// [WordView]
+class WordRoute extends PageRouteInfo<WordRouteArgs> {
+  WordRoute({Key? key, required Word word, List<PageRouteInfo>? children})
+    : super(
+        WordRoute.name,
+        args: WordRouteArgs(key: key, word: word),
+        initialChildren: children,
+      );
+
+  static const String name = 'WordRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<WordRouteArgs>();
+      return WordView(key: args.key, word: args.word);
+    },
+  );
+}
+
+class WordRouteArgs {
+  const WordRouteArgs({this.key, required this.word});
+
+  final Key? key;
+
+  final Word word;
+
+  @override
+  String toString() {
+    return 'WordRouteArgs{key: $key, word: $word}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WordRouteArgs) return false;
+    return key == other.key && word == other.word;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ word.hashCode;
+}

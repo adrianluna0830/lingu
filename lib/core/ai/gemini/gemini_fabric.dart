@@ -15,6 +15,7 @@ class GeminiFabric implements IAIFabric {
     assert(apiKey != null, 'API key must be configured');
     assert(apiKey!.isNotEmpty, 'API key cannot be empty');
 
+
     final policy = RetryPolicy(
       maxRetries: 4,
       initialDelay: Duration(seconds: 1),

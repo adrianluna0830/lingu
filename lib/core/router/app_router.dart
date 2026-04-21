@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/core/router/guards/chat_guard.dart';
 import 'package:lingu/core/router/guards/home_guard.dart';
 import 'package:lingu/core/router/guards/login_guards.dart';
@@ -15,6 +16,9 @@ import 'package:lingu/features/login/ui/native_locale_view.dart';
 import 'package:lingu/features/login/ui/pronunciation_assessment_credentials_view.dart';
 import 'package:lingu/features/login/ui/tts_credentials_view.dart';
 import 'package:lingu/features/topics/topics_view.dart';
+import 'package:lingu/core/word/word.dart';
+import 'package:lingu/features/word/word_fetch_view.dart';
+import 'package:lingu/features/word/word_view.dart';
 
 part 'app_router.gr.dart';
 
@@ -62,6 +66,9 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: STTCredentialsRoute.page),
     AutoRoute(page: PronunciationAssessmentCredentialsRoute.page),
     AutoRoute(page: TTSCredentialsRoute.page),
+    AutoRoute(page: WordRoute.page),
+    AutoRoute(page: WordFetchRoute.page),
+
     AutoRoute(
       page: HomeRoute.page,
       initial: true,

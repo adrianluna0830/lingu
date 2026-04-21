@@ -8,19 +8,41 @@ import 'package:lingu/hive/hive_adapters.dart';
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(CEFRAdapter());
+    registerAdapter(EnglishWordAdapter());
+    registerAdapter(EnglishWordDetailsAdapter());
+    registerAdapter(GermanWordAdapter());
+    registerAdapter(GermanWordDetailsAdapter());
+    registerAdapter(GrammaticalGenderAdapter());
     registerAdapter(LanguageLocaleAdapter());
+    registerAdapter(PartOfSpeechAdapter());
+    registerAdapter(SpanishWordAdapter());
+    registerAdapter(SpanishWordDetailsAdapter());
     registerAdapter(TopicAdapter());
     registerAdapter(TopicDataAdapter());
     registerAdapter(TopicStatusAdapter());
+    registerAdapter(VerbConjugationTypeAdapter());
+    registerAdapter(WordExampleAdapter());
+    registerAdapter(WordMeaningAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(CEFRAdapter());
+    registerAdapter(EnglishWordAdapter());
+    registerAdapter(EnglishWordDetailsAdapter());
+    registerAdapter(GermanWordAdapter());
+    registerAdapter(GermanWordDetailsAdapter());
+    registerAdapter(GrammaticalGenderAdapter());
     registerAdapter(LanguageLocaleAdapter());
+    registerAdapter(PartOfSpeechAdapter());
+    registerAdapter(SpanishWordAdapter());
+    registerAdapter(SpanishWordDetailsAdapter());
     registerAdapter(TopicAdapter());
     registerAdapter(TopicDataAdapter());
     registerAdapter(TopicStatusAdapter());
+    registerAdapter(VerbConjugationTypeAdapter());
+    registerAdapter(WordExampleAdapter());
+    registerAdapter(WordMeaningAdapter());
   }
 }
