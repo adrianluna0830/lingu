@@ -25,7 +25,7 @@ class PanelManager {
     _currentPanel.value = NonePanelState();
   }
 
-  void openChatPanel({String? initialQuestion}) {
-    _currentPanel.value = ChatPanelState(initialQuestion: initialQuestion);
+  void openChatPanel({String? initialMessage}) {
+    _currentPanel.value = ChatPanelState(initialMessage: initialMessage);
   }
 }

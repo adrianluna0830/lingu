@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:lingu/core/di/injection.dart';
+import 'package:lingu/core/router/app_router.dart';
 import 'package:lingu/features/chat/logic/feedback/managers/message_details_manager.dart';
+import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
 import 'package:lingu/features/chat/ui/widgets/chat_panel.dart';
 import 'package:lingu/features/chat/logic/panel/chat_panel_controller.dart';
 import 'package:lingu/features/chat/logic/message/models/chat_panel_message.dart';
@@ -22,12 +24,10 @@ import 'package:lingu/features/chat/ui/record/record_controller.dart';
 import 'package:lingu/features/chat/ui/record/record_display.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_audio_message_details.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/user_text_message_details.dart';
-import 'package:signals/signals_flutter.dart';
-import 'package:lingu/features/chat/logic/message/models/chat_message.dart';
-import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
-import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
-import 'package:lingu/core/router/app_router.dart';
+import 'package:lingu/features/chat/logic/panel/chat_panel_manager.dart';
 import 'package:lingu/features/word/word_selection_dialog.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:lingu/features/chat/ui/chat_messages_list/models/message_view_dto.dart';
 
 @RoutePage()
 class ChatView extends StatefulWidget {
@@ -38,7 +38,6 @@ class ChatView extends StatefulWidget {
 }
 
 class _ChatViewState extends State<ChatView> {
-  final ChatMessagesManager _chatMessagesManager = di<ChatMessagesManager>();
   final MessageDetailsManager _messageDetailsManager = di<MessageDetailsManager>();
   final InputBarController _inputBarController = InputBarController();
   final ChatMessagesListController _controller = ChatMessagesListController();
@@ -47,11 +46,15 @@ class _ChatViewState extends State<ChatView> {
   final ChatPanelController _chatPanelController = ChatPanelController();
   final AudioInputManager _recordInputHandler = di<AudioInputManager>();
   final PanelManager _panelManager = di<PanelManager>();
+  final ChatPanelManager _chatPanelManager = di<ChatPanelManager>();
   late final ChatOrchestrator _orchestrator = di<ChatOrchestrator>();
 
   @override
   void initState() {
     super.initState();
+    _chatPanelController.onNewUserMessage = (text) => _chatPanelManager.onNewUserMessage(text);
+    _chatPanelController.onNewChat = () => _chatPanelManager.onNewChat();
+
     _inputBarController.onUserTextMessage = (text, individualTextInputs) {
       _orchestrator.handleUserTextMessage(text: text, individualTextInputs: individualTextInputs);
     };
@@ -121,19 +124,14 @@ _controller.onWordInfoTap = (message) async {
 };
 
     _controller.onChatMessageTap = (message) {
-      final content = switch (message) {
+      String? content = switch (message) {
         UserTextMessageViewDto m => m.chatMessage.text,
-        UserAudioMessageViewDto m => m.feedbackSummary?.transcription ?? 'No transcription',
+        UserAudioMessageViewDto m => m.feedbackSummary?.transcription,
         AITextMessageViewDto m => m.chatMessage.text,
         AIAudioMessageViewDto m => m.chatMessage.transcript,
       };
-      debugPrint('Chat message tap on content: $content');
 
-      if (_panelManager.currentPanel.value is ChatPanelState) {
-        _chatPanelController.tryStartNewChatWithQuestion(content);
-      } else {
-        _panelManager.openChatPanel(initialQuestion: content);
-      }
+      _panelManager.openChatPanel(initialMessage: content);
     };
   }
 
@@ -194,13 +192,8 @@ _controller.onWordInfoTap = (message) async {
                   if (panelState is ChatPanelState) {
                     return ChatPanel(
                       controller: _chatPanelController,
-                      initialQuestion: panelState.initialQuestion,
-                      messages: [
-                        ChatPanelMessage(text: "Hola, ¿cómo estás?", isUser: false),
-                        ChatPanelMessage(text: "Bien, ¿y tú?", isUser: true),
-                        ChatPanelMessage(text: "Todo excelente por aquí.", isUser: false),
-                        ChatPanelMessage(text: "Me alegro mucho.", isUser: true),
-                      ],
+                      messages: _chatPanelManager.messages.watch(context),
+                      initialMessage: panelState.initialMessage,
                     );
                   }
                   return const SizedBox.shrink();

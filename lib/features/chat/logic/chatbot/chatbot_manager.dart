@@ -67,7 +67,7 @@ class ChatbotManager {
     AIChatHistory history,
     String userPrompt,
   ) async {
-    return _generateAudioResponse(history, userPrompt);
+    return _generateTextResponse(history, userPrompt);
   }
 
   Future<TextChatbotResponse> _generateTextResponse(

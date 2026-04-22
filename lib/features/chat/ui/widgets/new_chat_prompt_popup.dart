@@ -15,48 +15,47 @@ class NewChatPromptPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black54,
+      color: Colors.transparent,
       alignment: Alignment.center,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 32),
-        elevation: 8,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.chat_bubble_outline, size: 48, color: Colors.blue),
-              const SizedBox(height: 16),
-              Text(
-                (question != null && question!.isNotEmpty)
-                    ? 'Do you want to start a new chat with the following question?'
-                    : 'Are you sure you want to start a new chat?',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'New Chat?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.black,
+                decoration: TextDecoration.none,
               ),
-              const SizedBox(height: 12),
-              if (question != null && question!.isNotEmpty)
-                Text(
-                  '"$question"',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 15, fontStyle: FontStyle.italic),
+            ),
+            if (question?.isNotEmpty == true) ...[
+              const SizedBox(height: 8),
+              Text(
+                question!,
+                style: const TextStyle(
+                  color: Colors.black,
+                  decoration: TextDecoration.none,
+                  fontSize: 14,
                 ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    onPressed: onDeny,
-                    child: const Text('No'),
-                  ),
-                  TextButton(
-                    onPressed: onConfirm,
-                    child: const Text('Yes'),
-                  ),
-                ],
               ),
             ],
-          ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(onPressed: onDeny, child: const Text('No')),
+                const SizedBox(width: 8),
+                TextButton(onPressed: onConfirm, child: const Text('Yes')),
+              ],
+            ),
+          ],
         ),
       ),
     );

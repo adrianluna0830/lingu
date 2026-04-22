@@ -14,6 +14,13 @@ import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa_onnx;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+
+  // Limpiar cajas para evitar errores de casting por cambios de esquema
+  await Hive.deleteBoxFromDisk('topic_data');
+  await Hive.deleteBoxFromDisk('english_word_box');
+  await Hive.deleteBoxFromDisk('german_word_box');
+  await Hive.deleteBoxFromDisk('spanish_word_box');
+
   Hive.registerAdapters();
   JustAudioMediaKit.ensureInitialized();
   await DependencyInjection.init();

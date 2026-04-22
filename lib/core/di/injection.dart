@@ -39,6 +39,7 @@ import 'package:lingu/features/chat/logic/feedback/models/message_details_view_d
 import 'package:lingu/features/chat/logic/feedback/services/pronunciation_feedback_service.dart';
 import 'package:lingu/features/chat/logic/feedback/services/statement_feedback_service.dart';
 import 'package:lingu/features/chat/logic/input/audio_input_manager.dart';
+import 'package:lingu/features/chat/logic/panel/chat_panel_manager.dart';
 import 'package:lingu/features/chat/logic/message/managers/chat_messages_manager.dart';
 import 'package:lingu/features/chat/logic/panel/panel_manager.dart';
 import 'package:lingu/features/chat/ui/bottom_panel/details/ai_audio_message_details.dart';
@@ -307,6 +308,9 @@ class _ChatDependencies {
     });
     di.registerSingleton<PanelManager>(
       PanelManager(di<MessageDetailsManager>()),
+    );
+    di.registerSingleton<ChatPanelManager>(
+      ChatPanelManager(di<IAIService>()),
     );
   }
 

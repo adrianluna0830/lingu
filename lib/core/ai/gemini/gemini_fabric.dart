@@ -33,7 +33,7 @@ class GeminiFabric implements IAIFabric {
 
     return GeminiService(
       client: googleClient,
-modelType: GeminiModelType.gemini31FlashLitePreview,
+modelType: GeminiModelType.gemini25FlashLite,
     );
   }
 
