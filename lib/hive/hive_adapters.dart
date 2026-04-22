@@ -4,9 +4,9 @@ import 'package:lingu/core/models/language_locale.dart';
 import 'package:lingu/core/models/grammatical_gender.dart';
 import 'package:lingu/features/topics/topic.dart';
 import 'package:lingu/core/word/word.dart';
-import 'package:lingu/core/word/english_word_details.dart';
-import 'package:lingu/core/word/german_word_details.dart';
-import 'package:lingu/core/word/spanish_word_details.dart';
+import 'package:lingu/core/word/word_details/english_word_details.dart';
+import 'package:lingu/core/word/word_details/german_word_details.dart';
+import 'package:lingu/core/word/word_details/spanish_word_details.dart';
 
 @GenerateAdapters([
   AdapterSpec<Topic>(),
@@ -21,6 +21,7 @@ import 'package:lingu/core/word/spanish_word_details.dart';
   AdapterSpec<GermanWordDetails>(),
   AdapterSpec<VerbConjugationType>(),
   AdapterSpec<SpanishWordDetails>(),
+  AdapterSpec<WordImage>(),
   AdapterSpec<WordMeaning>(),
   AdapterSpec<EnglishWord>(),
   AdapterSpec<GermanWord>(),

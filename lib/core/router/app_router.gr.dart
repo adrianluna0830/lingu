@@ -315,6 +315,71 @@ class NativeLocaleRouteArgs {
 }
 
 /// generated route for
+/// [PixabayCredentialsView]
+class PixabayCredentialsRoute
+    extends PageRouteInfo<PixabayCredentialsRouteArgs> {
+  PixabayCredentialsRoute({
+    Key? key,
+    required VoidCallback onComplete,
+    bool isSetupFlow = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PixabayCredentialsRoute.name,
+         args: PixabayCredentialsRouteArgs(
+           key: key,
+           onComplete: onComplete,
+           isSetupFlow: isSetupFlow,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'PixabayCredentialsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<PixabayCredentialsRouteArgs>();
+      return PixabayCredentialsView(
+        key: args.key,
+        onComplete: args.onComplete,
+        isSetupFlow: args.isSetupFlow,
+      );
+    },
+  );
+}
+
+class PixabayCredentialsRouteArgs {
+  const PixabayCredentialsRouteArgs({
+    this.key,
+    required this.onComplete,
+    this.isSetupFlow = false,
+  });
+
+  final Key? key;
+
+  final VoidCallback onComplete;
+
+  final bool isSetupFlow;
+
+  @override
+  String toString() {
+    return 'PixabayCredentialsRouteArgs{key: $key, onComplete: $onComplete, isSetupFlow: $isSetupFlow}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PixabayCredentialsRouteArgs) return false;
+    return key == other.key &&
+        onComplete == other.onComplete &&
+        isSetupFlow == other.isSetupFlow;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ onComplete.hashCode ^ isSetupFlow.hashCode;
+}
+
+/// generated route for
 /// [PronunciationAssessmentCredentialsView]
 class PronunciationAssessmentCredentialsRoute
     extends PageRouteInfo<PronunciationAssessmentCredentialsRouteArgs> {

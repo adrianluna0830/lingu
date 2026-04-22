@@ -16,6 +16,7 @@ import 'package:lingu/core/router/guards/chat_guard.dart';
 import 'package:lingu/core/router/guards/home_guard.dart';
 import 'package:lingu/core/router/guards/login_guards.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
+import 'package:lingu/core/settings/image_credentials_service.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
 import 'package:lingu/core/settings/stores.dart';
@@ -24,8 +25,9 @@ import 'package:lingu/core/settings/text_to_speech_settings_service.dart';
 import 'package:lingu/core/stt/google_speech_to_text_fabric.dart';
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
-import 'package:lingu/core/tts/core/synthesis_with_timepoints_response.dart';
 import 'package:lingu/core/tts/google/google_tts_fabric.dart';
+import 'package:lingu/core/image/i_image_finder.dart';
+import 'package:lingu/core/image/pixabay_image_fabric.dart';
 import 'package:lingu/core/word/word_manager.dart';
 import 'package:lingu/core/word/word_repository.dart';
 import 'package:lingu/features/chat/di/chat_cefr.dart';
@@ -53,7 +55,7 @@ class DependencyInjection {
 
     await di.allReady();
 
-    _StartupDependencies.registerAudioAndFabrics();
+    await _StartupDependencies.registerAudioAndFabrics();
     _StartupDependencies.registerNavigationAndManagers();
 
     await di.allReady();
@@ -98,6 +100,9 @@ class _StartupDependencies {
     di.registerSingletonAsync<AICredentialsService>(
       () => AICredentialsService.create(di<SecureStore>()),
     );
+    di.registerSingletonAsync<ImageCredentialsService>(
+      () => ImageCredentialsService.create(di<SecureStore>()),
+    );
     di.registerSingletonAsync<STTCredentialsService>(
       () => STTCredentialsService.create(di<SecureStore>()),
     );
@@ -110,9 +115,13 @@ class _StartupDependencies {
     di.registerSingletonAsync<TopicDataRepository>(
       () => TopicDataRepository.create(),
     );
+
+    di.registerSingletonAsync<EnglishWordRepository>(() => EnglishWordRepository.create());
+    di.registerSingletonAsync<GermanWordRepository>(() => GermanWordRepository.create());
+    di.registerSingletonAsync<SpanishWordRepository>(() => SpanishWordRepository.create());
   }
 
-  static void registerAudioAndFabrics() {
+  static Future<void> registerAudioAndFabrics() async {
     di.registerSingleton<IAudioUtils>(PCMAudioUtils());
     di.registerSingleton<IAudioRecorder>(
       UniversalPCMRecorder(di<IAudioUtils>()),
@@ -131,9 +140,20 @@ class _StartupDependencies {
     di.registerFactory<ITTSFabric>(
       () => GoogleTTSFabric(di<TextToSpeechSettingsService>()),
     );
+
+    final imageFabric = PixabayImageFabric(di<ImageCredentialsService>());
+    di.registerSingleton<PixabayImageFabric>(imageFabric);
+
+    final imageFinder = await imageFabric.create();
+    if (imageFinder != null) {
+      di.registerSingleton<IImageFinder>(imageFinder);
+    }
   }
 
   static void registerNavigationAndManagers() {
+    di.registerFactory<ImageCredentialsGuard>(
+      () => ImageCredentialsGuard(di<ImageCredentialsService>()),
+    );
     di.registerFactory<PronunciationAssessmentCredentialsGuard>(
       () => PronunciationAssessmentCredentialsGuard(
         di<PronunciationAssessmentCredentialsService>(),
@@ -177,12 +197,31 @@ class _StartupDependencies {
         di<TTSCredentialsGuard>(),
         di<ChatGuard>(),
         di<HomeGuard>(),
+        di<ImageCredentialsGuard>(),
       ),
     );
 
     di.registerFactory<TopicsManager>(
       () =>
           TopicsManager(di<TopicDataRepository>(), di<LocaleSettingsService>()),
+    );
+
+    di.registerFactoryParam<IWordManager<Word, dynamic>, LanguageLocale, void>(
+      (locale, _) {
+        final aiService = di<IAIService>();
+        final ttsService = di<ITextToSpeechService>();
+        final audioUtils = di<IAudioUtils>();
+        final imageFinder = di.isRegistered<IImageFinder>() ? di<IImageFinder>() : null;
+
+        if (locale == LanguageLocale.en) {
+          return EnglishWordManager(aiService, ttsService, audioUtils, di<EnglishWordRepository>(), imageFinder);
+        } else if (locale == LanguageLocale.de) {
+          return GermanWordManager(aiService, ttsService, audioUtils, di<GermanWordRepository>(), imageFinder);
+        } else if (locale == LanguageLocale.es) {
+          return SpanishWordManager(aiService, ttsService, audioUtils, di<SpanishWordRepository>(), imageFinder);
+        }
+        throw Exception("Locale not supported: $locale");
+      },
     );
   }
 }

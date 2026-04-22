@@ -629,7 +629,7 @@ class WordMeaningAdapter extends TypeAdapter<WordMeaning> {
       partOfSpeech: fields[1] as PartOfSpeech,
       examples: (fields[2] as List).cast<WordExample>(),
       wordPronunciationAudioPath: fields[3] as String,
-      imagePath: fields[4] as String,
+      image: fields[6] as WordImage?,
       languageSpecificDetails: fields[5] as dynamic,
     );
   }
@@ -646,10 +646,10 @@ class WordMeaningAdapter extends TypeAdapter<WordMeaning> {
       ..write(obj.examples)
       ..writeByte(3)
       ..write(obj.wordPronunciationAudioPath)
-      ..writeByte(4)
-      ..write(obj.imagePath)
       ..writeByte(5)
-      ..write(obj.languageSpecificDetails);
+      ..write(obj.languageSpecificDetails)
+      ..writeByte(6)
+      ..write(obj.image);
   }
 
   @override
@@ -696,6 +696,49 @@ class SpanishWordAdapter extends TypeAdapter<SpanishWord> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SpanishWordAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class WordImageAdapter extends TypeAdapter<WordImage> {
+  @override
+  final typeId = 18;
+
+  @override
+  WordImage read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return WordImage(
+      imagePath: fields[0] as String,
+      imageCredits: fields[1] as String,
+      width: (fields[2] as num).toInt(),
+      height: (fields[3] as num).toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, WordImage obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.imagePath)
+      ..writeByte(1)
+      ..write(obj.imageCredits)
+      ..writeByte(2)
+      ..write(obj.width)
+      ..writeByte(3)
+      ..write(obj.height);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WordImageAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:lingu/core/router/app_router.dart';
 import 'package:lingu/core/settings/ai_credentials_service.dart';
+import 'package:lingu/core/settings/image_credentials_service.dart';
 import 'package:lingu/core/settings/stt_credentials_service.dart';
 import 'package:lingu/core/settings/locale_settings_service.dart';
 import 'package:lingu/core/settings/pronunciation_assessment_credentials_service.dart';
@@ -14,6 +15,7 @@ final _setupRoutes = {
   STTCredentialsRoute.name,
   TTSCredentialsRoute.name,
   PronunciationAssessmentCredentialsRoute.name,
+  PixabayCredentialsRoute.name,
 };
 
 class NativeLocaleGuard extends AutoRouteGuard {
@@ -226,5 +228,21 @@ class TTSCredentialsGuard extends AutoRouteGuard {
     } else {
       resolver.next(true);
     }
+  }
+}
+
+class ImageCredentialsGuard extends AutoRouteGuard {
+  final ImageCredentialsService _imageCredentials;
+
+  ImageCredentialsGuard(this._imageCredentials);
+
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    if (_setupRoutes.contains(resolver.routeName)) {
+      resolver.next(true);
+      return;
+    }
+
+    resolver.next(true);
   }
 }

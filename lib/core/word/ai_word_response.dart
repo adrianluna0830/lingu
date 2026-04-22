@@ -43,9 +43,10 @@ class AIWordResponse<T> {
                 description: 'The SSML (Speech Synthesis Markup Language) markup for the word pronunciation. Ensure high quality and natural intonation using phoneme tags if needed.',
               ),
               'imageDescription': Schema(type: SchemaType.string, description: 'A vivid, detailed description for an image generator to create a visual representation of this specific word meaning.'),
+              'imageCredits': Schema(type: SchemaType.string, description: 'The credits or author of the image.'),
               'languageSpecificDetails': languageSpecificDetails,
             },
-            required: ['meaning', 'partOfSpeech', 'examples', 'ssmlAudioPrompt', 'imageDescription', 'languageSpecificDetails'],
+            required: ['meaning', 'partOfSpeech', 'examples', 'ssmlAudioPrompt', 'imageDescription', 'imageCredits', 'languageSpecificDetails'],
           ),
         ),
       },
@@ -60,9 +61,18 @@ class AIMeaningResponse<T> {
   final List<AIExampleResponse> examples;
   final String ssmlAudioPrompt;
   final String imageDescription;
+  final String imageCredits;
   final T languageSpecificDetails;
 
-  AIMeaningResponse({required this.meaning, required this.partOfSpeech, required this.examples, required this.ssmlAudioPrompt, required this.imageDescription, required this.languageSpecificDetails});
+  AIMeaningResponse({
+    required this.meaning,
+    required this.partOfSpeech,
+    required this.examples,
+    required this.ssmlAudioPrompt,
+    required this.imageDescription,
+    required this.imageCredits,
+    required this.languageSpecificDetails,
+  });
 
   factory AIMeaningResponse.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) detailsFromJson) {
     return AIMeaningResponse(
@@ -71,6 +81,7 @@ class AIMeaningResponse<T> {
       examples: (json['examples'] as List).map((e) => AIExampleResponse.fromJson(e as Map<String, dynamic>)).toList(),
       ssmlAudioPrompt: json['ssmlAudioPrompt'] as String,
       imageDescription: json['imageDescription'] as String,
+      imageCredits: json['imageCredits'] as String,
       languageSpecificDetails: detailsFromJson(json['languageSpecificDetails'] as Map<String, dynamic>),
     );
   }

@@ -1,6 +1,6 @@
-import 'package:lingu/core/word/english_word_details.dart';
-import 'package:lingu/core/word/german_word_details.dart';
-import 'package:lingu/core/word/spanish_word_details.dart';
+import 'package:lingu/core/word/word_details/english_word_details.dart';
+import 'package:lingu/core/word/word_details/german_word_details.dart';
+import 'package:lingu/core/word/word_details/spanish_word_details.dart';
 
 sealed class Word {
   final String word;
@@ -20,12 +20,37 @@ enum PartOfSpeech {
   interjection,
 }
 
+final class WordImage {
+  final String imagePath;
+  final String imageCredits;
+  final int width;
+  final int height;
+
+  WordImage({required this.imagePath, required this.imageCredits, required this.width, required this.height});
+
+  factory WordImage.fromJson(Map<String, dynamic> json) {
+    return WordImage(
+      imagePath: json['imagePath'] as String,
+      imageCredits: json['imageCredits'] as String,
+      width: json['width'] as int,
+      height: json['height'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'imagePath': imagePath,
+        'imageCredits': imageCredits,
+        'width': width,
+        'height': height,
+      };
+}
+
 final class WordMeaning {
   final String meaning;
   final PartOfSpeech partOfSpeech;
   final List<WordExample> examples;
   final String wordPronunciationAudioPath;
-  final String imagePath;
+  final WordImage? image;
   final dynamic languageSpecificDetails;
 
   WordMeaning({
@@ -33,7 +58,7 @@ final class WordMeaning {
     required this.partOfSpeech,
     required this.examples,
     required this.wordPronunciationAudioPath,
-    required this.imagePath,
+    this.image,
     required this.languageSpecificDetails,
   });
 
@@ -48,8 +73,11 @@ final class WordMeaning {
           .map((e) => WordExample.fromJson(e as Map<String, dynamic>))
           .toList(),
       wordPronunciationAudioPath: json['wordPronunciationAudioPath'] as String,
-      imagePath: json['imagePath'] as String,
-      languageSpecificDetails: detailsFromJson(json['languageSpecificDetails'] as Map<String, dynamic>),
+      image: json['image'] != null
+          ? WordImage.fromJson(json['image'] as Map<String, dynamic>)
+          : null,
+      languageSpecificDetails: detailsFromJson(
+          json['languageSpecificDetails'] as Map<String, dynamic>),
     );
   }
 }

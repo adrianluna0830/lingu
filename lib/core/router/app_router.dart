@@ -20,6 +20,8 @@ import 'package:lingu/core/word/word.dart';
 import 'package:lingu/features/word/word_fetch_view.dart';
 import 'package:lingu/features/word/word_view.dart';
 
+import 'package:lingu/features/login/ui/pixabay_credentials_view.dart';
+
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'View,Route')
@@ -33,6 +35,7 @@ class AppRouter extends RootStackRouter {
   final TTSCredentialsGuard _ttsCredentialsGuard;
   final ChatGuard _chatGuard;
   final HomeGuard _homeGuard;
+  final ImageCredentialsGuard _imageCredentialsGuard;
 
   AppRouter(
     this._nativeLocaleGuard,
@@ -44,6 +47,7 @@ class AppRouter extends RootStackRouter {
     this._ttsCredentialsGuard,
     this._chatGuard,
     this._homeGuard,
+    this._imageCredentialsGuard,
   );
 
   @override
@@ -55,6 +59,7 @@ class AppRouter extends RootStackRouter {
     _sttCredentialsGuard,
     _pronunciationAssessmentCredentialGuard,
     _ttsCredentialsGuard,
+    _imageCredentialsGuard,
   ];
   @override
   List<AutoRoute> get routes => [
@@ -64,6 +69,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: CEFRLevelRoute.page),
     AutoRoute(page: AICredentialsRoute.page),
     AutoRoute(page: STTCredentialsRoute.page),
+    AutoRoute(page: PixabayCredentialsRoute.page),
     AutoRoute(page: PronunciationAssessmentCredentialsRoute.page),
     AutoRoute(page: TTSCredentialsRoute.page),
     AutoRoute(page: WordRoute.page),

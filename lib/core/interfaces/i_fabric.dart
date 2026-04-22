@@ -2,8 +2,8 @@ import 'package:lingu/core/models/credential_results.dart';
 import 'package:lingu/core/ai/core/i_ai_service.dart';
 import 'package:lingu/core/tts/core/i_text_to_speech_service.dart';
 import 'package:lingu/core/pronunciation/service/i_pronunciation_assessment.dart';
-
 import 'package:lingu/core/stt/i_speech_to_text_service.dart';
+import 'package:lingu/core/image/i_image_finder.dart';
 
 abstract class IAPIFabric<T> {
   Future<CredentialValidationResult> validate();

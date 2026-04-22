@@ -10,6 +10,8 @@ import 'package:lingu/core/router/app_router.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:lingu/core/models/cefr.dart';
 
+import 'package:lingu/core/settings/image_credentials_service.dart';
+
 @RoutePage()
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -21,6 +23,7 @@ class SettingsView extends StatelessWidget {
     final localeService = di<LocaleSettingsService>();
     final pronunciationService = di<PronunciationAssessmentCredentialsService>();
     final ttsService = di<TextToSpeechSettingsService>();
+    final imageService = di<ImageCredentialsService>();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -50,6 +53,11 @@ class SettingsView extends StatelessWidget {
             title: 'STT API Key',
             value: sttService.apiKey.watch(context) ?? 'Not set',
             onTap: () => context.router.push(STTCredentialsRoute(onComplete: () => context.router.maybePop())),
+          ),
+          _SecretSettingTile(
+            title: 'Pixabay API Key',
+            value: imageService.pixabayApiKey.watch(context) ?? 'Not set',
+            onTap: () => context.router.push(PixabayCredentialsRoute(onComplete: () => context.router.maybePop())),
           ),
           _PronunciationSettingTile(
             apiKey: pronunciationService.apiKey.watch(context) ?? 'Not set',

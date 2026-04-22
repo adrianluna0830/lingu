@@ -22,6 +22,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(TopicStatusAdapter());
     registerAdapter(VerbConjugationTypeAdapter());
     registerAdapter(WordExampleAdapter());
+    registerAdapter(WordImageAdapter());
     registerAdapter(WordMeaningAdapter());
   }
 }
@@ -43,6 +44,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(TopicStatusAdapter());
     registerAdapter(VerbConjugationTypeAdapter());
     registerAdapter(WordExampleAdapter());
+    registerAdapter(WordImageAdapter());
     registerAdapter(WordMeaningAdapter());
   }
 }
