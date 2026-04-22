@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:lingu/features/word/word_view_widgets.dart';
 
 Future<({String word, String context})?> showWordSelectionDialog(
   BuildContext context,
@@ -17,46 +18,12 @@ Future<({String word, String context})?> showWordSelectionDialog(
           final currentIdx = selectedIndex.value;
           final theme = Theme.of(context);
 
-          return Wrap(
-            spacing: 2.0,
-            runSpacing: 2.0,
-            alignment: WrapAlignment.center,
-            children: List.generate(words.length, (index) {
-              final isSelected = currentIdx == index;
-              final word = words[index];
-
-              return Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    selectedIndex.value = index;
-                  },
-                  borderRadius: BorderRadius.circular(4),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Text(
-                          word,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: Colors.transparent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          word,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
+          return SelectableWords(
+            words: words,
+            activeIndex: currentIdx,
+            onTap: (word, index) {
+              selectedIndex.value = index;
+            },
           );
         }),
       ),

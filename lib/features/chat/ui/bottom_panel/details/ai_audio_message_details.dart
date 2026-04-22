@@ -3,6 +3,7 @@ import 'package:lingu/core/audio/playback/i_audio_playback.dart';
 import 'package:lingu/core/di/injection.dart';
 import 'package:lingu/features/chat/logic/feedback/models/message_details_view_dto.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:lingu/features/word/word_view_widgets.dart';
 
 class AIAudioMessageDetailsInternalController {
   AIAudioMessageDetailsViewDto data;
@@ -111,49 +112,10 @@ class _AIAudioMessageDetailsState extends State<AIAudioMessageDetails> {
             padding: const EdgeInsets.all(16.0),
             child: Watch((context) {
               final currentIndex = _controller.currentWordIndex.value;
-              return Wrap(
-                spacing: 2.0,
-                runSpacing: 4.0,
-                alignment: WrapAlignment.center,
-                children: List.generate(timepoints.length, (index) {
-                  final isSelected = currentIndex == index;
-                  return Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => _controller.changeWord(index),
-                      borderRadius: BorderRadius.circular(4),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 2, vertical: 2),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Ghost text in bold to always reserve max space
-                            Text(
-                              timepoints[index].word,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                color: Colors.transparent,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            // Visible text on top
-                            Text(
-                              timepoints[index].word,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                color: isSelected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurface,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+              return SelectableWords(
+                words: timepoints.map((t) => t.word).toList(),
+                activeIndex: currentIndex,
+                onTap: (_, index) => _controller.changeWord(index),
               );
             }),
           ),

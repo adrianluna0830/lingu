@@ -87,7 +87,7 @@ class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
                   : const SizedBox.shrink(),
         if (isShowingTranscription && widget.transcription.trim().isNotEmpty)
           InteractableText(
-            text: '(${widget.transcription})',
+            text: widget.transcription,
             onChat: widget.onChat ?? () {},
             onWordInfo: widget.onWordInfo ?? () {},
             textStyle: const TextStyle(fontStyle: FontStyle.italic, color: Colors.black87, fontSize: 12),
