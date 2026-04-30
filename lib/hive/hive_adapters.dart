@@ -1,12 +1,12 @@
 import 'package:hive_ce/hive_ce.dart';
-import 'package:lingu/core/models/cefr.dart';
-import 'package:lingu/core/models/language_locale.dart';
-import 'package:lingu/core/models/grammatical_gender.dart';
-import 'package:lingu/features/topics/topic.dart';
-import 'package:lingu/core/word/word.dart';
-import 'package:lingu/core/word/word_details/english_word_details.dart';
-import 'package:lingu/core/word/word_details/german_word_details.dart';
-import 'package:lingu/core/word/word_details/spanish_word_details.dart';
+import 'package:lingu/domain/core/models/cefr.dart';
+import 'package:lingu/domain/core/models/language_locale.dart';
+import 'package:lingu/domain/word/models/grammatical_gender.dart';
+import 'package:lingu/domain/topic/models/topic.dart';
+import 'package:lingu/domain/word/models/word.dart';
+import 'package:lingu/domain/word/models/details/english_word_details.dart';
+import 'package:lingu/domain/word/models/details/german_word_details.dart';
+import 'package:lingu/domain/word/models/details/spanish_word_details.dart';
 
 @GenerateAdapters([
   AdapterSpec<Topic>(),

@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
-import 'package:lingu/core/di/injection.dart';
-import 'package:lingu/core/router/app_router.dart';
-import 'package:lingu/gen/assets.gen.dart';
+import 'package:lingu/domain/core/di/injection.dart';
+import 'package:lingu/domain/core/router/app_router.dart';
 import 'package:lingu/hive/hive_registrar.g.dart';
-import 'package:lingu/model_loader.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:signals/signals.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa_onnx;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
-  // Limpiar cajas para evitar errores de casting por cambios de esquema
   await Hive.deleteBoxFromDisk('topic_data');
   await Hive.deleteBoxFromDisk('english_word_box');
   await Hive.deleteBoxFromDisk('german_word_box');
@@ -25,14 +20,7 @@ void main() async {
   JustAudioMediaKit.ensureInitialized();
   await DependencyInjection.init();
   // sherpa_onnx.initBindings();
-  // di<AICredentialsService>().apiKey.value = null;
-  // di<STTCredentialsService>().apiKey.value = null;
-  // di<TextToSpeechSettingsService>().apiKey.value = null;
-  // di<PronunciationAssessmentCredentialsService>().apiKey.value = null;
-  // di<PronunciationAssessmentCredentialsService>().endpoint.value = null;
-  // di<LocaleSettingsService>().learningLocale.value = null;
-  // di<LocaleSettingsService>().nativeLocale.value = null;
-  // di<LocaleSettingsService>().currentTargetLanguageCEFR.value = null;
+
 
   SignalsObserver.instance = null;
   runApp(const MyApp());
