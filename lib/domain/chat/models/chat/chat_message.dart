@@ -1,3 +1,5 @@
+import 'package:lingu/domain/interfaces/tts/synthesis_with_timepoints_response.dart';
+
 sealed class ChatMessageModel {
   final int id;
   const ChatMessageModel({required this.id});
@@ -105,6 +107,7 @@ class AIAudioMessageModel extends ChatMessageModel {
   final String transcript;
   final String audioUrl;
   final Duration duration;
+  final List<SynthesisTimepoint> timepoints;
   final String? translation;
 
   const AIAudioMessageModel({
@@ -112,6 +115,7 @@ class AIAudioMessageModel extends ChatMessageModel {
     required this.transcript,
     required this.audioUrl,
     required this.duration,
+    required this.timepoints,
     this.translation,
   });
 
@@ -120,6 +124,7 @@ class AIAudioMessageModel extends ChatMessageModel {
     String? transcript,
     String? audioUrl,
     Duration? duration,
+    List<SynthesisTimepoint>? timepoints,
     String? translation,
   }) {
     return AIAudioMessageModel(
@@ -127,6 +132,7 @@ class AIAudioMessageModel extends ChatMessageModel {
       transcript: transcript ?? this.transcript,
       audioUrl: audioUrl ?? this.audioUrl,
       duration: duration ?? this.duration,
+      timepoints: timepoints ?? this.timepoints,
       translation: translation ?? this.translation,
     );
   }

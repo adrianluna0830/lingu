@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:lingu/domain/chat/models/chat/chat_message.dart';
+import 'package:lingu/domain/interfaces/tts/synthesis_with_timepoints_response.dart';
 import 'package:signals/signals.dart';
 
 class ChatMessagesManager {
@@ -29,7 +30,7 @@ class ChatMessagesManager {
     required String audioUrl,
     required Duration duration,
     required String transcript,
-    String? translation,
+    required List<SynthesisTimepoint> timepoints,
   }) async {
     final id = _generateId();
     final message = AIAudioMessageModel(
@@ -37,7 +38,7 @@ class ChatMessagesManager {
       duration: duration,
       transcript: transcript,
       audioUrl: audioUrl,
-      translation: translation,
+      timepoints: timepoints,
     );
     _messages.value = [..._messages.value, message];
     _newMessageController.add(message);

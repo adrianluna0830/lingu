@@ -89,14 +89,14 @@ types:
         index: 7
   WordExample:
     typeId: 6
-    nextIndex: 3
+    nextIndex: 5
     fields:
       translation:
         index: 0
       example:
         index: 1
-      exampleAudioPath:
-        index: 2
+      speechAudio:
+        index: 4
   GrammaticalGender:
     typeId: 7
     nextIndex: 3
@@ -167,7 +167,7 @@ types:
         index: 3
   WordMeaning:
     typeId: 16
-    nextIndex: 7
+    nextIndex: 9
     fields:
       meaning:
         index: 0
@@ -175,12 +175,12 @@ types:
         index: 1
       examples:
         index: 2
-      wordPronunciationAudioPath:
-        index: 3
       languageSpecificDetails:
         index: 5
       image:
         index: 6
+      speechAudio:
+        index: 8
   SpanishWord:
     typeId: 17
     nextIndex: 2

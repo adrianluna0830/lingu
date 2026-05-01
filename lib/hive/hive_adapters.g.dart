@@ -310,7 +310,7 @@ class WordExampleAdapter extends TypeAdapter<WordExample> {
     return WordExample(
       translation: fields[0] as String,
       example: fields[1] as String,
-      exampleAudioPath: fields[2] as String,
+      speechAudio: fields[4] as SpeechAudio,
     );
   }
 
@@ -322,8 +322,8 @@ class WordExampleAdapter extends TypeAdapter<WordExample> {
       ..write(obj.translation)
       ..writeByte(1)
       ..write(obj.example)
-      ..writeByte(2)
-      ..write(obj.exampleAudioPath);
+      ..writeByte(4)
+      ..write(obj.speechAudio);
   }
 
   @override
@@ -628,9 +628,9 @@ class WordMeaningAdapter extends TypeAdapter<WordMeaning> {
       meaning: fields[0] as String,
       partOfSpeech: fields[1] as PartOfSpeech,
       examples: (fields[2] as List).cast<WordExample>(),
-      wordPronunciationAudioPath: fields[3] as String,
       image: fields[6] as WordImage?,
       languageSpecificDetails: fields[5] as dynamic,
+      speechAudio: fields[8] as SpeechAudio,
     );
   }
 
@@ -644,12 +644,12 @@ class WordMeaningAdapter extends TypeAdapter<WordMeaning> {
       ..write(obj.partOfSpeech)
       ..writeByte(2)
       ..write(obj.examples)
-      ..writeByte(3)
-      ..write(obj.wordPronunciationAudioPath)
       ..writeByte(5)
       ..write(obj.languageSpecificDetails)
       ..writeByte(6)
-      ..write(obj.image);
+      ..write(obj.image)
+      ..writeByte(8)
+      ..write(obj.speechAudio);
   }
 
   @override

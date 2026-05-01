@@ -47,10 +47,9 @@ class ChatMessagesList extends StatelessWidget {
             onChat: () => controller?.onChatMessageTap?.call(message),
           ),
           AIAudioMessageViewDto message => AIVoiceMessage(
-            audioUrl: message.chatMessage.audioUrl,
-            duration: message.chatMessage.duration,
-            transcription: message.chatMessage.transcript,
+            transcription: message.transcription,
             translation: message.translation,
+            speechAudio: message.speechAudio,
             onTap: () => controller?.onMessageTap?.call(message),
             onTranslation: () => controller?.onAITranslationTap?.call(message),
             onWordInfo: () => controller?.onWordInfoTap?.call(message),

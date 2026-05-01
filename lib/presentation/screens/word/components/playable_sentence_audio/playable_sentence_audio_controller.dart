@@ -16,4 +16,6 @@ class PlayableSentenceAudioController {
   void stop() async {
     await _audioPlayerManager.stop(audioPath);
   }
+
+  void dispose() {}
 }

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:lingu/presentation/widgets/interactive_selectable_text.dart';
+import 'package:lingu/domain/chat/models/chat/message_details_view_dto.dart';
+import 'package:lingu/presentation/widgets/speech_transcription_widget.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:lingu/presentation/screens/chat/widgets/messages/message_layout.dart';
 import 'package:lingu/presentation/screens/chat/components/input/voice_note_controls.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
 class AIVoiceMessage extends StatefulWidget {
-  final String audioUrl;
-  final Duration duration;
   final String transcription;
   final String? translation;
+  final SpeechAudio speechAudio;
   final VoidCallback onTap;
   final VoidCallback onTranslation;
   final VoidCallback? onWordInfo;
@@ -17,9 +17,8 @@ class AIVoiceMessage extends StatefulWidget {
 
   const AIVoiceMessage({
     super.key,
-    required this.audioUrl,
-    required this.duration,
     required this.transcription,
+    required this.speechAudio,
     this.translation,
     required this.onTap,
     required this.onTranslation,
@@ -32,12 +31,10 @@ class AIVoiceMessage extends StatefulWidget {
 }
 
 class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
-  late final _showTranscription = createSignal(false);
   late final _showTranslation = createSignal(false);
 
   @override
   Widget build(BuildContext context) {
-    final isShowingTranscription = _showTranscription.watch(context);
     final isShowingTranslation = _showTranslation.watch(context);
 
     return MessageLayout(
@@ -56,14 +53,16 @@ class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
           borderRadius: BorderRadius.circular(4),
           child: Icon(Icons.translate_rounded, size: 16, color: isShowingTranslation ? Colors.blue : Colors.black38),
         ),
-        InkWell(
-          onTap: () => _showTranscription.value = !_showTranscription.value,
-          borderRadius: BorderRadius.circular(4),
-          child: Icon(Icons.subtitles_rounded, size: 16, color: isShowingTranscription ? Colors.blue : Colors.black38),
-        ),
       ],
       children: [
-        VoiceNoteControls(audioUrl: widget.audioUrl, duration: widget.duration),
+        VoiceNoteControls(
+          audioUrl: widget.speechAudio.audioUrl,
+          duration: widget.speechAudio.duration,
+        ),
+        SpeechTranscriptionWidget(
+          speechAudio: widget.speechAudio,
+          highlightCurrentSentence: true,
+        ),
         if (isShowingTranslation)
           widget.translation != null && widget.translation!.trim().isNotEmpty
               ? MessageSubText(
@@ -85,12 +84,6 @@ class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
                       ),
                     )
                   : const SizedBox.shrink(),
-        if (isShowingTranscription && widget.transcription.trim().isNotEmpty)
-          InteractiveSelectableText(
-            text: widget.transcription,
-            onChat: widget.onChat ?? () {},
-            onWordInfo: widget.onWordInfo ?? () {},
-          ),
       ],
     );
   }

@@ -1,5 +1,6 @@
 import 'package:lingu/domain/chat/models/feedback/message_feedback_summary.dart';
 import 'package:lingu/domain/chat/models/chat/chat_message.dart';
+import 'package:lingu/domain/chat/models/chat/message_details_view_dto.dart';
 
 sealed class MessageViewDto {
   final int id;
@@ -37,11 +38,14 @@ class AITextMessageViewDto extends MessageViewDto {
 }
 
 class AIAudioMessageViewDto extends MessageViewDto {
-  final AIAudioMessageModel chatMessage;
+  final String transcription;
   final String? translation;
+  final SpeechAudio speechAudio;
 
   AIAudioMessageViewDto({
-    required this.chatMessage,
+    required super.id,
+    required this.transcription,
+    required this.speechAudio,
     this.translation,
-  }) : super(id: chatMessage.id);
+  });
 }

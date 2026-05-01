@@ -14,6 +14,7 @@ import 'package:lingu/presentation/screens/login/cefr_level_view.dart';
 import 'package:lingu/presentation/screens/login/native_locale_view.dart';
 import 'package:lingu/presentation/screens/home/views/topics_view.dart';
 import 'package:lingu/domain/word/models/word.dart';
+import 'package:lingu/presentation/screens/login/pixabay_credentials_view.dart';
 import 'package:lingu/presentation/screens/word/word_fetch_view.dart';
 import 'package:lingu/presentation/screens/word/word_view.dart';
 

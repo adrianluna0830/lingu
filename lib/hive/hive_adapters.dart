@@ -1,4 +1,5 @@
 import 'package:hive_ce/hive_ce.dart';
+import 'package:lingu/domain/chat/models/chat/message_details_view_dto.dart';
 import 'package:lingu/domain/core/models/cefr.dart';
 import 'package:lingu/domain/core/models/language_locale.dart';
 import 'package:lingu/domain/word/models/grammatical_gender.dart';

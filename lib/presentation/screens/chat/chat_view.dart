@@ -8,7 +8,6 @@ import 'package:lingu/presentation/screens/chat/components/chat_layout/chat_pane
 import 'package:lingu/presentation/screens/chat/components/chat_layout/chat_panel_controller.dart';
 import 'package:lingu/presentation/screens/chat/components/chat_layout/bottom_panel.dart';
 import 'package:lingu/presentation/screens/chat/components/chat_layout/bottom_panel_controller.dart';
-import 'package:lingu/presentation/screens/chat/components/message_details/ai_audio_message_details.dart';
 import 'package:lingu/domain/chat/models/chat/chat_languages.dart';
 import 'package:lingu/domain/chat/models/chat/message_details_view_dto.dart';
 import 'package:lingu/domain/chat/models/enums/panel_state.dart';
@@ -98,7 +97,7 @@ class _ChatViewState extends State<ChatView> {
       if (message is AITextMessageViewDto) {
         _orchestrator.handleFetchTranslation(message.id, message.chatMessage.text);
       } else if (message is AIAudioMessageViewDto) {
-        _orchestrator.handleFetchTranslation(message.id, message.chatMessage.transcript);
+        _orchestrator.handleFetchTranslation(message.id, message.transcription);
       }
     };
 _controller.onWordInfoTap = (message) async {
@@ -106,7 +105,7 @@ _controller.onWordInfoTap = (message) async {
     UserTextMessageViewDto m => m.feedbackSummary!.translation!,
     UserAudioMessageViewDto m => m.feedbackSummary!.translation!,
     AITextMessageViewDto m => m.chatMessage.text,
-    AIAudioMessageViewDto m => m.chatMessage.transcript,
+    AIAudioMessageViewDto m => m.transcription,
   };
 
   final result = await showWordSelectionDialog(context, content);
@@ -129,7 +128,7 @@ _controller.onWordInfoTap = (message) async {
         UserTextMessageViewDto m => m.chatMessage.text,
         UserAudioMessageViewDto m => m.feedbackSummary?.transcription,
         AITextMessageViewDto m => m.chatMessage.text,
-        AIAudioMessageViewDto m => m.chatMessage.transcript,
+        AIAudioMessageViewDto m => m.transcription,
       };
 
       _panelManager.openChatPanel(initialMessage: content);
@@ -229,8 +228,6 @@ _controller.onWordInfoTap = (message) async {
                       return UserTextMessageDetails(data: data);
                     } else if (data is UserAudioDetails) {
                       return UserAudioMessageDetails(data: data);
-                    } else if (data is SpeechAudio) {
-                      return AIAudioMessageDetails(data: data);
                     }
                   }
                   if (panelState is ChatPanelState) {

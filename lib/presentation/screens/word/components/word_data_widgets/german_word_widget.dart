@@ -36,8 +36,7 @@ class _GermanWordWidgetState extends State<GermanWordWidget> with SignalsMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   PlayableSentenceAudio(
-                    audioPath: meaning.wordPronunciationAudioPath,
-                    sentence: widget.word.word,
+                    speechAudio: meaning.speechAudio,
                     onChat: () => widget.controller.onChat?.call(widget.word.word),
                     onWordInfo: () => widget.controller.onWordInfo?.call(widget.word.word),
                   ),
@@ -54,12 +53,11 @@ class _GermanWordWidgetState extends State<GermanWordWidget> with SignalsMixin {
                     (e) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        PlayableSentenceAudio(
-                          audioPath: e.exampleAudioPath,
-                          sentence: e.example,
-                          onChat: () => widget.controller.onChat?.call(e.example),
-                          onWordInfo: () => widget.controller.onWordInfo?.call(e.example),
-                        ),
+                      PlayableSentenceAudio(
+                           speechAudio: e.speechAudio,
+                           onChat: () => widget.controller.onChat?.call(e.example),
+                           onWordInfo: () => widget.controller.onWordInfo?.call(e.example),
+                         ),
                         Text(e.translation, style: const TextStyle(fontStyle: FontStyle.italic)),
                       ],
                     ),

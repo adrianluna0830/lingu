@@ -22,19 +22,6 @@ class MessageDetailsManager {
     _messageDetails[messageId] = details;
   }
 
-  void setAiAudioDetails(
-    int messageId,
-    List<SynthesisTimepoint> timepoints,
-    Duration duration,
-    String audioUrl,
-  ) {
-    _messageDetails[messageId] = SpeechAudio(
-      timepoints: timepoints,
-      duration: duration,
-      audioUrl: audioUrl,
-    );
-  }
-
   
   Future<UserTextDetails> fetchTextFeedback(
     int messageId,

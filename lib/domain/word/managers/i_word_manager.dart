@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io' as io;
+import 'package:lingu/domain/chat/models/chat/message_details_view_dto.dart';
 import 'package:lingu/domain/interfaces/image_finder/image_quality.dart';
 import 'package:lingu/domain/word/models/word.dart';
 import 'package:lingu/domain/word/repositories/i_word_repository.dart';
@@ -68,21 +69,35 @@ abstract class IWordManager<T extends Word, D> {
     final List<WordMeaning> meanings = [];
 
     for (final m in aiResponse.meanings) {
-      final response = await _ttsService.synthesizeSpeechText(
+      final response = await _ttsService.synthesizeSpeechWithTimepoints(
         text: m.ssmlAudioPrompt,
         languageCode: learningLocale.bcp47,
       );
       final wordAudioPath = await _audioUtils.saveToPath(response.audioBytes, true);
+      final wordSpeechAudio = SpeechAudio(
+        timepoints: response.timepoints,
+        duration: response.duration,
+        audioUrl: wordAudioPath,
+      );
 
       final List<WordExample> examples = [];
       for (final e in m.examples) {
-        final exampleResponse = await _ttsService.synthesizeSpeechText(
+        final exampleResponse = await _ttsService.synthesizeSpeechWithTimepoints(
           text: e.example,
           languageCode: learningLocale.bcp47,
         );
         final exampleAudioPath = await _audioUtils.saveToPath(exampleResponse.audioBytes, true);
+        final exampleSpeechAudio = SpeechAudio(
+          timepoints: exampleResponse.timepoints,
+          duration: exampleResponse.duration,
+          audioUrl: exampleAudioPath,
+        );
 
-        examples.add(WordExample(translation: e.translation, example: e.example, exampleAudioPath: exampleAudioPath));
+        examples.add(WordExample(
+          translation: e.translation,
+          example: e.example,
+          speechAudio: exampleSpeechAudio,
+        ));
       }
 
       WordImage? wordImage;
@@ -109,9 +124,9 @@ abstract class IWordManager<T extends Word, D> {
           meaning: m.meaning,
           partOfSpeech: m.partOfSpeech,
           examples: examples,
-          wordPronunciationAudioPath: wordAudioPath,
           image: wordImage,
           languageSpecificDetails: m.languageSpecificDetails as dynamic,
+          speechAudio: wordSpeechAudio,
         ),
       );
     }

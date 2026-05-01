@@ -106,15 +106,9 @@ class ChatOrchestrator {
           audioUrl: audioUrl,
           duration: duration,
           transcript: chatbotResponse.text,
+          timepoints: ttsResponse.timepoints,
         );
         _viewManager.addMessage(aiMessage);
-
-        _messageDetailsManager.setAiAudioDetails(
-          aiMessage.id,
-          ttsResponse.timepoints,
-          duration,
-          audioUrl,
-        );
     }
   }
 

@@ -47,8 +47,14 @@ class ChatMessageViewManager {
         translation: m.translation,
       ),
       AIAudioMessageModel m => AIAudioMessageViewDto(
-        chatMessage: m,
+        id: m.id,
+        transcription: m.transcript,
         translation: m.translation,
+        speechAudio: SpeechAudio(
+          timepoints: m.timepoints,
+          duration: m.duration,
+          audioUrl: m.audioUrl,
+        ),
       ),
     };
   }
