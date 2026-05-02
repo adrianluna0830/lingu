@@ -7,6 +7,7 @@ abstract class IAIService {
     required String prompt,
     String? systemInstructions,
     Map<String, dynamic>? responseSchema,
+    bool enableThinking = false,
   });
 
   Future<AIChatHistory> generateChatContent({
@@ -14,6 +15,7 @@ abstract class IAIService {
     AIChatHistory chatHistory = const AIChatHistory(),
     String? systemInstructions,
     Map<String, dynamic>? responseSchema,
+    bool enableThinking = false,
   });
 
   Future<double?> getCreditsUsage();

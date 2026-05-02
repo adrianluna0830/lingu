@@ -28,6 +28,7 @@ Future<String> generateContent({
   required String prompt,
   String? systemInstructions,
   Map<String, dynamic>? responseSchema,
+  bool enableThinking = false,
 }) async {
   try {
     final response = await _client.models.generateContent(
@@ -52,6 +53,7 @@ Future<AIChatHistory> generateChatContent({
   AIChatHistory chatHistory = const AIChatHistory(),
   String? systemInstructions,
   Map<String, dynamic>? responseSchema,
+  bool enableThinking = false,
 }) async {
   try {
     final historyWithUser = chatHistory.addUser(prompt);

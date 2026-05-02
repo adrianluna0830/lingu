@@ -12,7 +12,7 @@ class OpenRouterAiService extends IAIService {
 
   OpenRouterAiService({
     required this.apiKey,
-    this.model = 'qwen/qwen3-8b',
+    this.model = 'qwen/qwen3.5-flash-02-23',
   });
 
   Map<String, String> get _headers => {
@@ -66,6 +66,7 @@ class OpenRouterAiService extends IAIService {
     final body = <String, dynamic>{
       'model': model,
       'messages': messages,
+      'reasoning': {'enabled': false},
       if (responseFormat != null) 'response_format': responseFormat,
     };
 
@@ -88,6 +89,7 @@ class OpenRouterAiService extends IAIService {
     required String prompt,
     String? systemInstructions,
     Map<String, dynamic>? responseSchema,
+    bool enableThinking = false,
   }) async {
     final messages = _buildMessages(prompt, systemInstructions: systemInstructions);
     return _post(messages, _buildResponseFormat(responseSchema));
@@ -99,6 +101,7 @@ class OpenRouterAiService extends IAIService {
     AIChatHistory chatHistory = const AIChatHistory(),
     String? systemInstructions,
     Map<String, dynamic>? responseSchema,
+    bool enableThinking = false,
   }) async {
     final messages = _buildMessages(prompt, chatHistory: chatHistory, systemInstructions: systemInstructions);
     final content = await _post(messages, _buildResponseFormat(responseSchema));
