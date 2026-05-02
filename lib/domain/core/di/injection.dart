@@ -173,15 +173,16 @@ class _StartupDependencies {
     di.registerFactoryParam<IWordManager<Word, dynamic>, LanguageLocale, void>((locale, _) {
       final aiService = di<IAIService>();
       final ttsService = di<ITextToSpeechService>();
+      final sttService = di<ISpeechToTextService>();
       final audioUtils = di<IAudioUtils>();
       final imageFinder = di.isRegistered<IImageFinder>() ? di<IImageFinder>() : null;
 
       if (locale == LanguageLocale.en) {
-        return EnglishWordManager(aiService, ttsService, audioUtils, di<EnglishWordRepository>(), imageFinder);
+        return EnglishWordManager(aiService, ttsService, sttService, audioUtils, di<EnglishWordRepository>(), imageFinder);
       } else if (locale == LanguageLocale.de) {
-        return GermanWordManager(aiService, ttsService, audioUtils, di<GermanWordRepository>(), imageFinder);
+        return GermanWordManager(aiService, ttsService, sttService, audioUtils, di<GermanWordRepository>(), imageFinder);
       } else if (locale == LanguageLocale.es) {
-        return SpanishWordManager(aiService, ttsService, audioUtils, di<SpanishWordRepository>(), imageFinder);
+        return SpanishWordManager(aiService, ttsService, sttService, audioUtils, di<SpanishWordRepository>(), imageFinder);
       }
       throw Exception("Locale not supported: $locale");
     });
@@ -224,7 +225,7 @@ class _ChatDependencies {
     );
     di.registerLazySingleton<StatementFeedbackService>(() => StatementFeedbackService(di<IAIService>(), di<ChatLanguages>()));
     di.registerSingleton<MessageDetailsManager>(MessageDetailsManager(di<PronunciationFeedbackService>(), di<StatementFeedbackService>()));
-    di.registerSingletonAsync<ChatbotManager>(() async => ChatbotManager(di<IAIService>(), di<ITextToSpeechService>(), di<ChatLanguages>(), di<ChatCEFR>()));
+    di.registerSingletonAsync<ChatbotManager>(() async => ChatbotManager(di<IAIService>(), di<ITextToSpeechService>(), di<ISpeechToTextService>(), di<ChatLanguages>(), di<ChatCEFR>()));
     di.registerSingleton<ChatMessageViewManager>(ChatMessageViewManager());
     di.registerSingletonAsync<ChatOrchestrator>(() async {
       await di.isReady<ChatbotManager>();

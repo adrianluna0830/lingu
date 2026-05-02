@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:googleai_dart/googleai_dart.dart';
 import 'package:lingu/domain/interfaces/ai/ai_chat_history.dart';
 import 'package:lingu/domain/interfaces/ai/i_ai_service.dart';
+import 'package:lingu/domain/interfaces/stt/i_speech_to_text_service.dart';
 import 'package:lingu/domain/interfaces/tts/i_text_to_speech_service.dart';
 import 'package:lingu/domain/interfaces/tts/synthesis_with_timepoints_response.dart';
 import 'package:lingu/domain/chat/models/chat/chat_cefr.dart';
 import 'package:lingu/domain/chat/models/chat/chat_languages.dart';
+import 'package:lingu/domain/scripts/speech_timepoints_manager.dart';
 
 sealed class ChatbotResponse {
   final AIChatHistory history;
@@ -52,16 +54,20 @@ class ChatbotAIResponse {
 
 class ChatbotManager {
   final IAIService _aiService;
-  final ITextToSpeechService _ttsService;
+  final SpeechTimepointsManager _synthesizeScript;
   final ChatLanguages _chatLanguages;
   final ChatCEFR _chatCefr;
 
   ChatbotManager(
     this._aiService,
-    this._ttsService,
+    ITextToSpeechService ttsService,
+    ISpeechToTextService sttService,
     this._chatLanguages,
     this._chatCefr,
-  );
+  ) : _synthesizeScript = SpeechTimepointsManager(
+          ttsService: ttsService,
+          sttService: sttService,
+        );
 
   Future<ChatbotResponse> generateNextResponse(
     AIChatHistory history,
@@ -112,9 +118,9 @@ class ChatbotManager {
     final json = jsonDecode(aiRawJson) as Map<String, dynamic>;
     final chatbotResponse = ChatbotAIResponse.fromJson(json);
     print('Generated chatbot response: ${chatbotResponse.text}');
-    final audioTimepoints = await _ttsService.synthesizeSpeechWithTimepoints(
+    final audioTimepoints = await _synthesizeScript.execute(
       text: chatbotResponse.text,
-      languageCode: _chatLanguages.target.bcp47
+      languageLocale: _chatLanguages.target
     );
     print('Generated audio with duration ${audioTimepoints.duration} and ${audioTimepoints.timepoints.length} timepoints.');
     return AudioChatbotResponse(

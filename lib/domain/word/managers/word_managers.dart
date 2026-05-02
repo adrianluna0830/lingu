@@ -7,9 +7,11 @@ import 'package:lingu/domain/core/models/language_locale.dart';
 import 'package:lingu/domain/word/models/details/english_word_details.dart';
 import 'package:lingu/domain/word/models/details/german_word_details.dart';
 import 'package:lingu/domain/word/models/details/spanish_word_details.dart';
+import 'package:lingu/domain/interfaces/stt/i_speech_to_text_service.dart';
+import 'package:lingu/domain/interfaces/tts/i_text_to_speech_service.dart';
 
 class EnglishWordManager extends IWordManager<EnglishWord, EnglishWordDetails> {
-  EnglishWordManager(super.aiService, super.ttsService, super.audioUtils, super.wordRepository, super.imageFinder);
+  EnglishWordManager(super.aiService, super.ttsService, super.sttService, super.audioUtils, super.wordRepository, super.imageFinder);
 
   @override
   LanguageLocale get learningLocale => LanguageLocale.en;
@@ -32,7 +34,7 @@ class EnglishWordManager extends IWordManager<EnglishWord, EnglishWordDetails> {
 }
 
 class GermanWordManager extends IWordManager<GermanWord, GermanWordDetails> {
-  GermanWordManager(super.aiService, super.ttsService, super.audioUtils, super.wordRepository, super.imageFinder);
+  GermanWordManager(super.aiService, super.ttsService, super.sttService, super.audioUtils, super.wordRepository, super.imageFinder);
 
   @override
   LanguageLocale get learningLocale => LanguageLocale.de;
@@ -55,7 +57,7 @@ class GermanWordManager extends IWordManager<GermanWord, GermanWordDetails> {
 }
 
 class SpanishWordManager extends IWordManager<SpanishWord, SpanishWordDetails> {
-  SpanishWordManager(super.aiService, super.ttsService, super.audioUtils, super.wordRepository, super.imageFinder);
+  SpanishWordManager(super.aiService, super.ttsService, super.sttService, super.audioUtils, super.wordRepository, super.imageFinder);
 
   @override
   LanguageLocale get learningLocale => LanguageLocale.es;

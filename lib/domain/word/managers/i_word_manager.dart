@@ -10,19 +10,31 @@ import 'package:lingu/domain/interfaces/ai/i_ai_service.dart';
 import 'package:lingu/domain/interfaces/audio_utils/i_audio_utils.dart';
 import 'package:lingu/domain/core/models/language_locale.dart';
 import 'package:lingu/domain/interfaces/tts/i_text_to_speech_service.dart';
+import 'package:lingu/domain/interfaces/stt/i_speech_to_text_service.dart';
 import 'package:lingu/domain/word/models/ai_word_response.dart';
 import 'package:lingu/domain/interfaces/image_finder/i_image_finder.dart';
 import 'package:lingu/domain/interfaces/ai/i_ai_schema_service.dart';
 import 'package:lingu/domain/core/di/injection.dart';
+import 'package:lingu/domain/scripts/speech_timepoints_manager.dart';
 
 abstract class IWordManager<T extends Word, D> {
   final IAIService _aiService;
-  final ITextToSpeechService _ttsService;
+  final SpeechTimepointsManager _synthesizeScript;
   final IAudioUtils _audioUtils;
   final IWordRepository _wordRepository;
   final IImageFinder? _imageFinder;
 
-  IWordManager(this._aiService, this._ttsService, this._audioUtils, this._wordRepository, this._imageFinder);
+  IWordManager(
+    this._aiService,
+    ITextToSpeechService ttsService,
+    ISpeechToTextService sttService,
+    this._audioUtils,
+    this._wordRepository,
+    this._imageFinder,
+  ) : _synthesizeScript = SpeechTimepointsManager(
+          ttsService: ttsService,
+          sttService: sttService,
+        );
 
   LanguageLocale get learningLocale;
   Map<String, dynamic> get responseSchema;
@@ -69,9 +81,9 @@ abstract class IWordManager<T extends Word, D> {
     final List<WordMeaning> meanings = [];
 
     for (final m in aiResponse.meanings) {
-      final response = await _ttsService.synthesizeSpeechWithTimepoints(
+      final response = await _synthesizeScript.execute(
         text: m.ssmlAudioPrompt,
-        languageCode: learningLocale.bcp47,
+        languageLocale: learningLocale,
       );
       final wordAudioPath = await _audioUtils.saveToPath(response.audioBytes, true);
       final wordSpeechAudio = SpeechAudio(
@@ -82,9 +94,9 @@ abstract class IWordManager<T extends Word, D> {
 
       final List<WordExample> examples = [];
       for (final e in m.examples) {
-        final exampleResponse = await _ttsService.synthesizeSpeechWithTimepoints(
+        final exampleResponse = await _synthesizeScript.execute(
           text: e.example,
-          languageCode: learningLocale.bcp47,
+          languageLocale: learningLocale,
         );
         final exampleAudioPath = await _audioUtils.saveToPath(exampleResponse.audioBytes, true);
         final exampleSpeechAudio = SpeechAudio(

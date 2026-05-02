@@ -1,6 +1,7 @@
 import 'dart:convert' as convert;
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:lingu/domain/core/models/language_locale.dart';
 import 'package:lingu/domain/interfaces/tts/i_text_to_speech_service.dart';
 import 'package:lingu/domain/interfaces/tts/synthesis_with_timepoints_response.dart';
 import 'package:lingu/domain/interfaces/tts/tts_exceptions.dart';
@@ -24,22 +25,22 @@ class QwenAzureTTSService implements ITextToSpeechService {
   @override
   Future<SynthesisResponse> synthesizeSpeechText({
     required String text,
-    required String languageCode,
+    required LanguageLocale languageLocale,
     String? voiceName,
     double speakingRate = 1.0,
     bool isIPA = false,
   }) async {
-    final response = await synthesizeSpeechWithTimepoints(
-      text: text,
-      languageCode: languageCode,
-      voiceName: voiceName,
-      speakingRate: speakingRate,
-      isIPA: isIPA,
-    );
+    List<int> audioBytes;
+
+    if (isIPA) {
+      audioBytes = await _synthesizeWithAzure(text, languageLocale.bcp47, voiceName ?? 'en-US-AvaNeural');
+    } else {
+      audioBytes = await _synthesizeWithQwen(text, languageLocale.bcp47, voiceName ?? 'Serena');
+    }
 
     return SynthesisResponse(
-      audioBytes: response.audioBytes,
-      duration: response.duration,
+      audioBytes: Uint8List.fromList(audioBytes),
+      duration: const Duration(seconds: 1),
       text: text,
       isIPA: isIPA,
     );
@@ -50,47 +51,7 @@ class QwenAzureTTSService implements ITextToSpeechService {
     return ['Serena', 'Aiden'];
   }
 
-  @override
-  Future<SynthesisWithTimepoints> synthesizeSpeechWithTimepoints({
-    required String text,
-    required String languageCode,
-    String? voiceName,
-    double speakingRate = 1.0,
-    bool isIPA = false,
-  }) async {
-    try {
-      List<int> audioBytes;
-
-      if (isIPA) {
-        audioBytes = await _synthesizeWithAzure(text, languageCode, voiceName ?? 'en-US-AvaNeural');
-      } else {
-        audioBytes = await _synthesizeWithQwen(text, languageCode, voiceName ?? 'Serena');
-      }
-
-      // Generate a mock timepoint for the entire audio duration
-      // Since we don't have accurate word timings from Qwen/Azure without extra steps
-      final timepoints = [
-        SynthesisTimepoint(
-          word: text,
-          offset: Duration.zero,
-          duration: const Duration(seconds: 1), // Mock duration
-        ),
-      ];
-
-      return SynthesisWithTimepoints(
-        audioBytes: Uint8List.fromList(audioBytes),
-        timepoints: timepoints,
-        duration: const Duration(seconds: 1),
-        text: text,
-        isIPA: isIPA,
-      );
-    } catch (e) {
-      throw TTSUnknownException(e.toString());
-    }
-  }
-
   Future<List<int>> _synthesizeWithAzure(String text, String languageCode, String voiceName) async {
-    // Map common Qwen voices to an Azure voice fallback just in case
     if (voiceName == 'Serena' || voiceName == 'Aiden') {
       voiceName = 'en-US-AvaNeural';
     }
@@ -157,7 +118,6 @@ class QwenAzureTTSService implements ITextToSpeechService {
     final output = map['output'];
     
     if (output == null) {
-       // Wait and poll if it didn't complete
        final getUrl = map['urls']['get'];
        if (getUrl != null) {
            return await _pollReplicateResult(getUrl);

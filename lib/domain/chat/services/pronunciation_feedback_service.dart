@@ -126,7 +126,7 @@ The feedback MUST be written in the user's native language (${_languages.native.
     final voiceName = '${_languages.target.bcp47}-Standard-A';
     final correctWordPronunciationResponse = await _ttsService.synthesizeSpeechText(
       text: aiPronunciation.wordSSML,
-      languageCode: _languages.target.bcp47,
+      languageLocale: _languages.target,
       voiceName: voiceName,
     );
     final correctPronunciationFilePath = await _audioUtils.saveToPath(correctWordPronunciationResponse.audioBytes, true);
@@ -158,7 +158,7 @@ The feedback MUST be written in the user's native language (${_languages.native.
         
         final correctSyllableResponse = await _ttsService.synthesizeSpeechText(
           text: ttsText,
-          languageCode: _languages.target.bcp47,
+          languageLocale: _languages.target,
           voiceName: voiceName,
           isIPA: useIPA,
         );
