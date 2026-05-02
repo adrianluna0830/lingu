@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lingu/presentation/widgets/interactive_selectable_text.dart';
 
 class SelectableWords extends StatelessWidget {
   final List<String> words;
   final int? activeIndex;
   final bool highlightSentence;
   final void Function(String word, int index) onTap;
+  final void Function(String word)? onChat;
+  final void Function(String word)? onWordInfo;
 
   const SelectableWords({
     super.key,
@@ -12,6 +15,8 @@ class SelectableWords extends StatelessWidget {
     required this.activeIndex,
     this.highlightSentence = false,
     required this.onTap,
+    this.onChat,
+    this.onWordInfo,
   });
 
   @override
@@ -35,23 +40,16 @@ class SelectableWords extends StatelessWidget {
           final isSelected = activeIndex == index;
           final word = words[index];
 
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onTap(word, index),
-              borderRadius: BorderRadius.circular(4),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                child: Text(
-                  word,
-                  style: effectiveStyle?.copyWith(
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ),
+          return InteractiveSelectableText(
+            text: word,
+            onChat: () => onChat?.call(word),
+            onWordInfo: () => onWordInfo?.call(word),
+            onTap: () => onTap(word, index),
+            style: effectiveStyle?.copyWith(
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           );
         }),

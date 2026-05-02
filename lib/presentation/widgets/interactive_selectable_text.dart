@@ -6,12 +6,16 @@ class InteractiveSelectableText extends StatefulWidget {
   final String text;
   final VoidCallback onWordInfo;
   final VoidCallback onChat;
+  final VoidCallback? onTap;
+  final TextStyle? style;
 
   const InteractiveSelectableText({
     super.key,
     required this.text,
     required this.onWordInfo,
     required this.onChat,
+    this.onTap,
+    this.style,
   });
 
   @override
@@ -70,8 +74,15 @@ class _InteractiveSelectableTextState extends State<InteractiveSelectableText> {
         hoverColor: Colors.black.withOpacity(0.04),
         splashColor: Colors.black.withOpacity(0.06),
         highlightColor: Colors.transparent,
-        onTap: () => _controller.showTooltip(),
-        child: Text(widget.text),
+        onTap: widget.onTap,
+        onLongPress: () => _controller.showTooltip(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+          child: Text(
+            widget.text,
+            style: widget.style,
+          ),
+        ),
       ),
     );
   }

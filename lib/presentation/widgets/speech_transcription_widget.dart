@@ -10,11 +10,15 @@ import 'package:signals/signals_flutter.dart';
 class SpeechTranscriptionWidget extends StatefulWidget {
   final SpeechAudio speechAudio;
   final bool highlightCurrentSentence;
+  final void Function(String word)? onChat;
+  final void Function(String word)? onWordInfo;
 
   const SpeechTranscriptionWidget({
     super.key,
     required this.speechAudio,
     this.highlightCurrentSentence = false,
+    this.onChat,
+    this.onWordInfo,
   });
 
   @override
@@ -111,6 +115,8 @@ class _SpeechTranscriptionWidgetState extends State<SpeechTranscriptionWidget> {
         activeIndex: currentIndex,
         highlightSentence: widget.highlightCurrentSentence,
         onTap: _onWordTap,
+        onChat: widget.onChat,
+        onWordInfo: widget.onWordInfo,
       );
     });
   }

@@ -32,15 +32,29 @@ class AIVoiceMessage extends StatefulWidget {
 
 class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
   late final _showTranslation = createSignal(false);
+  late final _showTranscription = createSignal(false);
 
   @override
   Widget build(BuildContext context) {
     final isShowingTranslation = _showTranslation.watch(context);
+    final isShowingTranscription = _showTranscription.watch(context);
 
     return MessageLayout(
       isUser: false,
       onLongPress: widget.onTap,
       footerActions: [
+        InkWell(
+          onTap: () => _showTranscription.value = !_showTranscription.value,
+          borderRadius: BorderRadius.circular(4),
+          child: Icon(
+            isShowingTranscription
+                ? Icons.description_rounded
+                : Icons.description_outlined,
+            size: 16,
+            color: isShowingTranscription ? Colors.blue : Colors.black38,
+          ),
+        ),
+        const SizedBox(width: 8),
         InkWell(
           onTap: () {
             if (isShowingTranslation) {
@@ -51,7 +65,9 @@ class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
             }
           },
           borderRadius: BorderRadius.circular(4),
-          child: Icon(Icons.translate_rounded, size: 16, color: isShowingTranslation ? Colors.blue : Colors.black38),
+          child: Icon(Icons.translate_rounded,
+              size: 16,
+              color: isShowingTranslation ? Colors.blue : Colors.black38),
         ),
       ],
       children: [
@@ -59,10 +75,13 @@ class _AIVoiceMessageState extends State<AIVoiceMessage> with SignalsMixin {
           audioUrl: widget.speechAudio.audioUrl,
           duration: widget.speechAudio.duration,
         ),
-        SpeechTranscriptionWidget(
-          speechAudio: widget.speechAudio,
-          highlightCurrentSentence: true,
-        ),
+        if (isShowingTranscription)
+          SpeechTranscriptionWidget(
+            speechAudio: widget.speechAudio,
+            highlightCurrentSentence: false,
+            onChat: (_) => widget.onChat?.call(),
+            onWordInfo: (_) => widget.onWordInfo?.call(),
+          ),
         if (isShowingTranslation)
           widget.translation != null && widget.translation!.trim().isNotEmpty
               ? MessageSubText(
