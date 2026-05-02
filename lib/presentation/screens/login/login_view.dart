@@ -8,7 +8,7 @@ import 'package:lingu/domain/core/di/injection.dart';
 import 'package:lingu/domain/settings/services/open_router_settings_service.dart';
 import 'package:lingu/domain/settings/services/microsoft_settings_service.dart';
 import 'package:lingu/domain/settings/services/replicate_settings_service.dart';
-import 'package:lingu/datasources/implementations/microsoft_fabric.dart';
+import 'package:lingu/datasources/implementations/pronunciation_assessment/microsoft_fabric.dart';
 import 'package:signals/signals_flutter.dart';
 
 @RoutePage()

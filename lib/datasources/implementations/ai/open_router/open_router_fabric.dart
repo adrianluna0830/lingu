@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:lingu/datasources/implementations/ai/open_router_ai_service.dart';
+import 'package:lingu/datasources/implementations/ai/open_router/open_router_ai_service.dart';
 import 'package:lingu/domain/auth/models/credential_results.dart';
 import 'package:lingu/domain/core/i_fabric.dart';
 import 'package:lingu/domain/interfaces/ai/i_ai_service.dart';

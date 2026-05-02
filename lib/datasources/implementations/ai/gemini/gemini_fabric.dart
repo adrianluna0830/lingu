@@ -1,6 +1,6 @@
 import 'package:googleai_dart/googleai_dart.dart';
 import 'package:lingu/domain/interfaces/ai/i_ai_service.dart';
-import 'package:lingu/datasources/implementations/ai/gemini_service.dart';
+import 'package:lingu/datasources/implementations/ai/gemini/gemini_service.dart';
 import 'package:lingu/domain/core/i_fabric.dart';
 import 'package:lingu/domain/auth/models/credential_results.dart';
 import 'package:lingu/domain/settings/services/ai_credentials_service.dart';

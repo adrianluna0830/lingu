@@ -6,7 +6,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:lingu/domain/core/i_fabric.dart';
 import 'package:lingu/domain/auth/models/credential_results.dart';
 import 'package:lingu/domain/settings/services/stt_credentials_service.dart';
-import 'package:lingu/datasources/implementations/stt/google_speech_to_text_service.dart';
+import 'package:lingu/datasources/implementations/stt/google/google_speech_to_text_service.dart';
 import 'package:lingu/domain/interfaces/stt/i_speech_to_text_service.dart';
 
 class GoogleSpeechToTextFabric implements IAPIFabric<ISpeechToTextService> {

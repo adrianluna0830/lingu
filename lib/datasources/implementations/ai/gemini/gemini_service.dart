@@ -2,7 +2,7 @@ import 'package:googleai_dart/googleai_dart.dart';
 import 'package:lingu/domain/interfaces/ai/ai_chat_history.dart';
 import 'package:lingu/domain/interfaces/ai/ai_chat_message.dart';
 import 'package:lingu/domain/interfaces/ai/i_ai_service.dart';
-import 'package:lingu/datasources/implementations/ai/gemini_exception_mapper.dart';
+import 'package:lingu/datasources/implementations/ai/gemini/gemini_exception_mapper.dart';
 
 enum GeminiModelType {
   gemini25FlashLite('gemini-2.5-flash-lite'),

@@ -1,4 +1,4 @@
-import 'package:lingu/datasources/implementations/stt/replicate_stt_service.dart';
+import 'package:lingu/datasources/implementations/stt/replicate/replicate_stt_service.dart';
 import 'package:lingu/domain/auth/models/credential_results.dart';
 import 'package:lingu/domain/core/i_fabric.dart';
 import 'package:lingu/domain/interfaces/stt/i_speech_to_text_service.dart';
